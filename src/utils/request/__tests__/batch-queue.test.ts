@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { parseBatchResult } from "@/entrypoints/background/translation-queues"
 import { BATCH_SEPARATOR } from "@/utils/constants/prompt"
-import { Sha256Hex } from "@/utils/hash"
+import { sha256Hex } from "@/utils/hash"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
 import { BatchQueue } from "../batch-queue"
 import { RequestQueue } from "../request-queue"
@@ -17,7 +17,7 @@ vi.mock("@/utils/host/translate/execute-translate", () => ({
 }))
 
 vi.mock("@/utils/hash", () => ({
-  Sha256Hex: vi.fn((...args: string[]) => `hash-${args.join("-")}`),
+  sha256Hex: vi.fn(async (...args: string[]) => `hash-${args.join("-")}`),
 }))
 
 const mockExecuteTranslate = vi.mocked(executeTranslate)
@@ -99,7 +99,7 @@ function createBatchQueue(
       const { langConfig, providerConfig } = dataList[0]
       const texts = dataList.map(d => d.text)
       const batchText = texts.join(`\n\n${BATCH_SEPARATOR}\n\n`)
-      const hash = Sha256Hex(...dataList.map(d => d.hash))
+      const hash = await sha256Hex(...dataList.map(d => d.hash))
 
       const batchThunk = async (): Promise<string[]> => {
         const result = await executeTranslate(batchText, langConfig, providerConfig, mockPromptResolver, { isBatch: true })

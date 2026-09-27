@@ -1,6 +1,6 @@
 import type { TranslationNodeStyleConfig } from "@/types/config/translate"
-import { camelCase } from "case-anything"
 import { translationNodeStylePresetSchema } from "@/types/config/translate"
+import { camelCase } from "@/utils/case"
 import { CUSTOM_TRANSLATION_NODE_ATTRIBUTE } from "@/utils/constants/translation-node-style"
 import { getContainingShadowRoot } from "../../dom/node"
 import { ensureCustomCSS, ensurePresetStyles } from "./style-injector"

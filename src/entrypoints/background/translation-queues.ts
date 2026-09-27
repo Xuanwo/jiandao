@@ -8,7 +8,7 @@ import { BATCH_SEPARATOR, BATCH_SEPARATOR_LINE_PATTERN } from "@/utils/constants
 import { generateArticleSummary } from "@/utils/content/summary"
 import { cleanText } from "@/utils/content/utils"
 import { db } from "@/utils/db/dexie/db"
-import { Sha256Hex } from "@/utils/hash"
+import { sha256Hex, stringHash } from "@/utils/hash"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
 import { normalizePromptContextValue } from "@/utils/host/translate/translate-text"
 import { logger } from "@/utils/logger"
@@ -45,8 +45,8 @@ async function getOrGenerateWebPageSummary(
     return null
   }
 
-  const textHash = Sha256Hex(preparedText)
-  const cacheKey = Sha256Hex(webTitle, textHash, JSON.stringify(providerConfig))
+  const textHash = await sha256Hex(preparedText)
+  const cacheKey = await sha256Hex(webTitle, textHash, JSON.stringify(providerConfig))
 
   const cached = await db.articleSummaryCache.get(cacheKey)
   if (cached) {
@@ -120,14 +120,14 @@ async function createTranslationQueues<TContext>(config: TranslationQueueSetupCo
     maxRetries: 3,
     enableFallbackToIndividual: true,
     getBatchKey: (data) => {
-      return Sha256Hex(
+      return stringHash(
         `${data.langConfig.sourceCode}-${data.langConfig.targetCode}-${data.providerConfig.id}`,
         data.context ? JSON.stringify(data.context) : "",
       )
     },
     getCharacters: data => data.text.length,
     executeBatch: async (dataList) => {
-      const hash = Sha256Hex(...dataList.map(d => d.hash))
+      const hash = await sha256Hex(...dataList.map(d => d.hash))
       const earliestScheduleAt = Math.min(...dataList.map(d => d.scheduleAt))
 
       const batchThunk = async (): Promise<string[]> => {

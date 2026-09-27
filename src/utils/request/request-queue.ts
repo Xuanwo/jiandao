@@ -1,7 +1,7 @@
 import type { RequestRetryPolicy } from "./retry-policy"
-import { deepmerge } from "deepmerge-ts"
 import { requestQueueConfigSchema } from "@/types/config/translate"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
+import { deepMerge } from "@/utils/object"
 import { BinaryHeapPQ } from "./priority-queue"
 import { defaultRequestRetryPolicy } from "./retry-policy"
 
@@ -89,7 +89,7 @@ export class RequestQueue {
     if (parseConfigStatus.error) {
       throw new Error(parseConfigStatus.error.issues[0].message)
     }
-    this.options = deepmerge(this.options, queueOptions) as QueueOptions
+    this.options = deepMerge(this.options, queueOptions)
     if (retryPolicy) {
       this.retryPolicy = retryPolicy
     }

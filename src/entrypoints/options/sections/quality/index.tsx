@@ -1,9 +1,9 @@
-import { deepmerge } from "deepmerge-ts"
 import { useAtom } from "jotai"
 import { useId } from "react"
 import { i18n } from "#imports"
 import { Switch } from "@/components/ui/base-ui/switch"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { deepMerge } from "@/utils/object"
 import { SettingsGroup, SettingsRow, SettingsSection } from "../../components/settings-section"
 
 /** What the model is told. The prompt itself comes with the setup document; here it is only named. */
@@ -23,7 +23,7 @@ export function QualitySection() {
             <Switch
               id={contextSwitchId}
               checked={translateConfig.enableAIContentAware}
-              onCheckedChange={checked => void setTranslateConfig(deepmerge(translateConfig, { enableAIContentAware: checked }))}
+              onCheckedChange={checked => void setTranslateConfig(deepMerge(translateConfig, { enableAIContentAware: checked }))}
             />
           )}
         />

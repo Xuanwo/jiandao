@@ -1,7 +1,6 @@
 import "@/utils/zod-config"
 import type { Config } from "@/types/config/config"
 import type { ThemeMode } from "@/types/config/theme"
-import { QueryClientProvider } from "@tanstack/react-query"
 import { Provider as JotaiProvider } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
 import * as React from "react"
@@ -14,7 +13,6 @@ import { baseThemeModeAtom } from "@/utils/atoms/theme"
 import { getLocalConfig } from "@/utils/config/storage"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { renderPersistentReactRoot } from "@/utils/react-root"
-import { queryClient } from "@/utils/tanstack-query"
 import { applyTheme, getLocalThemeMode, isDarkMode } from "@/utils/theme"
 import App from "./app"
 import "@/assets/styles/theme.css"
@@ -50,16 +48,14 @@ async function initApp() {
     <React.StrictMode>
       <JotaiProvider>
         <HydrateAtoms initialValues={[[configAtom, config], [baseThemeModeAtom, themeMode]]}>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <TooltipProvider>
-                <AppToast />
-                <RecoveryBoundary>
-                  <App />
-                </RecoveryBoundary>
-              </TooltipProvider>
-            </ThemeProvider>
-          </QueryClientProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <AppToast />
+              <RecoveryBoundary>
+                <App />
+              </RecoveryBoundary>
+            </TooltipProvider>
+          </ThemeProvider>
         </HydrateAtoms>
       </JotaiProvider>
     </React.StrictMode>

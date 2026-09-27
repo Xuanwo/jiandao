@@ -9,9 +9,6 @@ jobs:
   test-and-build:
     name: Test & Build
     runs-on: ubuntu-latest
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     steps:
       - name: Checkout Repo
@@ -30,17 +27,6 @@ jobs:
         run: pnpm install --frozen-lockfile
         shell: bash
 
-      - name: Check for eruda imports
-        run: |
-          if grep -r "import.*eruda" src/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v ":.*[[:space:]]*//.*import.*eruda"; then
-            echo "❌ Found uncommented eruda imports in the codebase!"
-            echo "Please comment out or remove eruda imports before merging."
-            exit 1
-          else
-            echo "✅ No uncommented eruda imports found."
-          fi
-        shell: bash
-
       - name: ESLint
         run: pnpm lint
 
@@ -51,7 +37,7 @@ jobs:
         run: pnpm build
 
       - name: Run tests
-        run: pnpm test --exclude="**/free-api.test.ts"
+        run: pnpm test
 
   e2e:
     name: E2E

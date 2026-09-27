@@ -1,5 +1,4 @@
 import { IconChevronDown } from "@tabler/icons-react"
-import { deepmerge } from "deepmerge-ts"
 import { useAtom, useSetAtom } from "jotai"
 import { useState } from "react"
 import { i18n } from "#imports"
@@ -23,6 +22,7 @@ import {
   MIN_WORDS_PER_NODE,
 } from "@/utils/constants/translate"
 import { sendMessage } from "@/utils/message"
+import { deepMerge } from "@/utils/object"
 import { cn } from "@/utils/styles/utils"
 import { ConfirmAction } from "../../components/confirm-action"
 import { NumberSetting } from "../../components/number-setting"
@@ -69,7 +69,7 @@ export function AdvancedSection() {
                 aria-label={i18n.t("options.reading.range.title")}
                 value={page.range}
                 options={pageTranslateRangeSchema.options.map(range => ({ value: range, label: i18n.t(RANGE_LABEL_KEY[range]) }))}
-                onChange={range => void setTranslateConfig(deepmerge(translateConfig, { page: { range } }))}
+                onChange={range => void setTranslateConfig(deepMerge(translateConfig, { page: { range } }))}
               />
             </div>
             <NumberSetting

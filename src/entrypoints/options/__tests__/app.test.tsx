@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { QueryClientProvider } from "@tanstack/react-query"
 import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -7,7 +6,6 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import { TooltipProvider } from "@/components/ui/base-ui/tooltip"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
-import { queryClient } from "@/utils/tanstack-query"
 import App from "../app"
 
 vi.mock("@/utils/message", () => ({
@@ -24,15 +22,13 @@ function renderSettings() {
   store.set(configAtom, DEFAULT_CONFIG)
 
   return render(
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <ThemeProvider>
-          <TooltipProvider>
-            <App />
-          </TooltipProvider>
-        </ThemeProvider>
-      </Provider>
-    </QueryClientProvider>,
+    <Provider store={store}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
+      </ThemeProvider>
+    </Provider>,
   )
 }
 

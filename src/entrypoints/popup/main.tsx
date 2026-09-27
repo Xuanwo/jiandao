@@ -3,7 +3,6 @@ import type { ActiveTabInfo } from "./atoms"
 import type { Config } from "@/types/config/config"
 import type { ThemeMode } from "@/types/config/theme"
 import type { TranslationProgress } from "@/types/translation-progress"
-import { QueryClientProvider } from "@tanstack/react-query"
 import { Provider as JotaiProvider } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
 import * as React from "react"
@@ -18,7 +17,6 @@ import { getLocalConfig } from "@/utils/config/storage"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { sendMessage } from "@/utils/message"
 import { renderPersistentReactRoot } from "@/utils/react-root"
-import { queryClient } from "@/utils/tanstack-query"
 import { getLocalThemeMode } from "@/utils/theme"
 import App from "./app"
 import { activeTabAtom, isTranslatableUrl, pageTranslationEnabledAtom, translationProgressAtom } from "./atoms"
@@ -73,28 +71,26 @@ async function initApp() {
 
   renderPersistentReactRoot(root, (
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <JotaiProvider>
-          <HydrateAtoms
-            initialValues={[
-              [configAtom, config],
-              [baseThemeModeAtom, themeMode],
-              [activeTabAtom, tabInfo],
-              [pageTranslationEnabledAtom, enabled],
-              [translationProgressAtom, progress],
-            ]}
-          >
-            <ThemeProvider>
-              <TooltipProvider>
-                <AppToast />
-                <RecoveryBoundary>
-                  <App />
-                </RecoveryBoundary>
-              </TooltipProvider>
-            </ThemeProvider>
-          </HydrateAtoms>
-        </JotaiProvider>
-      </QueryClientProvider>
+      <JotaiProvider>
+        <HydrateAtoms
+          initialValues={[
+            [configAtom, config],
+            [baseThemeModeAtom, themeMode],
+            [activeTabAtom, tabInfo],
+            [pageTranslationEnabledAtom, enabled],
+            [translationProgressAtom, progress],
+          ]}
+        >
+          <ThemeProvider>
+            <TooltipProvider>
+              <AppToast />
+              <RecoveryBoundary>
+                <App />
+              </RecoveryBoundary>
+            </TooltipProvider>
+          </ThemeProvider>
+        </HydrateAtoms>
+      </JotaiProvider>
     </React.StrictMode>
   ))
 }

@@ -1,5 +1,5 @@
-import type { PartialDeep } from "type-fest"
 import type { ProviderConfig } from "@/types/config/provider"
+import type { DeepPartial } from "@/utils/object"
 import { describe, expect, it } from "vitest"
 import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
 import { updateProviderConfig } from "../provider"
@@ -29,7 +29,7 @@ describe("provider config updates", () => {
   it("rejects merged configs that no longer match the provider schema", () => {
     const invalidUpdates = {
       provider: "openai-compatible",
-    } as PartialDeep<ProviderConfig>
+    } as DeepPartial<ProviderConfig>
 
     // An openai-compatible service needs a base URL.
     expect(() => updateProviderConfig(DEFAULT_PROVIDER_CONFIG, invalidUpdates)).toThrow()

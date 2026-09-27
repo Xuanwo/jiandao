@@ -1,15 +1,27 @@
-import type { PartialDeep } from "type-fest"
 import type { FeatureKey } from "../constants/feature-providers"
+import type { DeepPartial } from "../object"
 import type { ProviderConfig } from "@/types/config/provider"
-import { deepmerge } from "deepmerge-ts"
 import { atom } from "jotai"
-import { atomFamily } from "jotai-family"
 import { providerConfigItemSchema } from "@/types/config/provider"
 import { getProviderConfigById } from "../config/helpers"
 import { FEATURE_PROVIDER_DEFS } from "../constants/feature-providers"
+import { deepMerge } from "../object"
 import { configAtom, configFieldsAtomMap } from "./config"
 
-export const featureProviderConfigAtom = atomFamily((featureKey: FeatureKey) =>
+/** One atom per key, created on first use, like jotai's atomFamily. */
+function memoizedAtoms<K, A>(create: (key: K) => A): (key: K) => A {
+  const atoms = new Map<K, A>()
+  return (key) => {
+    let created = atoms.get(key)
+    if (!created) {
+      created = create(key)
+      atoms.set(key, created)
+    }
+    return created
+  }
+}
+
+export const featureProviderConfigAtom = memoizedAtoms((featureKey: FeatureKey) =>
   atom((get) => {
     const config = get(configAtom)
     const def = FEATURE_PROVIDER_DEFS[featureKey]
@@ -19,7 +31,7 @@ export const featureProviderConfigAtom = atomFamily((featureKey: FeatureKey) =>
 )
 
 // Generic provider config atom family that accepts a name parameter
-export const providerConfigAtom = atomFamily((id: string) =>
+export const providerConfigAtom = memoizedAtoms((id: string) =>
   atom(
     (get) => {
       const providersConfig = get(configFieldsAtomMap.providersConfig)
@@ -37,14 +49,9 @@ export const providerConfigAtom = atomFamily((id: string) =>
   ),
 )
 
-function mergeUnknown(base: unknown, updates: unknown): unknown {
-  return (deepmerge as (base: unknown, updates: unknown) => unknown)(base, updates)
-}
-
 export function updateProviderConfig(
   config: ProviderConfig,
-  updates: PartialDeep<ProviderConfig>,
+  updates: DeepPartial<ProviderConfig>,
 ): ProviderConfig {
-  const result = mergeUnknown(config, updates) as ProviderConfig
-  return providerConfigItemSchema.parse(result)
+  return providerConfigItemSchema.parse(deepMerge(config, updates))
 }

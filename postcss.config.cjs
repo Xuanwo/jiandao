@@ -5,7 +5,6 @@ module.exports = {
       fromPrefix: "--tw-",
       toPrefix: "--rf-tw-",
     },
-    "autoprefixer": {},
     "postcss-rem-to-responsive-pixel": {
       rootValue: 16,
       propList: ["*"],

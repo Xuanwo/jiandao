@@ -1,9 +1,8 @@
-import { kebabCase } from "case-anything"
 import * as React from "react"
 import { Toaster } from "sonner"
-
 import { browser } from "#imports"
 import plainlyIcon from "@/assets/icons/plainly.png?url&no-inline"
+import { kebabCase } from "@/utils/case"
 import { APP_NAME } from "@/utils/constants/app"
 
 const plainlyIconUrl = new URL(plainlyIcon, browser.runtime.getURL("/")).href

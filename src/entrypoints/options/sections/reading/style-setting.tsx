@@ -1,11 +1,11 @@
 import type { TranslationNodeStylePreset } from "@/types/config/translate"
-import { deepmerge } from "deepmerge-ts"
 import { useAtom } from "jotai"
 import { useEffect, useRef } from "react"
 import { i18n } from "#imports"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { BLOCK_CONTENT_CLASS, CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { decorateTranslationNode } from "@/utils/host/translate/ui/decorate-translation"
+import { deepMerge } from "@/utils/object"
 import { cn } from "@/utils/styles/utils"
 import { SettingsRow } from "../../components/settings-section"
 import { CSSEditor } from "./css-editor"
@@ -76,7 +76,7 @@ export function StyleSetting() {
   const presets = OFFERED_PRESETS.includes(translationNodeStyle.preset) ? OFFERED_PRESETS : [...OFFERED_PRESETS, translationNodeStyle.preset]
 
   const choosePreset = (preset: TranslationNodeStylePreset) => {
-    void setTranslateConfig(deepmerge(translateConfig, { translationNodeStyle: { preset, isCustom: false } }))
+    void setTranslateConfig(deepMerge(translateConfig, { translationNodeStyle: { preset, isCustom: false } }))
   }
 
   return (
@@ -87,7 +87,7 @@ export function StyleSetting() {
             {i18n.t(PRESET_LABEL_KEY[preset])}
           </Chip>
         ))}
-        <Chip selected={selected === CUSTOM_CHOICE} onClick={() => void setTranslateConfig(deepmerge(translateConfig, { translationNodeStyle: { isCustom: true } }))}>
+        <Chip selected={selected === CUSTOM_CHOICE} onClick={() => void setTranslateConfig(deepMerge(translateConfig, { translationNodeStyle: { isCustom: true } }))}>
           {i18n.t("options.reading.style.custom")}
         </Chip>
       </div>

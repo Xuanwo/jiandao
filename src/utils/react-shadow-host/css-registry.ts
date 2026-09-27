@@ -1,10 +1,10 @@
-import { Sha256Hex } from "../hash"
+import { stringHash } from "../hash"
 
 export class CSSRegistry {
   private registry = new Map<string, { node: HTMLStyleElement, count: number }>()
 
   private static hash(content: string): string {
-    return Sha256Hex(content)
+    return stringHash(content)
   }
 
   inject(css: string): string {

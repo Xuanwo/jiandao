@@ -9,7 +9,7 @@ import { getProviderConfigById } from "@/utils/config/helpers"
 
 import { logger } from "@/utils/logger"
 import { getTranslatePrompt } from "@/utils/prompts/translate"
-import { Sha256Hex } from "../../hash"
+import { sha256Hex } from "../../hash"
 import { sendMessage } from "../../message"
 import { prepareTranslationText } from "./text-preparation"
 
@@ -122,7 +122,7 @@ export async function translateTextCore(options: TranslateTextOptions): Promise<
     langConfig,
     providerConfig,
     scheduleAt: Date.now(),
-    hash: Sha256Hex(...hashComponents),
+    hash: await sha256Hex(...hashComponents),
     webTitle: normalizedWebPageContext?.webTitle,
     webDescription: normalizedWebPageContext?.webDescription,
     webContent: normalizedWebPageContext?.webContent,

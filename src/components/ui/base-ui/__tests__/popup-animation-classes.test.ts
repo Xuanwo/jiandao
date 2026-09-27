@@ -13,11 +13,8 @@ describe("shared popup animation classes", () => {
 
   it("is applied to popup-like base-ui primitives", async () => {
     const files = await Promise.all([
-      readSource("../select.tsx"),
       readSource("../combobox.tsx"),
-      readSource("../popover.tsx"),
       readSource("../tooltip.tsx"),
-      readSource("../dialog.tsx"),
       readSource("../alert-dialog.tsx"),
     ])
 

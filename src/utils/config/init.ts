@@ -1,10 +1,10 @@
 import type { Config } from "@/types/config/config"
 import type { ConfigMeta } from "@/types/config/meta"
-import { dequal } from "dequal"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
 import { CONFIG_SCHEMA_VERSION, CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
+import { deepEqual } from "../object"
 import { migrateStoredConfig } from "./migrate"
 
 /**
@@ -34,7 +34,7 @@ export async function initializeConfig() {
     config = DEFAULT_CONFIG
     didConfigChange = true
   }
-  else if (!dequal(config, parseResult.data)) {
+  else if (!deepEqual(config, parseResult.data)) {
     config = parseResult.data
     didConfigChange = true
   }
