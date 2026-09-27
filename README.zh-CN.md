@@ -13,6 +13,10 @@ Plainly · [English](./README.md)
 - 可以把页面摘要交给模型，让译文贴合上下文。
 - 可以调整 Prompt、译文样式、请求速率和批量大小。
 
+## 配置
+
+素读没有翻译服务的设置表单，配置由你的 coding agent 完成：在弹窗里点“复制给 agent 的说明”，把这段话贴给 Claude Code、Codex 或任何能执行命令的 agent，它会用你的 API Key 验证一份配置并放进剪贴板，你再贴回弹窗、点应用即可。面向 agent 的细节见 [docs/agent-setup.md](./docs/agent-setup.md)，现成的 skill 在 [skills/plainly-setup](./skills/plainly-setup/SKILL.md)。
+
 ## 没有什么
 
 素读从 [Read Frog（陪读蛙）](https://github.com/mengxi-ream/read-frog) fork 而来，去掉了阅读网页以外的一切：视频字幕、输入框翻译、悬浮工具栏、朗读、自定义 AI 动作、托管存储与账号、配置同步、统计和实验功能开关。

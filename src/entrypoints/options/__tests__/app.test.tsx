@@ -15,10 +15,6 @@ vi.mock("@/utils/message", () => ({
   sendMessage: vi.fn(() => Promise.resolve(undefined)),
 }))
 
-vi.mock("@/components/ui/json-code-editor", () => ({
-  JSONCodeEditor: () => <textarea aria-label="json-editor" readOnly />,
-}))
-
 vi.mock("@/components/ui/css-code-editor", () => ({
   CSSCodeEditor: () => <textarea aria-label="css-editor" readOnly />,
 }))
@@ -49,16 +45,35 @@ describe("settings page", () => {
     const { container } = renderSettings()
 
     const sectionIds = [...container.querySelectorAll("section[id]")].map(section => section.id)
-    expect(sectionIds).toEqual(["providers", "reading", "quality", "advanced"])
+    expect(sectionIds).toEqual(["service", "reading", "quality", "advanced"])
   })
 
-  it("lists the default services with the active one expanded for editing", () => {
+  it("shows the service in use read-only, with the import and agent actions instead of a form", () => {
+    const { container } = renderSettings()
+
+    // One service, no selection: the card names the service in use and where page text goes.
+    expect(container.querySelector("#service input[type=radio]")).toBeNull()
+    expect(screen.getByText("OpenAI")).toBeInTheDocument()
+    expect(screen.getByText("options.service.status.unconfigured")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "options.service.paste.open" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "options.service.copyInstructions" })).toBeInTheDocument()
+    // No editable field in the service section: the service is configured through an agent.
+    expect(container.querySelector("#service textarea, #service input")).toBeNull()
+  })
+
+  it("opens the paste box with a preview once a valid configuration is pasted", () => {
     renderSettings()
 
-    const radios = screen.getAllByRole("radio", { name: /options\.providers\.useForTranslation/ })
-    expect(radios).toHaveLength(DEFAULT_CONFIG.providersConfig.length)
-    expect(radios[0]).toBeChecked()
-    expect(screen.getByLabelText("options.providers.form.apiKey")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "options.service.paste.open" }))
+    const textarea = screen.getByLabelText("options.service.paste.label")
+    expect(screen.getByRole("button", { name: "options.service.paste.apply" })).toBeDisabled()
+
+    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-test", model: "deepseek-flash" } }) } })
+
+    expect(screen.getByText("DeepSeek", { selector: "span" })).toBeInTheDocument()
+    expect(screen.getByText("deepseek-flash", { selector: "span" })).toBeInTheDocument()
+    expect(screen.getByText("options.service.sendsTo")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "options.service.paste.apply" })).toBeEnabled()
   })
 
   it("keeps the advanced knobs collapsed until opened", () => {

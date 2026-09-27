@@ -18,6 +18,16 @@ the [privacy policy](./PRIVACY.md).
 - Can give the model a summary of the page, so translations fit the context.
 - Lets you adjust the prompt, translation style, request rate, and batching.
 
+## Setting Up
+
+Plainly has no settings form for the translation service. Your coding agent
+configures it: click **Copy instructions for your agent** in the popup, paste
+the text into Claude Code, Codex or any agent with shell access, and it will
+verify a configuration with your API key and put it on your clipboard. Paste
+that into the popup and apply. The details for agents are in
+[docs/agent-setup.md](./docs/agent-setup.md); a ready-made skill is in
+[skills/plainly-setup](./skills/plainly-setup/SKILL.md).
+
 ## What It Leaves Out
 
 Plainly began as a fork of [Read Frog](https://github.com/mengxi-ream/read-frog)

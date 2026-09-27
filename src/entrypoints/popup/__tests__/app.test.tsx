@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import type { Config } from "@/types/config/config"
 import { QueryClientProvider } from "@tanstack/react-query"
-import { cleanup, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { ThemeProvider } from "@/components/providers/theme-provider"
@@ -49,11 +49,30 @@ describe("popup app", () => {
     cleanup()
   })
 
-  it("asks for the API key inline when the active service has none", () => {
+  it("shows the agent setup card when the active service has no key", () => {
     renderPopup()
 
     expect(screen.getByText("popup.setup.title")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "popup.setup.copyInstructions" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
     expect(screen.queryByRole("button", { name: /popup\.translate$/ })).toBeNull()
+  })
+
+  it("enables applying once a pasted configuration is valid and carries a key", () => {
+    renderPopup()
+    const textarea = screen.getByLabelText("popup.setup.pasteLabel")
+
+    fireEvent.change(textarea, { target: { value: "not json" } })
+    expect(screen.getByText(/Not valid JSON/)).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
+
+    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "openai", apiKey: "sk-…a9f2" } }) } })
+    expect(screen.getByText(/popup\.setup\.keyMissing/)).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
+
+    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "openai", apiKey: "sk-real-key", model: "gpt-6-luna" } }) } })
+    expect(screen.getByText("OpenAI · gpt-6-luna · api.openai.com")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeEnabled()
   })
 
   it("shows the translate action and display mode once a key is set", () => {
