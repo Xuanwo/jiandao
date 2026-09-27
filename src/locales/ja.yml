@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: ソース言語とターゲット言語は異なる必要があります
   autoModeSameLanguage: 検出された言語 '$1' はターゲット言語と同じです
+  thinkingFallback: 'このサービスは "reasoningEffort": "none" を受け付けません（$1）。プロバイダーオプションを "thinking": {"type": "disabled"} に変更し、翻訳ではこれを送信します。'
+  thinkingRemoved: 'このサービスは "reasoningEffort": "none" を受け付けません（$1）。プロバイダーオプションから削除し、翻訳では送信しません。ほかのオプションはそのままです。'
 shortcutKeySelector:
   placeholder: ショートカットを入力してください
 hotkey:

@@ -23,6 +23,10 @@ export const APIKeyField = withForm({
               labelExtra={(
                 <ConnectionTestButton
                   providerConfig={providerConfig}
+                  onProviderOptionsChange={(options) => {
+                    form.setFieldValue("providerOptions", options)
+                    void form.handleSubmit()
+                  }}
                 />
               )}
               type={showAPIKey ? "text" : "password"}

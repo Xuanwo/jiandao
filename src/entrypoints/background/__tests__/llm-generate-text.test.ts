@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { fakeBrowser } from "wxt/testing/fake-browser"
+import { storage } from "#imports"
+import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
 
 const onMessageMock = vi.fn()
 const getModelByIdMock = vi.fn()
@@ -32,9 +35,12 @@ function getRegisteredMessageHandler(name: string) {
 }
 
 describe("llm-generate-text", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetModules()
     vi.clearAllMocks()
+    // The handler reads the provider and its provider options from the saved config.
+    fakeBrowser.reset()
+    await storage.setItem(`local:${CONFIG_STORAGE_KEY}`, DEFAULT_CONFIG)
   })
 
   it("runs generateText with resolved model in background", async () => {
@@ -57,6 +63,7 @@ describe("llm-generate-text", () => {
       prompt: "hello world",
       temperature: 0.2,
       maxRetries: 0,
+      providerOptions: { openai: { reasoningEffort: "none" } },
     })
     expect(result).toEqual({ text: "eng" })
   })

@@ -216,6 +216,8 @@ translation:
   failed: 翻译失败
   retry: 重试
   unknownError: 出了点问题
+  thinkingFallback: '该服务不接受 "reasoningEffort": "none"（$1）。Provider 选项已改为使用 "thinking": {"type": "disabled"}，翻译会发送它。'
+  thinkingRemoved: '该服务不接受 "reasoningEffort": "none"（$1）。Provider 选项已删除这个参数，翻译不再发送它，其他参数保持不变。'
 shortcutKeySelector:
   placeholder: 按下快捷键
 languages:

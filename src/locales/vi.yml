@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: Ngôn ngữ nguồn và đích phải khác nhau
   autoModeSameLanguage: Ngôn ngữ phát hiện '$1' giống với ngôn ngữ đích
+  thinkingFallback: 'Dịch vụ không chấp nhận "reasoningEffort": "none" ($1). Tùy chọn nhà cung cấp giờ dùng "thinking": {"type": "disabled"}, và các yêu cầu dịch gửi giá trị này.'
+  thinkingRemoved: 'Dịch vụ không chấp nhận "reasoningEffort": "none" ($1). Tùy chọn nhà cung cấp không còn đặt giá trị này, và các yêu cầu dịch không gửi nó. Các tùy chọn khác của bạn giữ nguyên.'
 shortcutKeySelector:
   placeholder: Vui lòng nhập phím tắt
 hotkey:

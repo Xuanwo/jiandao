@@ -8,6 +8,7 @@ import { onMessage, sendMessage } from "@/utils/message"
 import { areSamePageTranslationOrigin } from "@/utils/url"
 import { setupUrlChangeListener } from "./listen"
 import { mountHostToast } from "./mount-host-toast"
+import { listenForThinkingFallback } from "./thinking-fallback-toast"
 import { bindTranslationShortcutKey } from "./translation-control/bind-translation-shortcut"
 import { PageTranslationManager } from "./translation-control/page-translation"
 
@@ -92,8 +93,11 @@ export async function bootstrapHostContent(ctx: ContentScriptContext, initialCon
       })
     : () => {}
 
+  const cleanupThinkingFallbackListener = listenForThinkingFallback(window === window.top)
+
   ctx.onInvalidated(() => {
     removeHostToast()
+    cleanupThinkingFallbackListener()
     cleanupUrlListener()
     cleanupTranslationShortcut()
     cleanupTranslationStateListener()

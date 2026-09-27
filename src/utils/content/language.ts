@@ -7,7 +7,6 @@ import { getLocalConfig } from "@/utils/config/storage"
 import { logger } from "@/utils/logger"
 import { sendMessage } from "@/utils/message"
 import { getLanguageDetectionSystemPrompt, parseDetectedLanguageCode } from "@/utils/prompts/language-detection"
-import { getProviderOptions } from "@/utils/providers/options"
 import { cleanText } from "./utils"
 
 const DEFAULT_MIN_LENGTH = 10
@@ -125,13 +124,11 @@ export async function detectLanguageWithLLM(
 
   try {
     const { temperature } = config
-    const providerOptions = getProviderOptions(config)
     const payload: BackgroundGenerateTextPayload = {
       providerId: config.id,
       system: getLanguageDetectionSystemPrompt(),
       prompt: text,
       temperature,
-      providerOptions,
       maxRetries: 0,
     }
 

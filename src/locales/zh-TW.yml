@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: 來源語言和目標語言必須不同
   autoModeSameLanguage: 偵測到的語言「$1」與目標語言相同
+  thinkingFallback: '此服務不接受 "reasoningEffort": "none"（$1）。Provider 選項已改為使用 "thinking": {"type": "disabled"}，翻譯會傳送它。'
+  thinkingRemoved: '此服務不接受 "reasoningEffort": "none"（$1）。Provider 選項已刪除這個參數，翻譯不再傳送它，其他參數保持不變。'
 shortcutKeySelector:
   placeholder: 請輸入快速鍵
 hotkey:

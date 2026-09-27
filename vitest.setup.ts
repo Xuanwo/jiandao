@@ -101,13 +101,8 @@ class ESBuildAndJSDOMCompatibleTextEncoder extends TextEncoder {
       throw new TypeError("`input` must be a string")
     }
 
-    const decodedURI = decodeURIComponent(encodeURIComponent(input))
-    const arr = new Uint8Array(decodedURI.length)
-    const chars = decodedURI.split("")
-    for (let i = 0; i < chars.length; i++) {
-      arr[i] = decodedURI[i].charCodeAt(0)
-    }
-    return arr
+    // Copy the UTF-8 bytes into a Uint8Array of the test global.
+    return new Uint8Array(super.encode(input))
   }
 }
 

@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: Kaynak ve hedef diller farklı olmalıdır
   autoModeSameLanguage: Algılanan dil '$1' hedef dille aynı
+  thinkingFallback: 'Hizmet "reasoningEffort": "none" değerini kabul etmiyor ($1). Sağlayıcı seçenekleri artık "thinking": {"type": "disabled"} kullanıyor ve çeviriler bunu gönderiyor.'
+  thinkingRemoved: 'Hizmet "reasoningEffort": "none" değerini kabul etmiyor ($1). Sağlayıcı seçenekleri artık onu ayarlamıyor ve çeviriler onu göndermiyor. Diğer seçenekleriniz değişmiyor.'
 shortcutKeySelector:
   placeholder: Lütfen kısayolu girin
 hotkey:

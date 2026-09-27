@@ -166,3 +166,20 @@ export async function listenOnLocalPort(server) {
   await new Promise(resolve => server.close(resolve))
   return listenOnLocalPort(server)
 }
+
+/**
+ * Turns on page translation with the Alt+E shortcut. The content script binds
+ * the shortcut after the page shows its text, so an early press does nothing.
+ * The extension walks the page at once when translation turns on, so a press
+ * without a walked node within 3 seconds had no effect, and the helper
+ * presses again.
+ */
+export async function turnOnPageTranslation(page, attempts = 5) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    await page.keyboard.press("Alt+e")
+    const started = await page.locator("[data-plainly-walked]").first().waitFor({ state: "attached", timeout: 3_000 }).then(() => true, () => false)
+    if (started)
+      return
+  }
+  throw new Error(`Page translation did not turn on after ${attempts} presses of Alt+E on ${page.url()}`)
+}

@@ -177,4 +177,22 @@ describe("translation queue helpers", () => {
       llmProvider,
     )
   })
+
+  it("user reads a page whose summary fails: Given a summary request that fails, When the page asks for the summary, Then it gets no summary and the translation can go on", async () => {
+    generateArticleSummaryMock.mockRejectedValue(Object.assign(new Error("Invalid API key"), { statusCode: 401 }))
+    const { setUpWebPageTranslationQueue } = await import("../translation-queues")
+    await setUpWebPageTranslationQueue()
+
+    const handler = getRegisteredMessageHandler("getOrGenerateWebPageSummary")
+    const result = await handler({
+      data: {
+        webTitle: "Page title",
+        webContent: "page body",
+        providerConfig: llmProvider,
+      },
+    })
+
+    expect(result).toBeNull()
+    expect(articleSummaryCachePutMock).not.toHaveBeenCalled()
+  })
 })

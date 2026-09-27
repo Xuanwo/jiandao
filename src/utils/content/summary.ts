@@ -6,7 +6,8 @@ import { getProviderOptions } from "@/utils/providers/options"
 import { cleanText } from "./utils"
 
 /**
- * Generate a brief summary of article content for translation context
+ * Generate a brief summary of article content for translation context. Throws
+ * when the request fails.
  */
 export async function generateArticleSummary(
   title: string,
@@ -19,32 +20,26 @@ export async function generateArticleSummary(
     return null
   }
 
-  try {
-    const { temperature } = providerConfig
-    const providerOptions = getProviderOptions(providerConfig)
-    const model = await getModelById(providerConfig.id)
+  const { temperature } = providerConfig
+  const providerOptions = getProviderOptions(providerConfig)
+  const model = await getModelById(providerConfig.id)
 
-    const prompt = `Summarize the following article in 2-3 sentences. Focus on the main topic and key points. Return ONLY the summary, no explanations or formatting.
+  const prompt = `Summarize the following article in 2-3 sentences. Focus on the main topic and key points. Return ONLY the summary, no explanations or formatting.
 
 Title: ${title}
 
 Content:
 ${preparedText}`
 
-    const { text: summary } = await generateText({
-      model,
-      prompt,
-      temperature,
-      providerOptions,
-    })
+  const { text: summary } = await generateText({
+    model,
+    prompt,
+    temperature,
+    providerOptions,
+  })
 
-    const cleanedSummary = summary.trim()
-    logger.info("Generated article summary:", `${cleanedSummary.slice(0, 100)}...`)
+  const cleanedSummary = summary.trim()
+  logger.info("Generated article summary:", `${cleanedSummary.slice(0, 100)}...`)
 
-    return cleanedSummary
-  }
-  catch (error) {
-    logger.error("Failed to generate article summary:", error)
-    return null
-  }
+  return cleanedSummary
 }

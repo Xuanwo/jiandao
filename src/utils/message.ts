@@ -7,6 +7,7 @@ import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
 import type { BatchQueueConfig, RequestQueueConfig } from "@/types/config/translate"
 import type { TranslationProgress } from "@/types/translation-progress"
+import type { ThinkingFallback } from "@/utils/providers/thinking-fallback"
 import { defineExtensionMessaging } from "@webext-core/messaging"
 
 interface ProtocolMap {
@@ -32,6 +33,8 @@ interface ProtocolMap {
   translationProgressChanged: (data: { tabId: number, progress: TranslationProgress }) => void
   // request
   enqueueTranslateRequest: (data: { text: string, langConfig: Config["language"], providerConfig: ProviderConfig, scheduleAt: number, hash: string, webTitle?: string | null, webDescription?: string | null, webContent?: string | null, webSummary?: string | null }) => Promise<string>
+  // Background to the tab: a custom provider now uses the thinking fallback options.
+  notifyThinkingFallback: (data: Pick<ThinkingFallback, "kind" | "reason">) => void
   getOrGenerateWebPageSummary: (data: { webTitle: string, webContent: string, providerConfig: ProviderConfig }) => Promise<string | null>
   backgroundGenerateText: (data: BackgroundGenerateTextPayload) => Promise<BackgroundGenerateTextResponse>
   setTranslateRequestQueueConfig: (data: Partial<RequestQueueConfig>) => void

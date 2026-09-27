@@ -1,9 +1,10 @@
 /* global chrome -- page.evaluate() runs these callbacks in the extension page. */
 import assert from "node:assert/strict"
-import { Buffer } from "node:buffer"
 import { createServer } from "node:http"
 import { after, afterEach, before, beforeEach, it } from "node:test"
 import { clickButton, launchBrowser, listenOnLocalPort, reportFailure, waitForStorage, waitForText } from "./browser.mjs"
+import { createFakeGateway } from "./fake-gateway.mjs"
+import { connectionResult, fill, modelInput, openAdvancedSettings, openProvider, providerOptionsEditor, reloadSettings, typeProviderOptions, waitForSavedProvider, waitForSavedProviderOptions } from "./provider-form.mjs"
 
 let context
 let page
@@ -14,8 +15,8 @@ let expectedAuthorization
 let expectedTenant
 let responseMode
 let pendingRequest
-let chatRequests
-let chatRequestSeen
+// The translation request of "Test connection".
+const gateway = createFakeGateway()
 
 // Wire contract checked against the provider documentation, not application code:
 // https://developers.openai.com/api/reference/resources/models/methods/list
@@ -25,22 +26,8 @@ const server = createServer(async (request, response) => {
   response.setHeader("Content-Type", "application/json")
   // OpenAI Chat Completions wire contract, also used by DeepSeek and compatible providers:
   // https://platform.openai.com/docs/api-reference/chat/create
-  if (request.method === "POST" && request.url === "/v1/chat/completions" && request.headers.authorization === expectedAuthorization) {
-    const chunks = []
-    for await (const chunk of request)
-      chunks.push(chunk)
-    chatRequests.push(JSON.parse(Buffer.concat(chunks).toString()))
-    chatRequestSeen?.()
-    response.end(JSON.stringify({
-      id: "chatcmpl-test",
-      object: "chat.completion",
-      created: 1,
-      model: "future-chat-model",
-      choices: [{ index: 0, message: { role: "assistant", content: "你好" }, finish_reason: "stop" }],
-      usage: { prompt_tokens: 5, completion_tokens: 1, total_tokens: 6 },
-    }))
+  if (request.url === "/v1/chat/completions" && request.headers.authorization === expectedAuthorization && await gateway.handle(request, response))
     return
-  }
   if (request.method !== "GET" || !["/v1/models", "/other/models"].includes(request.url)) {
     response.writeHead(404).end(JSON.stringify({ error: { message: "Unknown endpoint" } }))
     return
@@ -68,86 +55,20 @@ const server = createServer(async (request, response) => {
   }
 })
 
-/** Opens the inline editor of the provider row with this name. */
-async function openProvider(name) {
-  const row = page.locator("button[aria-expanded]").filter({ has: page.locator("span").filter({ hasText: new RegExp(`^${RegExp.escape(name)}$`) }) })
-  if (await row.getAttribute("aria-expanded") !== "true")
-    await row.click()
-  await row.and(page.locator("[aria-expanded=true]")).waitFor()
-  await modelInput().waitFor()
-}
-
-function modelInput() {
-  return page.getByRole("textbox", { name: "Model", exact: true })
-}
-
-async function fill(selector, text) {
-  await page.locator(selector).fill(text)
-}
-
 async function modelValue() {
-  return modelInput().inputValue()
+  return modelInput(page).inputValue()
 }
 
 async function selectModel(name) {
   await page.getByRole("option", { name, exact: true }).click()
 }
 
-/** Waits until a stored provider has all these field values. */
-async function waitForSavedProvider(fields) {
-  await waitForStorage(page, (config, fields) => config.providersConfig.some(provider => Object.entries(fields).every(([key, value]) => provider[key] === value)), fields)
-}
-
-/** The provider options editor in the open provider form. */
-function providerOptionsEditor() {
-  return page.locator("[aria-label='provider-options-editor'] .cm-content")
-}
-
-async function openAdvancedSettings() {
-  await clickButton(page, "Advanced: temperature, headers, provider options")
-  await providerOptionsEditor().waitFor()
-}
-
-/** Replaces the text of the provider options editor, like a user who pastes it. */
-async function typeProviderOptions(text) {
-  await providerOptionsEditor().click()
-  await page.keyboard.press("ControlOrMeta+a")
-  if (text)
-    await page.keyboard.insertText(text)
-  else
-    await page.keyboard.press("Backspace")
-  await page.keyboard.press("Tab")
-}
-
-/** Waits until the stored provider with this name has these provider options. */
-async function waitForSavedProviderOptions(name, options) {
-  await waitForStorage(page, (config, { name, options }) => {
-    const saved = config.providersConfig.find(provider => provider.name === name)
-    return saved !== undefined && JSON.stringify(saved.providerOptions) === JSON.stringify(options)
-  }, { name, options })
-}
-
 /** Clicks "Test connection" and waits until the endpoint gets the request and the test succeeds. */
 async function testConnection() {
-  const seen = new Promise((resolve) => {
-    chatRequestSeen = resolve
-  })
+  const seen = gateway.nextRequest()
   await clickButton(page, "Test connection")
   await seen
-  await connectionResult(".tabler-icon-check").waitFor()
-}
-
-/**
- * The result icon beside "Test connection". Other icons, such as the check of
- * the selected model in the closing model list, are not part of the result.
- */
-function connectionResult(icon = ".tabler-icon-check, .tabler-icon-x") {
-  return page.getByRole("button", { name: "Test connection", exact: true }).locator("..").locator(icon)
-}
-
-async function reloadSettings() {
-  await page.reload()
-  await waitForText(page, "DeepSeek")
+  await connectionResult(page, ".tabler-icon-check").waitFor()
 }
 
 before(async () => {
@@ -164,8 +85,7 @@ beforeEach(async () => {
   expectedTenant = undefined
   responseMode = "models"
   pendingRequest = undefined
-  chatRequests = []
-  chatRequestSeen = undefined
+  gateway.reset()
   await page.goto(optionsURL)
   await waitForText(page, "DeepSeek")
 })
@@ -193,8 +113,8 @@ for (const [providerName, modelsURL] of Object.entries(DEFAULT_MODELS_URLS)) {
   it(`user selects a fetched model for ${providerName}: Given no base URL, When the user fetches models from the default endpoint and selects one, Then the model survives reloading settings`, async () => {
     // Given: the local fake answers for the default endpoint of the provider.
     await context.route(modelsURL, async route => route.fulfill({ response: await route.fetch({ url: `${baseURL}/models` }) }))
-    await openProvider(providerName)
-    await fill("#apiKey", "test-key")
+    await openProvider(page, providerName)
+    await fill(page, "#apiKey", "test-key")
 
     // When
     await clickButton(page, "Fetch available models")
@@ -203,17 +123,17 @@ for (const [providerName, modelsURL] of Object.entries(DEFAULT_MODELS_URLS)) {
 
     // Then
     assert.equal(await modelValue(), "future-chat-model")
-    await reloadSettings()
-    await openProvider(providerName)
+    await reloadSettings(page)
+    await openProvider(page, providerName)
     assert.equal(await modelValue(), "future-chat-model")
   })
 }
 
 it("user refreshes available models: Given a saved model, When the provider changes its list, Then new models can be searched without changing the saved selection", async () => {
   // Given
-  await openProvider("DeepSeek")
-  await fill("#apiKey", "test-key")
-  await fill("#baseURL", `${baseURL}///`)
+  await openProvider(page, "DeepSeek")
+  await fill(page, "#apiKey", "test-key")
+  await fill(page, "#baseURL", `${baseURL}///`)
   const savedModel = await modelValue()
   await clickButton(page, "Fetch available models")
   await waitForText(page, "future-chat-model")
@@ -233,9 +153,9 @@ it("user refreshes available models: Given a saved model, When the provider chan
 for (const failure of ["error", "malformed"]) {
   it(`user recovers from ${failure}: Given a saved model, When fetching fails and is retried, Then the selection is preserved and the new list is available`, async () => {
     // Given
-    await openProvider("DeepSeek")
-    await fill("#apiKey", "test-key")
-    await fill("#baseURL", baseURL)
+    await openProvider(page, "DeepSeek")
+    await fill(page, "#apiKey", "test-key")
+    await fill(page, "#baseURL", baseURL)
     const savedModel = await modelValue()
     responseMode = failure
 
@@ -254,31 +174,31 @@ for (const failure of ["error", "malformed"]) {
 
 it("user uses a local provider without a key: Given an unauthenticated endpoint, When it returns no models, Then the user can still enter and save a model manually", async () => {
   // Given
-  await openProvider("Custom Provider")
-  await fill("#baseURL", baseURL)
+  await openProvider(page, "Custom Provider")
+  await fill(page, "#baseURL", baseURL)
   expectedAuthorization = undefined
   models = []
 
   // When
   await clickButton(page, "Fetch available models")
   await waitForText(page, "No models available")
-  await modelInput().fill("local-model")
+  await modelInput(page).fill("local-model")
   await page.keyboard.press("Tab")
-  await waitForSavedProvider({ model: "local-model" })
-  await reloadSettings()
+  await waitForSavedProvider(page, { model: "local-model" })
+  await reloadSettings(page)
 
   // Then
-  await openProvider("Custom Provider")
+  await openProvider(page, "Custom Provider")
   assert.equal(await modelValue(), "local-model")
 })
 
 it("user authenticates with custom headers: Given a provider with a key and header overrides, When models are fetched, Then the endpoint accepts the custom authorization and tenant", async () => {
   // Given
-  await openProvider("DeepSeek")
-  await fill("#apiKey", "unused-key")
-  await fill("#baseURL", baseURL)
+  await openProvider(page, "DeepSeek")
+  await fill(page, "#apiKey", "unused-key")
+  await fill(page, "#baseURL", baseURL)
   await clickButton(page, "Advanced: temperature, headers, provider options")
-  await fill("[aria-label='provider-headers-editor'] .cm-content", JSON.stringify({ "authorization": "Bearer custom-key", "X-Tenant": "reading", "X-Empty": "" }))
+  await fill(page, "[aria-label='provider-headers-editor'] .cm-content", JSON.stringify({ "authorization": "Bearer custom-key", "X-Tenant": "reading", "X-Empty": "" }))
   await page.keyboard.press("Tab")
   await waitForStorage(page, config => config.providersConfig.some(provider => provider.headers?.authorization === "Bearer custom-key"))
   expectedAuthorization = "Bearer custom-key"
@@ -295,9 +215,9 @@ it("user authenticates with custom headers: Given a provider with a key and head
 
 it("user switches providers during a request: Given an unfinished old request, When another provider is opened, Then only that provider's models are offered", async () => {
   // Given
-  await openProvider("DeepSeek")
-  await fill("#apiKey", "test-key")
-  await fill("#baseURL", baseURL)
+  await openProvider(page, "DeepSeek")
+  await fill(page, "#apiKey", "test-key")
+  await fill(page, "#baseURL", baseURL)
   const pending = Promise.withResolvers()
   pendingRequest = pending.resolve
   models = ["old-provider-model"]
@@ -306,9 +226,9 @@ it("user switches providers during a request: Given an unfinished old request, W
   await page.getByRole("button", { name: "Fetch available models", exact: true, disabled: true }).waitFor()
 
   // When
-  await openProvider("OpenAI")
-  await fill("#apiKey", "test-key")
-  await fill("#baseURL", baseURL.replace("/v1", "/other"))
+  await openProvider(page, "OpenAI")
+  await fill(page, "#apiKey", "test-key")
+  await fill(page, "#baseURL", baseURL.replace("/v1", "/other"))
   models = ["new-provider-model"]
   await clickButton(page, "Fetch available models")
   await waitForText(page, "new-provider-model")
@@ -318,8 +238,8 @@ it("user switches providers during a request: Given an unfinished old request, W
   // Then
   assert.equal(await page.getByRole("option").textContent(), "new-provider-model")
   await selectModel("new-provider-model")
-  await reloadSettings()
-  await openProvider("OpenAI")
+  await reloadSettings(page)
+  await openProvider(page, "OpenAI")
   assert.equal(await modelValue(), "new-provider-model")
 })
 
@@ -337,9 +257,9 @@ for (const [choice, name, options] of [
     await page.waitForFunction(name => document.querySelector("#name")?.value === name, name)
 
     // Then
-    await openAdvancedSettings()
-    assert.deepEqual(JSON.parse(await providerOptionsEditor().textContent()), options)
-    await waitForSavedProviderOptions(name, options)
+    await openAdvancedSettings(page)
+    assert.deepEqual(JSON.parse(await providerOptionsEditor(page).textContent()), options)
+    await waitForSavedProviderOptions(page, name, options)
   })
 }
 
@@ -349,38 +269,38 @@ for (const [providerName, thinkingOff] of [
 ]) {
   it(`user tests the connection of ${providerName}: Given the options of a new install, When the options are removed and the connection is tested again, Then only the first request turns off thinking`, async () => {
     // Given
-    await openProvider(providerName)
-    await fill("#apiKey", "test-key")
-    await fill("#baseURL", baseURL)
-    await modelInput().fill("future-chat-model")
-    await waitForSavedProvider({ name: providerName, model: "future-chat-model", baseURL })
+    await openProvider(page, providerName)
+    await fill(page, "#apiKey", "test-key")
+    await fill(page, "#baseURL", baseURL)
+    await modelInput(page).fill("future-chat-model")
+    await waitForSavedProvider(page, { name: providerName, model: "future-chat-model", baseURL })
     await testConnection()
 
     // When
-    await openAdvancedSettings()
-    await typeProviderOptions("")
-    await waitForSavedProviderOptions(providerName, undefined)
+    await openAdvancedSettings(page)
+    await typeProviderOptions(page, "")
+    await waitForSavedProviderOptions(page, providerName, undefined)
     await testConnection()
 
     // Then
     const thinkingFields = body => Object.fromEntries(Object.entries(body).filter(([key]) => ["thinking", "reasoning_effort"].includes(key)))
-    assert.deepEqual(chatRequests.map(thinkingFields), [thinkingOff, {}])
+    assert.deepEqual(gateway.requests.map(thinkingFields), [thinkingOff, {}])
   })
 }
 
 it("user clears the model: Given a provider with a model, When the model field is cleared, Then an error shows and the saved model stays", async () => {
   // Given
-  await openProvider("DeepSeek")
+  await openProvider(page, "DeepSeek")
   const savedModel = await modelValue()
 
   // When
-  await modelInput().clear()
+  await modelInput(page).clear()
   await page.keyboard.press("Tab")
 
   // Then
   await waitForText(page, "Enter a model ID.")
-  await reloadSettings()
-  await openProvider("DeepSeek")
+  await reloadSettings(page)
+  await openProvider(page, "DeepSeek")
   assert.equal(await modelValue(), savedModel)
 })
 
@@ -394,14 +314,14 @@ it("user tests a connection with a config from an older version: Given the store
     provider.model = { model: "deepseek-chat", isCustomModel: true, customModel: "future-chat-model" }
     await chrome.storage.local.set({ config })
   }, baseURL)
-  await reloadSettings()
-  await openProvider("DeepSeek")
+  await reloadSettings(page)
+  await openProvider(page, "DeepSeek")
   assert.equal(await modelValue(), "future-chat-model")
 
   // When
   await clickButton(page, "Test connection")
 
   // Then
-  await connectionResult().waitFor()
-  assert.equal(await connectionResult(".tabler-icon-check").count(), 1)
+  await connectionResult(page).waitFor()
+  assert.equal(await connectionResult(page, ".tabler-icon-check").count(), 1)
 })

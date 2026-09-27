@@ -216,6 +216,8 @@ translation:
   failed: Translation failed
   retry: Retry
   unknownError: Something went wrong
+  thinkingFallback: 'The service does not accept "reasoningEffort": "none" ($1). The provider options now use "thinking": {"type": "disabled"}, and translations send it.'
+  thinkingRemoved: 'The service does not accept "reasoningEffort": "none" ($1). The provider options no longer set it, and translations do not send it. Your other options stay.'
 shortcutKeySelector:
   placeholder: Press a shortcut
 languages:

@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: 원본 언어와 대상 언어는 달라야 합니다
   autoModeSameLanguage: 감지된 언어 '$1'은(는) 대상 언어와 같습니다
+  thinkingFallback: '이 서비스는 "reasoningEffort": "none"을(를) 허용하지 않습니다($1). 공급자 옵션이 이제 "thinking": {"type": "disabled"}를 사용하며, 번역 요청에 이 값을 보냅니다.'
+  thinkingRemoved: '이 서비스는 "reasoningEffort": "none"을(를) 허용하지 않습니다($1). 공급자 옵션에서 제거했으며, 번역 요청에 더 이상 보내지 않습니다. 다른 옵션은 그대로 유지됩니다.'
 shortcutKeySelector:
   placeholder: 단축키를 입력해 주세요
 hotkey:

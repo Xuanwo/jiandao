@@ -18,6 +18,7 @@ import { getTranslatePrompt } from "@/utils/prompts/translate"
 import { BatchQueue } from "@/utils/request/batch-queue"
 import { RequestQueue } from "@/utils/request/request-queue"
 import { ensureInitializedConfig } from "./config"
+import { withThinkingFallback } from "./thinking-fallback"
 
 export function parseBatchResult(result: string): string[] {
   return result.trim().split(BATCH_SEPARATOR_LINE_PATTERN).map(t => t.trim())
@@ -35,7 +36,11 @@ export async function executeBatchTranslation<TContext>(
   const texts = dataList.map(d => d.text)
 
   const batchText = texts.join(`\n\n${BATCH_SEPARATOR}\n\n`)
-  const result = await executeTranslate(batchText, langConfig, providerConfig, promptResolver, { isBatch: true, context })
+  const result = await withThinkingFallback(
+    providerConfig,
+    config => executeTranslate(batchText, langConfig, config, promptResolver, { isBatch: true, context }),
+    { tabIds: dataList.map(data => data.tabId) },
+  )
   return parseBatchResult(result)
 }
 
@@ -44,6 +49,7 @@ async function getOrGenerateWebPageSummary(
   webContent: string,
   providerConfig: LLMProviderConfig,
   requestQueue: RequestQueue,
+  tabId: number | undefined,
 ): Promise<string | null> {
   const preparedText = cleanText(webContent)
   if (!preparedText) {
@@ -65,7 +71,11 @@ async function getOrGenerateWebPageSummary(
       return cachedAgain.summary
     }
 
-    const summary = await generateArticleSummary(webTitle, webContent, providerConfig)
+    const summary = await withThinkingFallback(providerConfig, config => generateArticleSummary(webTitle, webContent, config), { tabIds: [tabId] })
+      .catch((error) => {
+        logger.error("Failed to generate article summary:", error)
+        return null
+      })
     if (!summary) {
       return ""
     }
@@ -97,6 +107,8 @@ export interface TranslateBatchData<TContext = unknown> {
   hash: string
   scheduleAt: number
   context?: TContext
+  /** The tab that asked for the translation. */
+  tabId?: number
 }
 
 interface TranslationQueueSetupConfig<TContext = unknown> {
@@ -142,9 +154,9 @@ async function createTranslationQueues<TContext>(config: TranslationQueueSetupCo
       return requestQueue.enqueue(batchThunk, earliestScheduleAt, hash)
     },
     executeIndividual: async (data) => {
-      const { text, langConfig, providerConfig, hash, scheduleAt, context } = data
+      const { text, langConfig, providerConfig, hash, scheduleAt, context, tabId } = data
       const thunk = async () => {
-        return executeTranslate(text, langConfig, providerConfig, promptResolver, { context })
+        return withThinkingFallback(providerConfig, config => executeTranslate(text, langConfig, config, promptResolver, { context }), { tabIds: [tabId] })
       }
       return requestQueue.enqueue(thunk, scheduleAt, hash)
     },
@@ -191,7 +203,7 @@ export async function setUpWebPageTranslationQueue() {
     }
 
     if (shouldUseBatchQueue(providerConfig)) {
-      const data = { text, langConfig, providerConfig, hash, scheduleAt, context }
+      const data = { text, langConfig, providerConfig, hash, scheduleAt, context, tabId: message.sender?.tab?.id }
       result = await batchQueue.enqueue(data)
     }
     else {
@@ -219,7 +231,7 @@ export async function setUpWebPageTranslationQueue() {
       return null
     }
 
-    return await getOrGenerateWebPageSummary(webTitle, webContent, providerConfig, requestQueue)
+    return await getOrGenerateWebPageSummary(webTitle, webContent, providerConfig, requestQueue, message.sender?.tab?.id)
   })
 
   onMessage("setTranslateRequestQueueConfig", (message) => {

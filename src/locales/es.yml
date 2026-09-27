@@ -322,6 +322,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: Los idiomas de origen y destino deben ser diferentes
   autoModeSameLanguage: El idioma detectado '$1' es el mismo que el idioma de destino
+  thinkingFallback: 'El servicio no acepta "reasoningEffort": "none" ($1). Las opciones del proveedor ahora usan "thinking": {"type": "disabled"} y las traducciones lo envían.'
+  thinkingRemoved: 'El servicio no acepta "reasoningEffort": "none" ($1). Las opciones del proveedor ya no lo incluyen y las traducciones no lo envían. Tus otras opciones no cambian.'
 shortcutKeySelector:
   placeholder: Introduce el atajo
 hotkey:

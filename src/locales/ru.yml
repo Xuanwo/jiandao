@@ -321,6 +321,8 @@ noAPIKeyConfig:
 translation:
   sameLanguage: Исходный и целевой языки должны различаться
   autoModeSameLanguage: Обнаруженный язык '$1' совпадает с целевым языком
+  thinkingFallback: 'Сервис не принимает "reasoningEffort": "none" ($1). Параметры провайдера теперь используют "thinking": {"type": "disabled"}, и переводы отправляют его.'
+  thinkingRemoved: 'Сервис не принимает "reasoningEffort": "none" ($1). Параметры провайдера его больше не задают, и переводы его не отправляют. Остальные параметры не изменились.'
 shortcutKeySelector:
   placeholder: Пожалуйста, введите горячую клавишу
 hotkey:
