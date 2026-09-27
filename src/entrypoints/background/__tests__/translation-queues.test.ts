@@ -64,6 +64,7 @@ describe("translation queue helpers", () => {
 
     ensureInitializedConfigMock.mockResolvedValue({
       ...DEFAULT_CONFIG,
+      providersConfig: [llmProvider],
       translate: {
         ...DEFAULT_CONFIG.translate,
         enableAIContentAware: true,
@@ -166,7 +167,7 @@ describe("translation queue helpers", () => {
       data: {
         webTitle: "Page title",
         webContent: "page body",
-        providerConfig: llmProvider,
+        providerConfig: { ...llmProvider, apiKey: "sk-page" },
       },
     })
 

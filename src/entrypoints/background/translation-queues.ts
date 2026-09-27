@@ -27,6 +27,19 @@ export function shouldUseBatchQueue(providerConfig: ProviderConfig): boolean {
   return isLLMProviderConfig(providerConfig)
 }
 
+/**
+ * Reads the stored provider config with the given id. A message from a web page
+ * can contain a changed provider config. Thus the background uses only the id.
+ */
+async function getStoredProviderConfig(providerId: string): Promise<ProviderConfig> {
+  const config = await ensureInitializedConfig()
+  const providerConfig = config?.providersConfig.find(provider => provider.id === providerId)
+  if (!providerConfig) {
+    throw new Error(`Provider ${providerId} not found`)
+  }
+  return providerConfig
+}
+
 export async function executeBatchTranslation<TContext>(
   dataList: TranslateBatchData<TContext>[],
   promptResolver: PromptResolver<TContext>,
@@ -172,7 +185,7 @@ export async function setUpWebPageTranslationQueue() {
   })
 
   onMessage("enqueueTranslateRequest", async (message) => {
-    const { data: { text, langConfig, providerConfig, scheduleAt, hash, webTitle, webDescription, webContent, webSummary } } = message
+    const { data: { text, langConfig, scheduleAt, hash, webTitle, webDescription, webContent, webSummary } } = message
 
     // Check cache first
     if (hash) {
@@ -182,6 +195,7 @@ export async function setUpWebPageTranslationQueue() {
       }
     }
 
+    const providerConfig = await getStoredProviderConfig(message.data.providerConfig.id)
     let result = ""
     const context: WebPagePromptContext = {
       webTitle: normalizePromptContextValue(webTitle),
@@ -213,7 +227,8 @@ export async function setUpWebPageTranslationQueue() {
   })
 
   onMessage("getOrGenerateWebPageSummary", async (message) => {
-    const { webTitle, webContent, providerConfig } = message.data
+    const { webTitle, webContent } = message.data
+    const providerConfig = await getStoredProviderConfig(message.data.providerConfig.id)
 
     if (!isLLMProviderConfig(providerConfig) || !webTitle || !webContent) {
       return null
