@@ -1,11 +1,11 @@
 import type { TranslatePromptObj } from "@/types/config/translate"
-import { saveAs } from "file-saver"
 import { APP_NAME } from "@/utils/constants/app"
 
 export type PromptConfig = Omit<TranslatePromptObj, "id">
 export type PromptConfigList = PromptConfig[]
 
 const PROMPTS_FILE = `${APP_NAME}_prompts`
+const OBJECT_URL_LIFETIME_MS = 40_000
 
 export function checkPromptConfig(list: PromptConfig[]) {
   if (!Array.isArray(list)) {
@@ -18,7 +18,16 @@ export function checkPromptConfig(list: PromptConfig[]) {
 export function downloadJSONFile(data: object) {
   const json = JSON.stringify(data, null, 2)
   const blob = new Blob([json], { type: "text/json" })
-  saveAs(blob, `${PROMPTS_FILE}.json`)
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement("a")
+  anchor.download = `${PROMPTS_FILE}.json`
+  anchor.href = url
+  document.body.append(anchor)
+  anchor.click()
+  anchor.remove()
+
+  // Firefox and Chromium can still use the URL after the click returns.
+  setTimeout(() => URL.revokeObjectURL(url), OBJECT_URL_LIFETIME_MS)
 }
 
 export function analysisJSONFile(file: File): Promise<PromptConfigList> {
