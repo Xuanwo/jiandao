@@ -52,43 +52,26 @@ options:
   title: 设置
   service:
     title: 翻译服务
-    description: 由你的 agent 配置，不用手填。Plainly 只预览并应用 agent 生成的配置。
-    key: 密钥
-    keyConfigured: 已填密钥
-    keyMissing: 未填密钥
+    status:
+      none: 尚无服务
+      unconfigured: 未填密钥
+      configured: 未测试
+      testing: 测试中…
+      ok: 已连接
+      failed: 连接失败
+    testConnection: 测试连接
     sendsTo: 网页文本发往 $1
-    thinkingOff: 思考模式已关闭
-    connected: 已连接
-    connectionFailed: 连接失败
-    import: 导入配置
-    export: 复制当前配置
     copyInstructions: 复制给 agent 的说明
     copied: 已复制
-    test: 测试连接
-    testing: 测试中…
-    remove: 移除
-    removeDialog:
-      title: 移除“$1”？
-      description: 它的密钥会从这个浏览器里删除。如果没有剩下的服务，弹窗会重新提示配置。
-      confirm: 移除
+    paste:
+      open: 粘贴配置
+      label: agent 生成的配置
+      keyMissing: 配置里没有 API Key。
       cancel: 取消
-    importPanel:
-      title: 导入配置
-      description: 粘贴 agent 放进剪贴板的配置。agent 已经用真实接口验证过它；应用时 Plainly 会再发一条极短请求确认。
-      pasteLabel: 配置 JSON
-      previewTitle: 将会应用
-      empty: 粘贴的内容是一份有效配置后，这里会显示预览。
-      replaces: 已有的 $1 服务会被替换，其它服务和设置不变。
-      adds: 会新增一个服务，其它服务和设置不变。
-      clearsClipboard: 应用后会清空剪贴板。
-      confirming: 已应用，正在确认连接…
-      done: 已连接，翻译现在使用这个服务。
-      cancel: 取消
-      close: 关闭
-      apply: 应用并确认连接
+      apply: 应用
+      applying: 确认中…
   reading:
     title: 阅读
-    description: 译文怎么出现在页面上。
     mode:
       title: 显示方式
       bilingual: 双语对照
@@ -124,52 +107,19 @@ options:
         allSaved: 所有更改已保存
     range:
       title: 翻译范围
-      description: “正文”会跳过导航、侧栏和页脚。
       main: 正文
       all: 整页
     shortcut:
       title: 快捷键
-      description: 在任意网页按下即可翻译或还原。清空则关闭。
   quality:
     title: 译文质量
-    description: 让模型知道它在翻译什么。
     context:
       title: 结合全文上下文
-      description: 先让模型读一遍页面摘要，再翻译各段。开始时会慢几秒，多用一些 token。
-    prompts:
+    prompt:
       title: 提示词
       default: 默认
-      new: 新建
-      view: 查看
-      edit: 编辑
-      delete: 删除
-      import: 导入
-      export: 导出
-      importSuccess: 提示词已导入
-      importFailed: 导入提示词失败
-      editor:
-        newTitle: 新建提示词
-        editTitle: 编辑提示词
-        name: 名称
-        systemPrompt: 系统提示词
-        prompt: 提示词
-        save: 保存
-        cancel: 取消
-      tokens:
-        input: 需要翻译的文本
-        targetLanguage: 目标语言
-        webTitle: 网页标题
-        webDescription: 页面元信息中的描述
-        webContent: 网页正文（前 2000 个字符）
-        webSummary: 网页摘要（需开启全文上下文）
-      deleteDialog:
-        title: 删除“$1”？
-        description: 此操作无法撤销。
-        confirm: 删除
-        cancel: 取消
   advanced:
     title: 高级
-    hint: 默认折叠，一般不需要改。
     rate: 每秒请求数
     capacity: 同时进行的请求上限
     maxCharactersPerBatch: 每次请求最多字符
@@ -181,8 +131,8 @@ options:
     minError: 数值不能小于 $1
     rangeError: 数值必须在 $1 到 $2 之间
     cache:
-      description: 译文缓存在这个浏览器里，会自动清理。
-      clear: 清除缓存
+      title: 译文缓存
+      clear: 清除
       clearing: 清除中…
       dialog:
         title: 清除翻译缓存？
@@ -195,7 +145,7 @@ options:
     light: 浅色
     dark: 深色
   reset:
-    title: 重置所有设置
+    title: 全部设置
     dialog:
       title: 重置所有设置？
       description: 包括 API Key 和提示词在内的所有设置都会恢复默认值。

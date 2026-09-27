@@ -34,3 +34,5 @@ templates: https://github.com/Xuanwo/plainly/blob/main/docs/agent-setup.md
 - Ollama / LM Studio: `type: "openai-compatible"`, `baseURL` ending in `/v1`,
   any non-empty `apiKey`, the model tag the server lists.
 - Chinese readers: `targetLanguage: "cmn"` (Simplified) or `"cmn-Hant"`.
+- A custom prompt goes in `prompt: { name, systemPrompt, prompt }` with
+  `{{input}}` in `prompt`; `prompt: null` restores the built-in one.

@@ -52,43 +52,26 @@ options:
   title: Settings
   service:
     title: Translation service
-    description: Set up by your agent, not by hand. Plainly previews what the agent produced and applies it.
-    key: Key
-    keyConfigured: Key set
-    keyMissing: No key yet
+    status:
+      none: No service
+      unconfigured: No key yet
+      configured: Not tested
+      testing: Testing…
+      ok: Connected
+      failed: Connection failed
+    testConnection: Test the connection
     sendsTo: Page text goes to $1
-    thinkingOff: Thinking off
-    connected: Connected
-    connectionFailed: Connection failed
-    import: Import configuration
-    export: Copy current configuration
     copyInstructions: Copy instructions for your agent
     copied: Copied
-    test: Test connection
-    testing: Testing…
-    remove: Remove
-    removeDialog:
-      title: Remove "$1"?
-      description: Its key is deleted from this browser. If no service is left, the popup asks you to set one up again.
-      confirm: Remove
+    paste:
+      open: Paste configuration
+      label: Configuration from your agent
+      keyMissing: The configuration has no API key.
       cancel: Cancel
-    importPanel:
-      title: Import configuration
-      description: Paste the configuration your agent put on the clipboard. The agent already verified it against the service; Plainly sends one short request to confirm.
-      pasteLabel: Configuration JSON
-      previewTitle: What will be applied
-      empty: The preview appears once the pasted text is a valid configuration.
-      replaces: The stored $1 service is replaced. Other services and settings stay.
-      adds: A new service is added. Other services and settings stay.
-      clearsClipboard: The clipboard is cleared after applying.
-      confirming: Applied. Confirming the connection…
-      done: Connected. Translation uses this service now.
-      cancel: Cancel
-      close: Close
-      apply: Apply and confirm connection
+      apply: Apply
+      applying: Confirming…
   reading:
     title: Reading
-    description: How translations appear on the page.
     mode:
       title: Display
       bilingual: Bilingual
@@ -124,52 +107,19 @@ options:
         allSaved: All changes saved
     range:
       title: Translate
-      description: '"Main content" skips navigation, sidebars and footers.'
       main: Main content
       all: Whole page
     shortcut:
       title: Shortcut
-      description: Press it on any page to translate or restore. Clear it to turn the shortcut off.
   quality:
     title: Translation quality
-    description: What the model knows about the page it is translating.
     context:
       title: Use page context
-      description: Lets the model read a summary of the page before translating each paragraph. Starting takes a few seconds longer and uses more tokens.
-    prompts:
+    prompt:
       title: Prompt
       default: Default
-      new: New
-      view: View
-      edit: Edit
-      delete: Delete
-      import: Import
-      export: Export
-      importSuccess: Prompts imported
-      importFailed: Could not import prompts
-      editor:
-        newTitle: New prompt
-        editTitle: Edit prompt
-        name: Name
-        systemPrompt: System prompt
-        prompt: Prompt
-        save: Save
-        cancel: Cancel
-      tokens:
-        input: Text to translate
-        targetLanguage: Target language
-        webTitle: Page title
-        webDescription: Page description from metadata
-        webContent: Page content (first 2000 characters)
-        webSummary: Page summary (needs page context)
-      deleteDialog:
-        title: Delete "$1"?
-        description: This cannot be undone.
-        confirm: Delete
-        cancel: Cancel
   advanced:
     title: Advanced
-    hint: Collapsed by default. Rarely needs changing.
     rate: Requests per second
     capacity: Requests in flight at once
     maxCharactersPerBatch: Characters per request
@@ -181,8 +131,8 @@ options:
     minError: Value must be at least $1
     rangeError: Value must be between $1 and $2
     cache:
-      description: Translations are cached in this browser and cleaned up automatically.
-      clear: Clear cache
+      title: Translation cache
+      clear: Clear
       clearing: Clearing…
       dialog:
         title: Clear the translation cache?
@@ -195,7 +145,7 @@ options:
     light: Light
     dark: Dark
   reset:
-    title: Reset all settings
+    title: All settings
     dialog:
       title: Reset all settings?
       description: Every setting, including API keys and prompts, goes back to its default value.

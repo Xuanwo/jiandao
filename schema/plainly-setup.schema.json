@@ -73,6 +73,37 @@
       ],
       "additionalProperties": false
     },
+    "prompt": {
+      "description": "Translation prompt to use. null restores Plainly's built-in prompt. Omit to leave the current prompt as it is.",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "description": "Shown in settings. Defaults to \"Custom\".",
+              "type": "string",
+              "minLength": 1
+            },
+            "systemPrompt": {
+              "description": "System message. Omit for none.",
+              "type": "string"
+            },
+            "prompt": {
+              "type": "string",
+              "minLength": 1,
+              "description": "User message template. Must contain {{input}}; may use {{targetLanguage}}, {{webTitle}}, {{webDescription}}, {{webContent}}, {{webSummary}}."
+            }
+          },
+          "required": [
+            "prompt"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "targetLanguage": {
       "description": "ISO 639-3 code of the language to translate into, e.g. \"cmn\" for Simplified Chinese, \"eng\" for English.",
       "type": "string",

@@ -140,6 +140,40 @@ describe("applySetupDocument", () => {
   })
 })
 
+describe("applySetupDocument prompt", () => {
+  it("installs the document's prompt as the one in use and restores the default with null", () => {
+    const withPrompt = parseSetupDocument(JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-abc" }, prompt: { name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" } }))
+    if (!withPrompt.ok)
+      throw new Error(withPrompt.error)
+    const applied = applySetupDocument(DEFAULT_CONFIG, withPrompt.document).config
+    expect(applied.translate.customPromptsConfig).toEqual({
+      promptId: "agent-prompt",
+      patterns: [{ id: "agent-prompt", name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" }],
+    })
+    expect(exportSetupDocument(applied)?.prompt).toEqual({ name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" })
+
+    const restore = parseSetupDocument(JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-…-abc" }, prompt: null }))
+    if (!restore.ok)
+      throw new Error(restore.error)
+    const restored = applySetupDocument(applied, restore.document).config
+    expect(restored.translate.customPromptsConfig).toEqual({ promptId: null, patterns: [] })
+    expect(exportSetupDocument(restored)?.prompt).toBeUndefined()
+  })
+
+  it("leaves the stored prompt alone when the document does not mention it, and rejects a prompt without {{input}}", () => {
+    const stored = { ...DEFAULT_CONFIG, translate: { ...DEFAULT_CONFIG.translate, customPromptsConfig: { promptId: "p1", patterns: [{ id: "p1", name: "Mine", systemPrompt: "", prompt: "{{input}}" }] } } }
+    const untouched = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc"}}`)
+    if (!untouched.ok)
+      throw new Error(untouched.error)
+    expect(applySetupDocument(stored, untouched.document).config.translate.customPromptsConfig).toEqual(stored.translate.customPromptsConfig)
+
+    const bad = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc"},"prompt":{"prompt":"Translate this"}}`)
+    expect(bad.ok).toBe(false)
+    if (!bad.ok)
+      expect(bad.error).toContain("prompt.prompt: prompt must contain {{input}}")
+  })
+})
+
 describe("describeSetupDocument", () => {
   it("tells the reader where page text will go and whether the key is new", () => {
     const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash","providerOptions":{"thinking":{"type":"disabled"}}},"targetLanguage":"cmn","mode":"bilingual"}`)
@@ -156,6 +190,7 @@ describe("describeSetupDocument", () => {
       targetLanguage: "cmn",
       sourceLanguage: undefined,
       mode: "bilingual",
+      promptName: undefined,
       replaces: true,
     })
   })

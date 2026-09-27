@@ -42,9 +42,16 @@ export const setupProviderSchema = z.strictObject({
   }
 })
 
+export const setupPromptSchema = z.strictObject({
+  name: z.string().trim().min(1).optional().describe("Shown in settings. Defaults to \"Custom\"."),
+  systemPrompt: z.string().optional().describe("System message. Omit for none."),
+  prompt: z.string().min(1).describe("User message template. Must contain {{input}}; may use {{targetLanguage}}, {{webTitle}}, {{webDescription}}, {{webContent}}, {{webSummary}}."),
+}).refine(prompt => prompt.prompt.includes("{{input}}"), { path: ["prompt"], message: "prompt must contain {{input}}" })
+
 export const setupDocumentSchema = z.strictObject({
   plainly: z.literal(SETUP_DOCUMENT_VERSION).describe("Document format version. Always 1."),
   provider: setupProviderSchema,
+  prompt: setupPromptSchema.nullable().optional().describe("Translation prompt to use. null restores Plainly's built-in prompt. Omit to leave the current prompt as it is."),
   targetLanguage: langCodeISO6393Schema.optional().describe("ISO 639-3 code of the language to translate into, e.g. \"cmn\" for Simplified Chinese, \"eng\" for English."),
   sourceLanguage: langCodeISO6393Schema.or(z.literal("auto")).optional().describe("ISO 639-3 code of the page language, or \"auto\" to detect it."),
   mode: translationModeSchema.optional().describe("\"bilingual\" shows the translation under each paragraph; \"translationOnly\" replaces the original."),
@@ -52,6 +59,21 @@ export const setupDocumentSchema = z.strictObject({
 
 export type SetupDocument = z.infer<typeof setupDocumentSchema>
 export type SetupProvider = SetupDocument["provider"]
+export type SetupPrompt = z.infer<typeof setupPromptSchema>
+
+const CUSTOM_PROMPT_ID = "agent-prompt"
+
+/** The prompt config a document asks for; undefined leaves the stored prompt alone. */
+function buildPromptsConfig(prompt: SetupDocument["prompt"]): Config["translate"]["customPromptsConfig"] | undefined {
+  if (prompt === undefined)
+    return undefined
+  if (prompt === null)
+    return { promptId: null, patterns: [] }
+  return {
+    promptId: CUSTOM_PROMPT_ID,
+    patterns: [{ id: CUSTOM_PROMPT_ID, name: prompt.name ?? "Custom", systemPrompt: prompt.systemPrompt ?? "", prompt: prompt.prompt }],
+  }
+}
 
 export type SetupDocumentParseResult
   = | { ok: true, document: SetupDocument }
@@ -218,6 +240,7 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
     ? config.providersConfig.map(p => p.id === existing.id ? next : p)
     : [...config.providersConfig, next]
 
+  const promptsConfig = buildPromptsConfig(document.prompt)
   const candidate: Config = {
     ...config,
     providersConfig,
@@ -230,6 +253,7 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
       ...config.translate,
       providerId: next.id,
       ...(document.mode && { mode: document.mode }),
+      ...(promptsConfig && { customPromptsConfig: promptsConfig }),
     },
   }
 
@@ -255,6 +279,8 @@ export interface SetupPreview {
   targetLanguage?: LangCodeISO6393
   sourceLanguage?: LangCodeISO6393 | "auto"
   mode?: TranslationMode
+  /** Name of the prompt the document sets; undefined when it leaves the prompt alone or restores the default. */
+  promptName?: string
   replaces: boolean
 }
 
@@ -274,6 +300,7 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
     targetLanguage: document.targetLanguage,
     sourceLanguage: document.sourceLanguage,
     mode: document.mode,
+    promptName: document.prompt ? document.prompt.name ?? "Custom" : undefined,
     replaces: !!existing,
   }
 }
@@ -288,6 +315,8 @@ export function exportSetupDocument(config: Config): SetupDocument | null {
     return null
 
   const modelId = isLLMProviderConfig(provider) ? resolveModelId(provider.model) : undefined
+  const { promptId, patterns } = config.translate.customPromptsConfig
+  const prompt = promptId ? patterns.find(pattern => pattern.id === promptId) : undefined
 
   return {
     plainly: SETUP_DOCUMENT_VERSION,
@@ -301,6 +330,7 @@ export function exportSetupDocument(config: Config): SetupDocument | null {
       ...(provider.providerOptions && { providerOptions: provider.providerOptions }),
       ...(provider.temperature !== undefined && { temperature: provider.temperature }),
     },
+    ...(prompt && { prompt: { name: prompt.name, ...(prompt.systemPrompt && { systemPrompt: prompt.systemPrompt }), prompt: prompt.prompt } }),
     targetLanguage: config.language.targetCode,
     sourceLanguage: config.language.sourceCode,
     mode: config.translate.mode,

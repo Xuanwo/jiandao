@@ -2,7 +2,6 @@ import { IconCheck, IconCopy } from "@tabler/icons-react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useId, useMemo, useState } from "react"
 import { i18n } from "#imports"
-import { describePreviewInline } from "@/components/setup-preview"
 import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
 import { clearClipboard, copyText } from "@/utils/clipboard"
 import { buildAgentInstructions } from "@/utils/setup-agent-instructions"
@@ -12,6 +11,11 @@ import { activeTabAtom, pageTranslationEnabledAtom } from "../atoms"
 import { setPageTranslation } from "./translate-button"
 
 const COPIED_FEEDBACK_MS = 2000
+
+/** "DeepSeek · deepseek-flash · api.deepseek.com": what the service is and where page text goes. */
+function describePreviewInline(preview: { providerName: string, modelId: string, host: string }): string {
+  return [preview.providerName, preview.modelId, preview.host].filter(Boolean).join(" · ")
+}
 
 /**
  * First-run path. The reader hands instructions to their agent, the agent

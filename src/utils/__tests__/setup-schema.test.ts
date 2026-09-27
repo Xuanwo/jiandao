@@ -33,7 +33,7 @@ describe("setup document JSON Schema", () => {
   it("keeps the fields agents rely on and rejects unknown ones", () => {
     const schema = buildSetupJsonSchema()
     const properties = schema.properties as Record<string, unknown>
-    expect(Object.keys(properties)).toEqual(["plainly", "provider", "targetLanguage", "sourceLanguage", "mode"])
+    expect(Object.keys(properties)).toEqual(["plainly", "provider", "prompt", "targetLanguage", "sourceLanguage", "mode"])
     expect(schema.additionalProperties).toBe(false)
     const provider = properties.provider as { properties: Record<string, unknown>, additionalProperties: boolean }
     expect(Object.keys(provider.properties)).toEqual(["type", "name", "apiKey", "model", "baseURL", "headers", "providerOptions", "temperature"])

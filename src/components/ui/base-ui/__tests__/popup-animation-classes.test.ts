@@ -19,7 +19,6 @@ describe("shared popup animation classes", () => {
       readSource("../tooltip.tsx"),
       readSource("../dialog.tsx"),
       readSource("../alert-dialog.tsx"),
-      readSource("../sheet.tsx"),
     ])
 
     for (const source of files) {

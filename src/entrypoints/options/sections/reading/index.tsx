@@ -1,10 +1,9 @@
-import { deepmerge } from "deepmerge-ts"
 import { useAtom } from "jotai"
 import { useId } from "react"
 import { i18n } from "#imports"
 import { SegmentedControl } from "@/components/segmented-control"
 import { ShortcutKeyRecorder } from "@/components/shortcut-key-recorder"
-import { pageTranslateRangeSchema, TRANSLATION_MODES } from "@/types/config/translate"
+import { TRANSLATION_MODES } from "@/types/config/translate"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { DEFAULT_AUTO_TRANSLATE_SHORTCUT_KEY } from "@/utils/constants/translate"
 import { SettingsGroup, SettingsRow, SettingsSection } from "../../components/settings-section"
@@ -15,21 +14,12 @@ const MODE_LABEL_KEY = {
   translationOnly: "options.reading.mode.translationOnly",
 } as const
 
-const RANGE_LABEL_KEY = {
-  main: "options.reading.range.main",
-  all: "options.reading.range.all",
-} as const
-
 export function ReadingSection() {
   const [translateConfig, setTranslateConfig] = useAtom(configFieldsAtomMap.translate)
   const shortcutId = useId()
 
   return (
-    <SettingsSection
-      id="reading"
-      title={i18n.t("options.reading.title")}
-      description={i18n.t("options.reading.description")}
-    >
+    <SettingsSection id="reading" title={i18n.t("options.reading.title")}>
       <SettingsGroup>
         <SettingsRow
           label={i18n.t("options.reading.mode.title")}
@@ -45,21 +35,7 @@ export function ReadingSection() {
         />
         <StyleSetting />
         <SettingsRow
-          label={i18n.t("options.reading.range.title")}
-          description={i18n.t("options.reading.range.description")}
-          control={(
-            <SegmentedControl
-              size="sm"
-              aria-label={i18n.t("options.reading.range.title")}
-              value={translateConfig.page.range}
-              options={pageTranslateRangeSchema.options.map(range => ({ value: range, label: i18n.t(RANGE_LABEL_KEY[range]) }))}
-              onChange={range => void setTranslateConfig(deepmerge(translateConfig, { page: { range } }))}
-            />
-          )}
-        />
-        <SettingsRow
           label={i18n.t("options.reading.shortcut.title")}
-          description={i18n.t("options.reading.shortcut.description")}
           htmlFor={shortcutId}
           control={(
             <ShortcutKeyRecorder

@@ -1,9 +1,13 @@
 import { IconChevronDown } from "@tabler/icons-react"
-import { useAtom } from "jotai"
+import { deepmerge } from "deepmerge-ts"
+import { useAtom, useSetAtom } from "jotai"
 import { useState } from "react"
 import { i18n } from "#imports"
+import { SegmentedControl } from "@/components/segmented-control"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/base-ui/collapsible"
-import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { pageTranslateRangeSchema } from "@/types/config/translate"
+import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
+import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import {
   MAX_CHARACTERS_PER_NODE,
   MAX_PRELOAD_MARGIN,
@@ -23,8 +27,21 @@ import { cn } from "@/utils/styles/utils"
 import { ConfirmAction } from "../../components/confirm-action"
 import { NumberSetting } from "../../components/number-setting"
 
-function ClearCacheRow() {
+const RANGE_LABEL_KEY = {
+  main: "options.reading.range.main",
+  all: "options.reading.range.all",
+} as const
+
+function DangerRow({ children }: { children: React.ReactNode }) {
+  return <div className="col-span-full flex items-center justify-between gap-3 border-t border-border pt-3">{children}</div>
+}
+
+export function AdvancedSection() {
+  const [open, setOpen] = useState(false)
+  const [translateConfig, setTranslateConfig] = useAtom(configFieldsAtomMap.translate)
+  const setConfig = useSetAtom(writeConfigAtom)
   const [clearing, setClearing] = useState(false)
+  const { requestQueueConfig, batchQueueConfig, page } = translateConfig
 
   const clearCache = async () => {
     setClearing(true)
@@ -37,40 +54,24 @@ function ClearCacheRow() {
   }
 
   return (
-    <div className="col-span-full flex items-center justify-between gap-3 border-t border-border pt-3">
-      <span className="text-xs text-muted-foreground">{i18n.t("options.advanced.cache.description")}</span>
-      <ConfirmAction
-        disabled={clearing}
-        trigger={(
-          <button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs hover:bg-muted">
-            {clearing ? i18n.t("options.advanced.cache.clearing") : i18n.t("options.advanced.cache.clear")}
-          </button>
-        )}
-        title={i18n.t("options.advanced.cache.dialog.title")}
-        description={i18n.t("options.advanced.cache.dialog.description")}
-        confirmLabel={i18n.t("options.advanced.cache.dialog.confirm")}
-        cancelLabel={i18n.t("options.advanced.cache.dialog.cancel")}
-        onConfirm={clearCache}
-      />
-    </div>
-  )
-}
-
-export function AdvancedSection() {
-  const [open, setOpen] = useState(false)
-  const [translateConfig, setTranslateConfig] = useAtom(configFieldsAtomMap.translate)
-  const { requestQueueConfig, batchQueueConfig, page } = translateConfig
-
-  return (
-    <section id="advanced" className="flex scroll-mt-8 flex-col gap-3.5">
+    <section id="advanced" className="flex scroll-mt-8 flex-col gap-3">
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger className="flex cursor-pointer items-center gap-1.5 text-left">
           <IconChevronDown className={cn("size-3.5 text-muted-foreground transition-transform", !open && "-rotate-90")} aria-hidden="true" />
           <h2 className="text-[15px] font-semibold">{i18n.t("options.advanced.title")}</h2>
-          <span className="ml-1 text-xs text-muted-foreground">{i18n.t("options.advanced.hint")}</span>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="mt-3.5 grid grid-cols-1 gap-x-6 gap-y-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2">
+          <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2">
+            <div className="col-span-full flex items-center justify-between gap-3">
+              <span className="text-[13px]">{i18n.t("options.reading.range.title")}</span>
+              <SegmentedControl
+                size="sm"
+                aria-label={i18n.t("options.reading.range.title")}
+                value={page.range}
+                options={pageTranslateRangeSchema.options.map(range => ({ value: range, label: i18n.t(RANGE_LABEL_KEY[range]) }))}
+                onChange={range => void setTranslateConfig(deepmerge(translateConfig, { page: { range } }))}
+              />
+            </div>
             <NumberSetting
               id="advanced-rate"
               label={i18n.t("options.advanced.rate")}
@@ -145,7 +146,29 @@ export function AdvancedSection() {
               max={MAX_WORDS_PER_NODE}
               onChange={minWordsPerNode => void setTranslateConfig({ ...translateConfig, page: { ...page, minWordsPerNode } })}
             />
-            <ClearCacheRow />
+            <DangerRow>
+              <span className="text-[13px]">{i18n.t("options.advanced.cache.title")}</span>
+              <ConfirmAction
+                disabled={clearing}
+                trigger={<button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs hover:bg-muted">{clearing ? i18n.t("options.advanced.cache.clearing") : i18n.t("options.advanced.cache.clear")}</button>}
+                title={i18n.t("options.advanced.cache.dialog.title")}
+                description={i18n.t("options.advanced.cache.dialog.description")}
+                confirmLabel={i18n.t("options.advanced.cache.dialog.confirm")}
+                cancelLabel={i18n.t("options.advanced.cache.dialog.cancel")}
+                onConfirm={clearCache}
+              />
+            </DangerRow>
+            <DangerRow>
+              <span className="text-[13px]">{i18n.t("options.reset.title")}</span>
+              <ConfirmAction
+                trigger={<button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs text-destructive hover:bg-muted">{i18n.t("options.reset.dialog.confirm")}</button>}
+                title={i18n.t("options.reset.dialog.title")}
+                description={i18n.t("options.reset.dialog.description")}
+                confirmLabel={i18n.t("options.reset.dialog.confirm")}
+                cancelLabel={i18n.t("options.reset.dialog.cancel")}
+                onConfirm={() => setConfig(DEFAULT_CONFIG)}
+              />
+            </DangerRow>
           </div>
         </CollapsibleContent>
       </Collapsible>
