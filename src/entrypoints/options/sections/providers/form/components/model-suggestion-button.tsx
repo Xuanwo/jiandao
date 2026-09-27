@@ -13,6 +13,7 @@ import {
   ComboboxList,
 } from "@/components/ui/base-ui/combobox"
 import { extractErrorMessage } from "@/utils/error/extract-message"
+import { normalizeBaseURL } from "@/utils/providers/base-url"
 
 interface ModelsResponse {
   object: string
@@ -42,7 +43,7 @@ export function ModelSuggestionButton({
         throw new Error(i18n.t("options.providers.form.models.apiKeyRequired"))
       }
 
-      const response = await fetch(`${baseURL}/models`, {
+      const response = await fetch(`${normalizeBaseURL(baseURL)}/models`, {
         headers: { Authorization: `Bearer ${apiKey}` },
       })
       if (!response.ok) {

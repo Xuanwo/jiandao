@@ -6,6 +6,7 @@ import { storage } from "#imports"
 import { isCustomLLMProvider } from "@/types/config/provider"
 import { getLLMProvidersConfig, getProviderConfigById } from "../config/helpers"
 import { CONFIG_STORAGE_KEY } from "../constants/config"
+import { normalizeBaseURL } from "./base-url"
 import { getProviderHeadersWithOverride } from "./headers"
 import { resolveModelId } from "./model-id"
 
@@ -28,16 +29,17 @@ async function getLanguageModelById(providerId: string) {
   }
 
   const headers = getProviderHeadersWithOverride(providerConfig.provider, providerConfig.headers)
+  const baseURL = normalizeBaseURL(providerConfig.baseURL)
   const provider = isCustomLLMProvider(providerConfig.provider)
     ? CREATE_AI_MAPPER[providerConfig.provider]({
         name: providerConfig.provider,
-        baseURL: providerConfig.baseURL ?? "",
+        baseURL,
         supportsStructuredOutputs: true,
         ...(providerConfig.apiKey && { apiKey: providerConfig.apiKey }),
         ...(headers && { headers }),
       })
     : CREATE_AI_MAPPER[providerConfig.provider]({
-        ...(providerConfig.baseURL && { baseURL: providerConfig.baseURL }),
+        ...(baseURL && { baseURL }),
         ...(providerConfig.apiKey && { apiKey: providerConfig.apiKey }),
         ...(headers && { headers }),
       })
