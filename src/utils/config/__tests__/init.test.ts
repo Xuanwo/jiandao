@@ -1,7 +1,7 @@
 import type { Config } from "@/types/config/config"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { isAPIProviderConfig } from "@/types/config/provider"
-import { CONFIG_SCHEMA_VERSION, DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_CONFIG } from "@/utils/constants/config"
 
 const getItemMock = vi.fn()
 const getMetaMock = vi.fn()
@@ -32,6 +32,9 @@ vi.mock("@/utils/logger", () => ({
     warn: loggerWarnMock,
   },
 }))
+
+// Import after the mocks above exist, so that init.ts gets the mocked storage.
+const { CONFIG_SCHEMA_VERSION } = await import("../init")
 
 function buildStableConfig(): Config {
   const config = structuredClone(DEFAULT_CONFIG)

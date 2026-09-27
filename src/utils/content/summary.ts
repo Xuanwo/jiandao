@@ -2,8 +2,7 @@ import type { LLMProviderConfig } from "@/types/config/provider"
 import { generateText } from "ai"
 import { logger } from "@/utils/logger"
 import { getModelById } from "@/utils/providers/model"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getProviderOptionsWithOverride } from "@/utils/providers/options"
+import { getProviderOptions } from "@/utils/providers/options"
 import { cleanText } from "./utils"
 
 /**
@@ -21,9 +20,8 @@ export async function generateArticleSummary(
   }
 
   try {
-    const { model: providerModel, provider, providerOptions: userProviderOptions, temperature } = providerConfig
-    const modelName = resolveModelId(providerModel)
-    const providerOptions = getProviderOptionsWithOverride(modelName ?? "", provider, userProviderOptions)
+    const { temperature } = providerConfig
+    const providerOptions = getProviderOptions(providerConfig)
     const model = await getModelById(providerConfig.id)
 
     const prompt = `Summarize the following article in 2-3 sentences. Focus on the main topic and key points. Return ONLY the summary, no explanations or formatting.

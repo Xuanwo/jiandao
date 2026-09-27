@@ -1,5 +1,6 @@
 /* global chrome -- page.evaluate() runs these callbacks in the extension page. */
 import assert from "node:assert/strict"
+import { Buffer } from "node:buffer"
 import { createServer } from "node:http"
 import { after, afterEach, before, beforeEach, it } from "node:test"
 import { clickButton, launchBrowser, listenOnLocalPort, reportFailure, waitForStorage, waitForText } from "./browser.mjs"
@@ -13,16 +14,23 @@ let expectedAuthorization
 let expectedTenant
 let responseMode
 let pendingRequest
+let chatRequests
+let chatRequestSeen
 
 // Wire contract checked against the provider documentation, not application code:
 // https://developers.openai.com/api/reference/resources/models/methods/list
 // https://api-docs.deepseek.com/api/list-models
 // https://lmstudio.ai/docs/developer/openai-compat/models
-const server = createServer((request, response) => {
+const server = createServer(async (request, response) => {
   response.setHeader("Content-Type", "application/json")
   // OpenAI Chat Completions wire contract, also used by DeepSeek and compatible providers:
   // https://platform.openai.com/docs/api-reference/chat/create
   if (request.method === "POST" && request.url === "/v1/chat/completions" && request.headers.authorization === expectedAuthorization) {
+    const chunks = []
+    for await (const chunk of request)
+      chunks.push(chunk)
+    chatRequests.push(JSON.parse(Buffer.concat(chunks).toString()))
+    chatRequestSeen?.()
     response.end(JSON.stringify({
       id: "chatcmpl-test",
       object: "chat.completion",
@@ -90,6 +98,45 @@ async function waitForSavedProvider(fields) {
   await waitForStorage(page, (config, fields) => config.providersConfig.some(provider => Object.entries(fields).every(([key, value]) => provider[key] === value)), fields)
 }
 
+/** The provider options editor in the open provider form. */
+function providerOptionsEditor() {
+  return page.locator("[aria-label='provider-options-editor'] .cm-content")
+}
+
+async function openAdvancedSettings() {
+  await clickButton(page, "Advanced: temperature, headers, provider options")
+  await providerOptionsEditor().waitFor()
+}
+
+/** Replaces the text of the provider options editor, like a user who pastes it. */
+async function typeProviderOptions(text) {
+  await providerOptionsEditor().click()
+  await page.keyboard.press("ControlOrMeta+a")
+  if (text)
+    await page.keyboard.insertText(text)
+  else
+    await page.keyboard.press("Backspace")
+  await page.keyboard.press("Tab")
+}
+
+/** Waits until the stored provider with this name has these provider options. */
+async function waitForSavedProviderOptions(name, options) {
+  await waitForStorage(page, (config, { name, options }) => {
+    const saved = config.providersConfig.find(provider => provider.name === name)
+    return saved !== undefined && JSON.stringify(saved.providerOptions) === JSON.stringify(options)
+  }, { name, options })
+}
+
+/** Clicks "Test connection" and waits until the endpoint gets the request and the test succeeds. */
+async function testConnection() {
+  const seen = new Promise((resolve) => {
+    chatRequestSeen = resolve
+  })
+  await clickButton(page, "Test connection")
+  await seen
+  await connectionResult(".tabler-icon-check").waitFor()
+}
+
 /**
  * The result icon beside "Test connection". Other icons, such as the check of
  * the selected model in the closing model list, are not part of the result.
@@ -117,6 +164,8 @@ beforeEach(async () => {
   expectedTenant = undefined
   responseMode = "models"
   pendingRequest = undefined
+  chatRequests = []
+  chatRequestSeen = undefined
   await page.goto(optionsURL)
   await waitForText(page, "DeepSeek")
 })
@@ -273,6 +322,51 @@ it("user switches providers during a request: Given an unfinished old request, W
   await openProvider("OpenAI")
   assert.equal(await modelValue(), "new-provider-model")
 })
+
+for (const [choice, name, options] of [
+  ["OpenAI", "OpenAI 1", { reasoningEffort: "none" }],
+  ["DeepSeek", "DeepSeek 1", { thinking: { type: "disabled" } }],
+  ["OpenAI-compatible endpoint", "Custom Provider 1", { reasoningEffort: "none" }],
+]) {
+  it(`user adds a ${choice} service: Given the add menu, When the service is added, Then its provider options show the options that turn off thinking`, async () => {
+    // Given
+    await page.getByRole("button", { name: /^Add a service/ }).click()
+
+    // When
+    await page.getByRole("button", { name: choice, exact: true }).click()
+    await page.waitForFunction(name => document.querySelector("#name")?.value === name, name)
+
+    // Then
+    await openAdvancedSettings()
+    assert.deepEqual(JSON.parse(await providerOptionsEditor().textContent()), options)
+    await waitForSavedProviderOptions(name, options)
+  })
+}
+
+for (const [providerName, thinkingOff] of [
+  ["DeepSeek", { thinking: { type: "disabled" } }],
+  ["Custom Provider", { reasoning_effort: "none" }],
+]) {
+  it(`user tests the connection of ${providerName}: Given the options of a new install, When the options are removed and the connection is tested again, Then only the first request turns off thinking`, async () => {
+    // Given
+    await openProvider(providerName)
+    await fill("#apiKey", "test-key")
+    await fill("#baseURL", baseURL)
+    await modelInput().fill("future-chat-model")
+    await waitForSavedProvider({ name: providerName, model: "future-chat-model", baseURL })
+    await testConnection()
+
+    // When
+    await openAdvancedSettings()
+    await typeProviderOptions("")
+    await waitForSavedProviderOptions(providerName, undefined)
+    await testConnection()
+
+    // Then
+    const thinkingFields = body => Object.fromEntries(Object.entries(body).filter(([key]) => ["thinking", "reasoning_effort"].includes(key)))
+    assert.deepEqual(chatRequests.map(thinkingFields), [thinkingOff, {}])
+  })
+}
 
 it("user clears the model: Given a provider with a model, When the model field is cleared, Then an error shows and the saved model stays", async () => {
   // Given

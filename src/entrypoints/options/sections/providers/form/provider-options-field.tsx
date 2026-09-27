@@ -4,8 +4,6 @@ import { useCallback } from "react"
 import { i18n } from "#imports"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { isLLMProviderConfig } from "@/types/config/provider"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getRecommendedProviderOptions } from "@/utils/providers/options"
 import { AutosavedJsonCodeEditorField } from "./components/autosaved-json-code-editor-field"
 import { withForm } from "./form"
 
@@ -20,6 +18,8 @@ function parseJson(input: string): { valid: true, value: Record<string, unknown>
     return { valid: false, error: i18n.t("options.providers.form.invalidJson") }
   }
 }
+
+const PLACEHOLDER = JSON.stringify({ field: "value" }, null, 2)
 
 function toJson(options: APIProviderConfig["providerOptions"]) {
   return options ? JSON.stringify(options, null, 2) : ""
@@ -41,14 +41,6 @@ export const ProviderOptionsField = withForm({
       return null
     }
 
-    const modelId = resolveModelId(providerConfig.model)
-    const placeholderText = (() => {
-      const recommendedOptions = getRecommendedProviderOptions(modelId ?? "")
-      return recommendedOptions
-        ? JSON.stringify(recommendedOptions, null, 2)
-        : JSON.stringify({ field: "value" }, null, 2)
-    })()
-
     return (
       <AutosavedJsonCodeEditorField
         value={providerConfig.providerOptions}
@@ -59,7 +51,7 @@ export const ProviderOptionsField = withForm({
         onCommit={handleProviderOptionsCommit}
         onSubmit={handleSubmit}
         editorAriaLabel="provider-options-editor"
-        placeholder={placeholderText}
+        placeholder={PLACEHOLDER}
         label={(
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-1.5">

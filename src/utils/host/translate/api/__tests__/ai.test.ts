@@ -6,8 +6,7 @@ import { aiTranslate } from "../ai"
 const mocks = vi.hoisted(() => ({
   generateText: vi.fn(),
   getModelById: vi.fn(),
-  resolveModelId: vi.fn(),
-  getProviderOptionsWithOverride: vi.fn(),
+  getProviderOptions: vi.fn(),
 }))
 
 vi.mock("ai", () => ({
@@ -18,12 +17,8 @@ vi.mock("@/utils/providers/model", () => ({
   getModelById: mocks.getModelById,
 }))
 
-vi.mock("@/utils/providers/model-id", () => ({
-  resolveModelId: mocks.resolveModelId,
-}))
-
 vi.mock("@/utils/providers/options", () => ({
-  getProviderOptionsWithOverride: mocks.getProviderOptionsWithOverride,
+  getProviderOptions: mocks.getProviderOptions,
 }))
 
 const providerConfig: LLMProviderConfig = {
@@ -44,8 +39,7 @@ describe("aiTranslate", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.getModelById.mockResolvedValue("model")
-    mocks.resolveModelId.mockReturnValue("gpt-5-mini")
-    mocks.getProviderOptionsWithOverride.mockReturnValue({})
+    mocks.getProviderOptions.mockReturnValue({})
   })
 
   it("preserves AI SDK error metadata for retry policy decisions", async () => {

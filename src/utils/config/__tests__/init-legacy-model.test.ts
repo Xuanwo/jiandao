@@ -6,7 +6,7 @@ import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
 import { initializeConfig } from "../init"
 
 const LEGACY_MODELS = {
-  "openai": { model: "gpt-5-mini", isCustomModel: false, customModel: null },
+  "openai": { model: "gpt-5.4-mini", isCustomModel: false, customModel: null },
   "deepseek": { model: "deepseek-chat", isCustomModel: true, customModel: "deepseek-v4-pro" },
   "openai-compatible": { model: "use-custom-model", isCustomModel: true, customModel: null },
 }
@@ -33,7 +33,7 @@ it("user upgrades with saved providers: Given a config saved with the old model 
   // Then
   const stored = await storage.getItem<Config>(`local:${CONFIG_STORAGE_KEY}`)
   expect(stored?.providersConfig.map(({ provider, apiKey, model }) => ({ provider, apiKey, model }))).toEqual([
-    { provider: "openai", apiKey: "key-openai", model: "gpt-5-mini" },
+    { provider: "openai", apiKey: "key-openai", model: "gpt-5.4-mini" },
     { provider: "deepseek", apiKey: "key-deepseek", model: "deepseek-v4-pro" },
     { provider: "openai-compatible", apiKey: "key-openai-compatible", model: "" },
   ])

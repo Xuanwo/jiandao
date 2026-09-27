@@ -110,11 +110,6 @@ options:
       providerOptions: Sağlayıcı Seçenekleri
       providerOptionsHint: Düşünme/akıl yürütme modu gibi standart dışı API özellikleri için sağlayıcıya özel seçenekler. Ayrıntılar için Vercel AI SDK belgelerine veya sağlayıcınızın resmi belgelerine bakın.
       providerOptionsDocsLink: Sağlayıcı Belgelerini Görüntüle
-      providerOptionsRecommendationTrigger: Önerilen sağlayıcı seçeneklerini görüntüle
-      providerOptionsRecommendationTitle: Önerilen sağlayıcı seçenekleri bulundu
-      providerOptionsRecommendationDescription: Önerilen yapılandırmayı gözden geçirip manuel olarak uygulayın.
-      providerOptionsRecommendationApply: Uygula
-      providerOptionsRecommendationApplied: Uygulandı
       invalidJson: Geçersiz JSON formatı
     providers:
       description:

@@ -82,11 +82,6 @@ options:
       providerOptions: Provider 选项
       providerOptionsHint: 用于思考 / 推理模式等非标准 API 功能的服务商专有选项。详见 Vercel AI SDK 文档或服务商文档。
       providerOptionsDocsLink: 查看服务商文档
-      providerOptionsRecommendationTrigger: 查看推荐的 Provider 选项
-      providerOptionsRecommendationTitle: 检测到推荐的 Provider 选项
-      providerOptionsRecommendationDescription: 请先检查，再应用推荐配置。
-      providerOptionsRecommendationApply: 应用
-      providerOptionsRecommendationApplied: 已应用
       invalidJson: JSON 格式无效
       testConnection:
         button: 测试连接

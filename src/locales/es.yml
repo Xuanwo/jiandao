@@ -111,11 +111,6 @@ options:
       providerOptions: Opciones del proveedor
       providerOptionsHint: Opciones específicas del proveedor para funciones API no estándar, como el modo thinking/reasoning. Consulta la documentación de Vercel AI SDK o la documentación oficial de tu proveedor para ver detalles de configuración.
       providerOptionsDocsLink: Ver documentación del proveedor
-      providerOptionsRecommendationTrigger: Ver opciones recomendadas del proveedor
-      providerOptionsRecommendationTitle: Opciones recomendadas del proveedor detectadas
-      providerOptionsRecommendationDescription: Revisa y aplica manualmente la configuración recomendada.
-      providerOptionsRecommendationApply: Aplicar
-      providerOptionsRecommendationApplied: Aplicado
       invalidJson: Formato JSON no válido
     providers:
       description:

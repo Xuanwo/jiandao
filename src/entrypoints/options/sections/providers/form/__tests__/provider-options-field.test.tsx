@@ -147,47 +147,12 @@ describe("providerOptionsField", () => {
     expect(screen.getByLabelText("provider-options-editor")).toHaveValue("{\"reasoningEffort\":\"low\"}")
   })
 
-  it("shows the matched recommended provider options as the placeholder when the value is empty", () => {
-    render(<ProviderOptionsFieldHarness initialConfig={baseProviderConfig} />)
+  it("user clears the provider options: Given no saved options, When the field shows, Then the placeholder shows only the format and no option that a request would send", () => {
+    render(<ProviderOptionsFieldHarness initialConfig={{ ...baseProviderConfig, provider: "deepseek", model: "deepseek-flash" }} />)
 
     expect(screen.getByLabelText("provider-options-editor")).toHaveAttribute(
       "placeholder",
-      JSON.stringify({ reasoningEffort: "minimal" }, null, 2),
-    )
-  })
-
-  it("uses the current model recommendation for the placeholder", () => {
-    render(
-      <ProviderOptionsFieldHarness
-        initialConfig={{
-          ...baseProviderConfig,
-          provider: "deepseek",
-          model: "deepseek-v4-flash",
-        }}
-      />,
-    )
-
-    expect(screen.getByLabelText("provider-options-editor")).toHaveAttribute(
-      "placeholder",
-      JSON.stringify({ thinking: { type: "disabled" } }, null, 2),
-    )
-  })
-
-  it("matches recommendations by model name even when the provider differs", () => {
-    render(
-      <ProviderOptionsFieldHarness
-        initialConfig={{
-          ...baseProviderConfig,
-          provider: "openai-compatible",
-          baseURL: "https://api.example.com/v1",
-          model: "gpt-5-mini",
-        }}
-      />,
-    )
-
-    expect(screen.getByLabelText("provider-options-editor")).toHaveAttribute(
-      "placeholder",
-      JSON.stringify({ reasoningEffort: "minimal" }, null, 2),
+      JSON.stringify({ field: "value" }, null, 2),
     )
   })
 
