@@ -125,3 +125,30 @@ export async function reportFailure(test, context) {
 export async function clickButton(page, name) {
   await page.getByRole("button", { name, exact: true }).click()
 }
+
+/** The extension's stored config, read in the service worker. */
+export async function storedConfig(context) {
+  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker")
+  return worker.evaluate(async () => (await chrome.storage.local.get("config")).config)
+}
+
+/**
+ * Records what the page hands to navigator.clipboard.writeText while keeping
+ * the real call. Extension pages are opaque origins, so CDP cannot grant
+ * clipboard-read to them; recording the writes is the next best check.
+ */
+export async function trackClipboard(page) {
+  await page.evaluate(() => {
+    const original = navigator.clipboard.writeText.bind(navigator.clipboard)
+    window.__clipboardWrites = []
+    navigator.clipboard.writeText = (text) => {
+      window.__clipboardWrites.push(text)
+      return original(text)
+    }
+  })
+}
+
+/** Every text written to the clipboard since trackClipboard, oldest first. */
+export function readClipboardWrites(page) {
+  return page.evaluate(() => window.__clipboardWrites ?? [])
+}

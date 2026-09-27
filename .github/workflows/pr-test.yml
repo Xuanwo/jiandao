@@ -53,8 +53,31 @@ jobs:
       - name: Run tests
         run: pnpm test --exclude="**/free-api.test.ts"
 
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build extension
+        run: pnpm build
+
       # The headless shell cannot load extensions, so only full Chromium is installed.
-      - name: Install Chromium and its system libraries for E2E tests
+      - name: Install Chromium and its system libraries
         run: pnpm exec playwright-core install --with-deps --no-shell chromium
 
       - name: Run E2E tests
