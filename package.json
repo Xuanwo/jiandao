@@ -25,7 +25,8 @@
     "zip:edge": "wxt zip -b edge",
     "zip:firefox": "wxt zip -b firefox --mv3",
     "zip:all": "pnpm zip && pnpm zip:edge && pnpm zip:firefox",
-    "prepare": "husky"
+    "prepare": "husky",
+    "schema:setup": "UPDATE_SETUP_SCHEMA=1 vitest run src/utils/__tests__/setup-schema.test.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.36",
@@ -34,13 +35,11 @@
     "@babel/runtime": "^7.29.7",
     "@base-ui/react": "^1.5.0",
     "@codemirror/lang-css": "^6.3.1",
-    "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.43.1",
     "@tabler/icons-react": "^3.44.0",
     "@tanstack/hotkeys": "^0.8.0",
-    "@tanstack/react-form": "^1.33.0",
     "@tanstack/react-query": "^5.101.0",
     "@uiw/codemirror-extensions-color": "^4.25.10",
     "@uiw/react-codemirror": "^4.25.10",

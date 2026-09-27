@@ -22,15 +22,18 @@ popup:
   notTranslatable: 这个页面不能翻译。
   settings: 设置
   provider:
-    switch: 切换翻译服务
+    none: 尚无服务
     missingKey: 未配置
   setup:
-    title: 先填入 $1 的 API Key
-    description: 密钥只保存在这个浏览器里，网页文本直接发给 $1。
-    placeholder: sk-…
-    saveAndTranslate: 保存并翻译此页
-    save: 保存
-    otherService: 改用 DeepSeek 或自建服务 →
+    title: 还没有翻译服务
+    description: 把说明交给你的 agent，它会用你的密钥验证一份配置并放进剪贴板，贴到下面就行。
+    copyInstructions: 复制给 agent 的说明
+    copied: 已复制
+    pasteLabel: agent 生成的配置
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: 配置里没有 API Key
+    apply: 应用并翻译此页
+    applyOnly: 应用
 errorRecovery:
   title: 应用发生异常
   description: 已进入恢复模式。刷新页面或重置设置后再试。
@@ -47,60 +50,42 @@ errorRecovery:
     cancel: 取消
 options:
   title: 设置
-  providers:
+  service:
     title: 翻译服务
-    description: 选一个用于翻译。密钥只保存在浏览器里，网页文本直接发给该服务。
-    useForTranslation: 用 $1 翻译
+    description: 由你的 agent 配置，不用手填。Plainly 只预览并应用 agent 生成的配置。
+    key: 密钥
     keyConfigured: 已填密钥
     keyMissing: 未填密钥
-    add: 添加服务：OpenAI、DeepSeek 或任何 OpenAI 兼容接口
-    addChoice:
-      openai: OpenAI
-      deepseek: DeepSeek
-      openaiCompatible: OpenAI 兼容接口
-    duplicate: 复制
-    delete: 删除
-    duplicateName: 已经有一个服务叫“$1”
-    atLeastOne: 至少保留一个翻译服务。
-    deleteDialog:
-      title: 删除这个服务？
-      description: 此操作无法撤销。如果它正用于翻译，会自动改用其他服务。
-      confirm: 删除
+    sendsTo: 网页文本发往 $1
+    thinkingOff: 思考模式已关闭
+    connected: 已连接
+    connectionFailed: 连接失败
+    import: 导入配置
+    export: 复制当前配置
+    copyInstructions: 复制给 agent 的说明
+    copied: 已复制
+    test: 测试连接
+    testing: 测试中…
+    remove: 移除
+    removeDialog:
+      title: 移除“$1”？
+      description: 它的密钥会从这个浏览器里删除。如果没有剩下的服务，弹窗会重新提示配置。
+      confirm: 移除
       cancel: 取消
-    form:
-      name: 名称
-      apiKey: API Key
-      showApiKey: 显示密钥
-      baseURL: Base URL
-      optional: 可选
-      model: 模型
-      customModel: 改为手动输入模型名
-      advanced: 高级：温度、请求头、Provider 选项
-      temperature: 温度
-      temperatureHint: 控制回复的随机性。越低（0）越确定，越高越发散。范围因服务商而异，留空则使用服务商默认值。
-      headers: 请求头
-      headersHint: 创建 AI 客户端时附加的自定义 HTTP 请求头。留空使用默认值；填 {} 可禁用默认值。
-      providerOptions: Provider 选项
-      providerOptionsHint: 用于思考 / 推理模式等非标准 API 功能的服务商专有选项。详见 Vercel AI SDK 文档或服务商文档。
-      providerOptionsDocsLink: 查看服务商文档
-      providerOptionsRecommendationTrigger: 查看推荐的 Provider 选项
-      providerOptionsRecommendationTitle: 检测到推荐的 Provider 选项
-      providerOptionsRecommendationDescription: 请先检查，再应用推荐配置。
-      providerOptionsRecommendationApply: 应用
-      providerOptionsRecommendationApplied: 已应用
-      invalidJson: JSON 格式无效
-      testConnection:
-        button: 测试连接
-        testing: 测试中…
-      models:
-        fetchModels: 获取可用模型
-        fetchError: 获取模型失败
-        clickToRetry: 点击重试
-        noModels: 没有可用的模型
-        selectModel: 选择模型
-        apiKeyRequired: 请先填写 API Key
-        searchModels: 搜索模型…
-        noModelsFound: 未找到模型
+    importPanel:
+      title: 导入配置
+      description: 粘贴 agent 放进剪贴板的配置。agent 已经用真实接口验证过它；应用时 Plainly 会再发一条极短请求确认。
+      pasteLabel: 配置 JSON
+      previewTitle: 将会应用
+      empty: 粘贴的内容是一份有效配置后，这里会显示预览。
+      replaces: 已有的 $1 服务会被替换，其它服务和设置不变。
+      adds: 会新增一个服务，其它服务和设置不变。
+      clearsClipboard: 应用后会清空剪贴板。
+      confirming: 已应用，正在确认连接…
+      done: 已连接，翻译现在使用这个服务。
+      cancel: 取消
+      close: 关闭
+      apply: 应用并确认连接
   reading:
     title: 阅读
     description: 译文怎么出现在页面上。
@@ -222,6 +207,28 @@ translation:
   failed: 翻译失败
   retry: 重试
   unknownError: 出了点问题
+setupPreview:
+  provider: 翻译服务
+  model: 模型
+  apiKey: API Key
+  keyNew: 新密钥
+  keyReused: 沿用已存密钥
+  keyMissing: 缺少
+  host: 网页文本会发往
+  thinking: 关闭思考模式
+  yes: 是
+  no: 否
+  unset: 未设置
+  languages: 目标语言 · 显示
+  unchanged: 不变
+agentInstructions:
+  noConfiguration: （尚未配置）
+  text: |
+    我在用浏览器扩展 Plainly（素读）翻译网页，请帮我配置它的翻译服务。
+    先阅读说明：$1
+    按说明操作：问清我要用哪家服务、API Key 在哪里、我读什么语言；用我的 Key 按说明里的请求模板验证，直到请求成功；把配置 JSON 写入我的剪贴板；最后告诉我在 Plainly 弹窗里粘贴并应用。
+    我当前的配置（密钥已脱敏）：
+    $2
 shortcutKeySelector:
   placeholder: 按下快捷键
 languages:

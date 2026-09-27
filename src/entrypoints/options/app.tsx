@@ -2,15 +2,17 @@ import { useEffect } from "react"
 import { AdvancedSection } from "./sections/advanced"
 import { SettingsFooter } from "./sections/footer"
 import { SettingsHeader } from "./sections/header"
-import { ProvidersSection } from "./sections/providers"
 import { QualitySection } from "./sections/quality"
 import { ReadingSection } from "./sections/reading"
+import { IMPORT_HASH, ServiceSection } from "./sections/service"
 
 function useScrollToHashSection() {
   useEffect(() => {
-    const sectionId = window.location.hash.slice(1)
-    if (!sectionId)
+    const hash = window.location.hash.slice(1)
+    if (!hash)
       return
+    // "#import" opens the paste box inside the service section.
+    const sectionId = hash === IMPORT_HASH ? "service" : hash
     document.getElementById(sectionId)?.scrollIntoView({ block: "start" })
   }, [])
 }
@@ -26,7 +28,7 @@ export default function App() {
   return (
     <main className="mx-auto flex w-full max-w-[640px] flex-col gap-10 px-6 pt-12 pb-16 text-[13px]">
       <SettingsHeader />
-      <ProvidersSection />
+      <ServiceSection />
       <ReadingSection />
       <QualitySection />
       <AdvancedSection />

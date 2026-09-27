@@ -22,15 +22,18 @@ popup:
   notTranslatable: This page can't be translated.
   settings: Settings
   provider:
-    switch: Switch translation service
+    none: No service yet
     missingKey: no key yet
   setup:
-    title: Add your $1 API key first
-    description: The key stays in this browser. Page text goes straight to $1.
-    placeholder: sk-…
-    saveAndTranslate: Save and translate this page
-    save: Save
-    otherService: Use DeepSeek or a self-hosted service instead →
+    title: No translation service yet
+    description: Hand the instructions to your agent. It verifies a configuration with your key and puts it on the clipboard; paste it below.
+    copyInstructions: Copy instructions for your agent
+    copied: Copied
+    pasteLabel: Configuration from your agent
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: no API key in the configuration
+    apply: Apply and translate this page
+    applyOnly: Apply
 errorRecovery:
   title: Something went wrong
   description: Recovery mode is active. Refresh the page or reset settings and try again.
@@ -47,60 +50,42 @@ errorRecovery:
     cancel: Cancel
 options:
   title: Settings
-  providers:
+  service:
     title: Translation service
-    description: Pick the one to translate with. Keys stay in this browser; page text goes straight to that service.
-    useForTranslation: Use $1 for translation
+    description: Set up by your agent, not by hand. Plainly previews what the agent produced and applies it.
+    key: Key
     keyConfigured: Key set
     keyMissing: No key yet
-    add: "Add a service: OpenAI, DeepSeek, or any OpenAI-compatible endpoint"
-    addChoice:
-      openai: OpenAI
-      deepseek: DeepSeek
-      openaiCompatible: OpenAI-compatible endpoint
-    duplicate: Duplicate
-    delete: Delete
-    duplicateName: 'Another service is already named "$1"'
-    atLeastOne: Keep at least one translation service.
-    deleteDialog:
-      title: Delete this service?
-      description: This cannot be undone. If it was used for translation, another service takes over.
-      confirm: Delete
+    sendsTo: Page text goes to $1
+    thinkingOff: Thinking off
+    connected: Connected
+    connectionFailed: Connection failed
+    import: Import configuration
+    export: Copy current configuration
+    copyInstructions: Copy instructions for your agent
+    copied: Copied
+    test: Test connection
+    testing: Testing…
+    remove: Remove
+    removeDialog:
+      title: Remove "$1"?
+      description: Its key is deleted from this browser. If no service is left, the popup asks you to set one up again.
+      confirm: Remove
       cancel: Cancel
-    form:
-      name: Name
-      apiKey: API Key
-      showApiKey: Show key
-      baseURL: Base URL
-      optional: optional
-      model: Model
-      customModel: Type a model name instead
-      advanced: "Advanced: temperature, headers, provider options"
-      temperature: Temperature
-      temperatureHint: Controls randomness in responses. Lower values (0) are more deterministic, higher values are more creative. Range varies by provider. Leave empty to use the provider default.
-      headers: Headers
-      headersHint: Custom HTTP headers sent when creating the AI provider client. Leave empty to use provider defaults; use {} to disable defaults.
-      providerOptions: Provider options
-      providerOptionsHint: Provider-specific options for non-standard API features like thinking/reasoning mode. See the Vercel AI SDK docs or your provider's documentation.
-      providerOptionsDocsLink: View provider docs
-      providerOptionsRecommendationTrigger: View recommended provider options
-      providerOptionsRecommendationTitle: Recommended provider options detected
-      providerOptionsRecommendationDescription: Review and apply the recommended configuration.
-      providerOptionsRecommendationApply: Apply
-      providerOptionsRecommendationApplied: Applied
-      invalidJson: Invalid JSON
-      testConnection:
-        button: Test connection
-        testing: Testing…
-      models:
-        fetchModels: Fetch available models
-        fetchError: Failed to fetch models
-        clickToRetry: Click to retry
-        noModels: No models available
-        selectModel: Select a model
-        apiKeyRequired: Add the API key first
-        searchModels: Search models…
-        noModelsFound: No models found
+    importPanel:
+      title: Import configuration
+      description: Paste the configuration your agent put on the clipboard. The agent already verified it against the service; Plainly sends one short request to confirm.
+      pasteLabel: Configuration JSON
+      previewTitle: What will be applied
+      empty: The preview appears once the pasted text is a valid configuration.
+      replaces: The stored $1 service is replaced. Other services and settings stay.
+      adds: A new service is added. Other services and settings stay.
+      clearsClipboard: The clipboard is cleared after applying.
+      confirming: Applied. Confirming the connection…
+      done: Connected. Translation uses this service now.
+      cancel: Cancel
+      close: Close
+      apply: Apply and confirm connection
   reading:
     title: Reading
     description: How translations appear on the page.
@@ -222,6 +207,28 @@ translation:
   failed: Translation failed
   retry: Retry
   unknownError: Something went wrong
+setupPreview:
+  provider: Translation service
+  model: Model
+  apiKey: API Key
+  keyNew: new key
+  keyReused: stored key kept
+  keyMissing: missing
+  host: Page text goes to
+  thinking: Thinking off
+  yes: Yes
+  no: No
+  unset: Not set
+  languages: Target language · display
+  unchanged: Unchanged
+agentInstructions:
+  noConfiguration: (none yet)
+  text: |
+    I use the browser extension Plainly (素读) to translate web pages. Please set up its translation service for me.
+    Read the guide first: $1
+    Follow it: ask me which service I want, where my API key is and which language I read in. Verify with my key using the request template in the guide until a request succeeds. Write the configuration JSON to my clipboard. Then tell me to paste it into the Plainly popup and apply.
+    My current configuration, with the key masked:
+    $2
 shortcutKeySelector:
   placeholder: Press a shortcut
 languages:
