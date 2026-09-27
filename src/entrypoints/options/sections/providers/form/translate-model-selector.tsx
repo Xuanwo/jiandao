@@ -1,12 +1,7 @@
 import type { APIProviderConfig } from "@/types/config/provider"
 import { useStore } from "@tanstack/react-form"
-import { useSetAtom } from "jotai"
-import { toast } from "sonner"
 import { i18n } from "#imports"
-import { Checkbox } from "@/components/ui/base-ui/checkbox"
-import { SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/base-ui/select"
-import { isCustomLLMProviderConfig, isLLMProviderConfig, LLM_PROVIDER_MODELS } from "@/types/config/provider"
-import { providerConfigAtom, updateLLMProviderConfig } from "@/utils/atoms/provider"
+import { isLLMProviderConfig } from "@/types/config/provider"
 import { resolveModelId } from "@/utils/providers/model-id"
 import { ModelSuggestionButton } from "./components/model-suggestion-button"
 import { ProviderOptionsRecommendationTrigger } from "./components/provider-options-recommendation-trigger"
@@ -16,126 +11,43 @@ export const TranslateModelSelector = withForm({
   ...{ defaultValues: {} as APIProviderConfig },
   render: function Render({ form }) {
     const providerConfig = useStore(form.store, state => state.values)
-    const setProviderConfig = useSetAtom(providerConfigAtom(providerConfig.id))
     if (!isLLMProviderConfig(providerConfig))
       return <></>
 
     const modelId = resolveModelId(providerConfig.model)
-    const { isCustomModel, customModel, model } = providerConfig.model
-
-    const applyRecommendedProviderOptions = (options: Record<string, unknown>) => {
-      form.setFieldValue("providerOptions", options)
+    const setModel = (model: string) => {
+      form.setFieldValue("model", model)
       void form.handleSubmit()
     }
 
-    const recommendationTrigger = (
-      <ProviderOptionsRecommendationTrigger
-        providerId={providerConfig.id}
-        modelId={modelId}
-        currentProviderOptions={providerConfig.providerOptions}
-        onApply={applyRecommendedProviderOptions}
-      />
-    )
-
     return (
-      <div>
-        {isCustomModel
-          ? (
-              <form.AppField name="model.customModel">
-                {field => (
-                  <field.InputFieldAutoSave
-                    formForSubmit={form}
-                    label={i18n.t("options.providers.form.model")}
-                    labelExtra={(
-                      <div className="flex items-center gap-2">
-                        {recommendationTrigger}
-                        {isCustomLLMProviderConfig(providerConfig) && (
-                          <ModelSuggestionButton
-                            baseURL={providerConfig.baseURL}
-                            apiKey={providerConfig.apiKey}
-                            onSelect={(model) => {
-                              field.handleChange(model)
-                              void form.handleSubmit()
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    value={customModel ?? ""}
-                  />
-                )}
-              </form.AppField>
-            )
-          : (
-              <form.AppField name="model.model">
-                {field => (
-                  <field.SelectFieldAutoSave
-                    formForSubmit={form}
-                    label={i18n.t("options.providers.form.model")}
-                    labelExtra={recommendationTrigger}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={i18n.t("options.providers.form.models.selectModel")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {LLM_PROVIDER_MODELS[providerConfig.provider].map(model => (
-                          <SelectItem key={model} value={model}>
-                            {model}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </field.SelectFieldAutoSave>
-                )}
-              </form.AppField>
-            )}
-        {providerConfig.provider !== "openai-compatible" && (
-          <form.Field name="model.isCustomModel">
-            {field => (
-              <div className="mt-2.5 flex items-center space-x-2">
-                <Checkbox
-                  id="isCustomModel-translate"
-                  checked={field.state.value}
-                  onCheckedChange={(checked) => {
-                    try {
-                      if (checked === false) {
-                        void setProviderConfig(
-                          updateLLMProviderConfig(providerConfig, {
-                            model: {
-                              customModel: null,
-                              isCustomModel: false,
-                            },
-                          }),
-                        )
-                      }
-                      else if (checked === true) {
-                        void setProviderConfig(
-                          updateLLMProviderConfig(providerConfig, {
-                            model: {
-                              customModel: model,
-                              isCustomModel: true,
-                            },
-                          }),
-                        )
-                      }
-                    }
-                    catch (error) {
-                      toast.error(error instanceof Error ? error.message : "Failed to update configuration")
-                    }
+      <form.AppField
+        name="model"
+        validators={{
+          onChange: ({ value }) => value.trim() ? undefined : i18n.t("options.providers.form.models.required"),
+        }}
+      >
+        {field => (
+          <field.InputFieldAutoSave
+            formForSubmit={form}
+            label={i18n.t("options.providers.form.model")}
+            labelExtra={(
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <ProviderOptionsRecommendationTrigger
+                  providerId={providerConfig.id}
+                  modelId={modelId}
+                  currentProviderOptions={providerConfig.providerOptions}
+                  onApply={(options) => {
+                    form.setFieldValue("providerOptions", options)
+                    void form.handleSubmit()
                   }}
                 />
-                <label
-                  htmlFor="isCustomModel-translate"
-                  className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
-                  {i18n.t("options.providers.form.customModel")}
-                </label>
+                <ModelSuggestionButton providerConfig={providerConfig} onSelect={setModel} />
               </div>
             )}
-          </form.Field>
+          />
         )}
-      </div>
+      </form.AppField>
     )
   },
 })

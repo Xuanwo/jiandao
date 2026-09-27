@@ -96,9 +96,9 @@ options:
         clickToRetry: 點選重試
         noModels: 沒有可用的模型
         selectModel: 選擇模型
-        apiKeyRequired: 請先新增 API 金鑰
         searchModels: 搜尋模型…
         noModelsFound: 找不到模型
+        required: 請填寫模型 ID。
       featureProviders: 功能提供者
       advancedOptions: 進階選項
       providerSettingLabels:

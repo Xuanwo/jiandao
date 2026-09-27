@@ -10,12 +10,6 @@ interface OpenAIGPT5ReasoningEffortPolicy {
   recommendedValue?: OpenAIReasoningEffort
 }
 
-export const LLM_PROVIDER_MODELS = {
-  "openai": ["gpt-5.4-pro", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano", "gpt-5.3-chat-latest", "gpt-5.2-pro", "gpt-5.2", "gpt-5.2-chat-latest", "gpt-5.1-codex-mini", "gpt-5.1-codex", "gpt-5.1", "gpt-5.1-chat-latest", "gpt-5-pro", "gpt-5-codex", "gpt-5", "gpt-5-mini", "gpt-5-nano", "gpt-5-chat-latest", "gpt-4.1-nano", "gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o"],
-  "deepseek": ["deepseek-v4-flash", "deepseek-v4-pro", "deepseek-chat", "deepseek-reasoner"],
-  "openai-compatible": ["use-custom-model"],
-} as const
-
 const OPENAI_GPT5_REASONING_EFFORT_POLICIES: OpenAIGPT5ReasoningEffortPolicy[] = [
   {
     pattern: /^gpt-5\.4-pro$/i,

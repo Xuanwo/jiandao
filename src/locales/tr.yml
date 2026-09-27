@@ -96,9 +96,9 @@ options:
         clickToRetry: Yeniden denemek için tıklayın
         noModels: Mevcut model yok
         selectModel: Model seç
-        apiKeyRequired: Lütfen önce API anahtarı ekleyin
         searchModels: Model ara...
         noModelsFound: Model bulunamadı
+        required: Bir model kimliği girin.
       featureProviders: Özellik Sağlayıcıları
       advancedOptions: Gelişmiş Seçenekler
       providerSettingLabels:

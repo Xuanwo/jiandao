@@ -74,7 +74,6 @@ options:
       baseURL: Base URL
       optional: 可选
       model: 模型
-      customModel: 改为手动输入模型名
       advanced: 高级：温度、请求头、Provider 选项
       temperature: 温度
       temperatureHint: 控制回复的随机性。越低（0）越确定，越高越发散。范围因服务商而异，留空则使用服务商默认值。
@@ -98,9 +97,9 @@ options:
         clickToRetry: 点击重试
         noModels: 没有可用的模型
         selectModel: 选择模型
-        apiKeyRequired: 请先填写 API Key
         searchModels: 搜索模型…
         noModelsFound: 未找到模型
+        required: 请填写模型 ID。
   reading:
     title: 阅读
     description: 译文怎么出现在页面上。

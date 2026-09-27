@@ -96,9 +96,9 @@ options:
         clickToRetry: クリックして再試行
         noModels: 利用可能なモデルがありません
         selectModel: モデルを選択
-        apiKeyRequired: 先にAPIキーを追加してください
         searchModels: モデルを検索...
         noModelsFound: モデルが見つかりません
+        required: モデル ID を入力してください。
       featureProviders: 機能プロバイダー
       advancedOptions: 詳細オプション
       providerSettingLabels:

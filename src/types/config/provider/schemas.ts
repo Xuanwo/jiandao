@@ -1,6 +1,5 @@
 import type {
   APIProviderTypes,
-  CustomLLMProviderTypes,
   LLMProviderTypes,
   NonCustomLLMProviderTypes,
   TranslateProviderTypes,
@@ -8,20 +7,29 @@ import type {
 
 import { z } from "zod"
 
-import { LLM_PROVIDER_MODELS } from "./constants"
-
 /* ──────────────────────────────
   Providers config schema
   ────────────────────────────── */
 
-// Helper function to create provider-specific model schema
-function createProviderModelSchema<T extends LLMProviderTypes>(provider: T) {
-  const models = LLM_PROVIDER_MODELS[provider]
-  return z.object({
-    model: z.enum(models),
-    isCustomModel: provider === "openai-compatible" ? z.literal(true) : z.boolean(),
+// An empty model means that the provider has no model yet.
+const providerModelSchema = z.string()
+
+// Configs saved before the model catalog was removed store the model as
+// { model, isCustomModel, customModel }. The other provider fields stay as they are.
+const legacyProviderSchema = z.looseObject({
+  model: z.object({
+    model: z.string(),
+    isCustomModel: z.boolean(),
     customModel: z.string().nullable(),
-  })
+  }),
+})
+
+function migrateLegacyProviderModel(provider: unknown): unknown {
+  const legacy = legacyProviderSchema.safeParse(provider)
+  if (!legacy.success)
+    return provider
+  const { model, isCustomModel, customModel } = legacy.data.model
+  return { ...legacy.data, model: isCustomModel ? customModel ?? "" : model }
 }
 
 // Base schema without models
@@ -47,15 +55,15 @@ export const baseCustomLLMProviderConfigSchema = baseAPIProviderConfigSchema.ext
 const llmProviderConfigSchemaList = [
   baseCustomLLMProviderConfigSchema.extend({
     provider: z.literal("openai-compatible"),
-    model: createProviderModelSchema<"openai-compatible">("openai-compatible"),
+    model: providerModelSchema,
   }),
   baseAPIProviderConfigSchema.extend({
     provider: z.literal("openai"),
-    model: createProviderModelSchema<"openai">("openai"),
+    model: providerModelSchema,
   }),
   baseAPIProviderConfigSchema.extend({
     provider: z.literal("deepseek"),
-    model: createProviderModelSchema<"deepseek">("deepseek"),
+    model: providerModelSchema,
   }),
 ] as const
 
@@ -67,11 +75,10 @@ export const providerConfigSchemaList = [
   ...apiProviderConfigSchemaList,
 ] as const
 
-export const llmProviderConfigItemSchema = z.discriminatedUnion("provider", llmProviderConfigSchemaList)
 export const apiProviderConfigItemSchema = z.discriminatedUnion("provider", apiProviderConfigSchemaList)
 export const providerConfigItemSchema = z.discriminatedUnion("provider", providerConfigSchemaList)
 
-export const providersConfigSchema = z.array(providerConfigItemSchema).superRefine(
+export const providersConfigSchema = z.array(z.preprocess(migrateLegacyProviderModel, providerConfigItemSchema)).superRefine(
   (providers, ctx) => {
     const idSet = new Set<string>()
     providers.forEach((provider, index) => {
@@ -104,39 +111,3 @@ export type APIProviderConfig = Extract<ProviderConfig, { provider: APIProviderT
 export type LLMProviderConfig = Extract<ProviderConfig, { provider: LLMProviderTypes }>
 export type TranslateProviderConfig = Extract<ProviderConfig, { provider: TranslateProviderTypes }>
 export type NonCustomLLMProviderConfig = Extract<ProviderConfig, { provider: NonCustomLLMProviderTypes }>
-export type CustomLLMProviderConfig = Extract<ProviderConfig, { provider: CustomLLMProviderTypes }>
-
-/* ──────────────────────────────
-  unified llm model config helpers
-  ────────────────────────────── */
-
-type ModelTuple = readonly [string, ...string[]] // 至少一个元素才能给 z.enum
-function providerConfigSchema<T extends ModelTuple>(models: T) {
-  return z.object({
-    model: z.enum(models),
-    isCustomModel: z.boolean(),
-    customModel: z.string().nullable(),
-  })
-}
-
-type SchemaShape<M extends Record<string, ModelTuple>> = { [K in keyof M]: ReturnType<typeof providerConfigSchema<M[K]>> }
-
-function buildProviderModelsSchema<M extends Record<string, ModelTuple>>(models: M) {
-  return z.object(
-    // Keep key names and types when building schema dynamically.
-    (Object.keys(models) as (keyof M)[]).reduce((acc, key) => {
-      acc[key] = providerConfigSchema(models[key])
-      return acc
-    }, {} as SchemaShape<M>),
-  )
-}
-
-const { "openai-compatible": _, ...modelsWithoutOpenaiCompatible } = LLM_PROVIDER_MODELS
-export const llmProviderModelsSchema = buildProviderModelsSchema(modelsWithoutOpenaiCompatible).extend({
-  "openai-compatible": z.object({
-    model: z.enum(LLM_PROVIDER_MODELS["openai-compatible"]),
-    isCustomModel: z.literal(true),
-    customModel: z.string().nullable(),
-  }),
-})
-export type LLMProviderModels = z.infer<typeof llmProviderModelsSchema>

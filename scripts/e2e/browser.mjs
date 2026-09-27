@@ -125,3 +125,44 @@ export async function reportFailure(test, context) {
 export async function clickButton(page, name) {
   await page.getByRole("button", { name, exact: true }).click()
 }
+
+/** Waits until `text` is visible on the page. */
+export async function waitForText(page, text) {
+  await page.getByText(text).first().waitFor()
+}
+
+/**
+ * Waits until `predicate(config, arg)` is true for the config in the extension
+ * storage. It checks at once and after each storage change. `page` must be an
+ * extension page. The predicate runs in that page, so it can use only its
+ * parameters, and `arg` must be JSON.
+ */
+export async function waitForStorage(page, predicate, arg) {
+  // A string, because a function argument cannot cross into the page.
+  await page.evaluate(`new Promise((resolve) => {
+    const predicate = ${predicate}
+    const check = async () => {
+      const { config } = await chrome.storage.local.get("config")
+      if (config && predicate(config, ${JSON.stringify(arg) ?? "undefined"})) {
+        chrome.storage.onChanged.removeListener(check)
+        resolve()
+      }
+    }
+    chrome.storage.onChanged.addListener(check)
+    check()
+  })`)
+}
+
+// Chromium refuses these ports with ERR_UNSAFE_PORT (net/base/port_util.cc).
+// Only ports above 1023 are here, because the system never assigns lower ones.
+const UNSAFE_PORTS = new Set([1719, 1720, 1723, 2049, 3659, 4045, 4190, 5060, 5061, 6000, 6566, 6665, 6666, 6667, 6668, 6669, 6679, 6697, 10080])
+
+/** Listens on a free local port that the browser can reach, and returns the port. */
+export async function listenOnLocalPort(server) {
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve))
+  const { port } = server.address()
+  if (!UNSAFE_PORTS.has(port))
+    return port
+  await new Promise(resolve => server.close(resolve))
+  return listenOnLocalPort(server)
+}

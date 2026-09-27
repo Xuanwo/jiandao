@@ -1,6 +1,5 @@
 import type {
   APIProviderConfig,
-  CustomLLMProviderConfig,
   LLMProviderConfig,
   NonCustomLLMProviderConfig,
   ProviderConfig,
@@ -8,7 +7,6 @@ import type {
 } from "./schemas"
 import {
   isAPIProvider,
-  isCustomLLMProvider,
   isLLMProvider,
   isNonCustomLLMProvider,
   isTranslateProvider,
@@ -23,10 +21,6 @@ export function isTranslateProviderConfig(config: ProviderConfig): config is Tra
 
 export function isLLMProviderConfig(config: ProviderConfig): config is LLMProviderConfig {
   return isLLMProvider(config.provider)
-}
-
-export function isCustomLLMProviderConfig(config: ProviderConfig): config is CustomLLMProviderConfig {
-  return isCustomLLMProvider(config.provider)
 }
 
 export function isNonCustomLLMProviderConfig(config: ProviderConfig): config is NonCustomLLMProviderConfig {

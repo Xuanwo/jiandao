@@ -20,11 +20,7 @@ const providerConfig: LLMProviderConfig = {
   enabled: true,
   provider: "openai",
   apiKey: "test-api-key",
-  model: {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
+  model: "gpt-5-mini",
   providerOptions: {},
   temperature: 0,
 }

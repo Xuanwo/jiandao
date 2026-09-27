@@ -1,5 +1,8 @@
+import type { Config } from "@/types/config/config"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { storage } from "#imports"
+import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { DEFAULT_LLM_PROVIDER_BASE_URLS } from "@/utils/constants/providers"
 
 let getStorageItemMock: ReturnType<typeof vi.fn>
 
@@ -46,6 +49,14 @@ vi.mock("@ai-sdk/openai-compatible", () => ({
   createOpenAICompatible: createOpenAICompatibleMock,
 }))
 
+/** Returns a valid stored config in which `provider` replaces the default provider of its type. */
+function configWith(provider: Config["providersConfig"][number]): Config {
+  return {
+    ...DEFAULT_CONFIG,
+    providersConfig: DEFAULT_CONFIG.providersConfig.map(item => item.provider === provider.provider ? provider : item),
+  }
+}
+
 describe("getModelById", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -56,21 +67,15 @@ describe("getModelById", () => {
     ;(storage.getItem as unknown as ReturnType<typeof vi.fn>) = getStorageItemMock
   })
 
-  it("creates OpenAI language models", async () => {
-    getStorageItemMock.mockResolvedValue({
-      providersConfig: [{
-        id: "openai-default",
-        name: "OpenAI",
-        enabled: true,
-        provider: "openai",
-        apiKey: "test-key",
-        model: {
-          model: "gpt-5-mini",
-          isCustomModel: false,
-          customModel: null,
-        },
-      }],
-    })
+  it("user translates with OpenAI and no base URL: Given the default OpenAI provider, When the model is created, Then it uses the default OpenAI base URL", async () => {
+    getStorageItemMock.mockResolvedValue(configWith({
+      id: "openai-default",
+      name: "OpenAI",
+      enabled: true,
+      provider: "openai",
+      apiKey: "test-key",
+      model: "gpt-5-mini",
+    }))
 
     const { getModelById } = await import("../model")
     const result = await getModelById("openai-default")
@@ -78,25 +83,20 @@ describe("getModelById", () => {
     expect(result).toBe("openai-model")
     expect(createOpenAIMock).toHaveBeenCalledWith(expect.objectContaining({
       apiKey: "test-key",
+      baseURL: DEFAULT_LLM_PROVIDER_BASE_URLS.openai,
     }))
     expect(openAILanguageModelMock).toHaveBeenCalledWith("gpt-5-mini")
   })
 
-  it("creates DeepSeek language models", async () => {
-    getStorageItemMock.mockResolvedValue({
-      providersConfig: [{
-        id: "deepseek-default",
-        name: "DeepSeek",
-        enabled: true,
-        provider: "deepseek",
-        apiKey: "test-key",
-        model: {
-          model: "deepseek-v4-flash",
-          isCustomModel: false,
-          customModel: null,
-        },
-      }],
-    })
+  it("user translates with DeepSeek and no base URL: Given the default DeepSeek provider, When the model is created, Then it uses the default DeepSeek base URL", async () => {
+    getStorageItemMock.mockResolvedValue(configWith({
+      id: "deepseek-default",
+      name: "DeepSeek",
+      enabled: true,
+      provider: "deepseek",
+      apiKey: "test-key",
+      model: "deepseek-v4-flash",
+    }))
 
     const { getModelById } = await import("../model")
     const result = await getModelById("deepseek-default")
@@ -104,32 +104,25 @@ describe("getModelById", () => {
     expect(result).toBe("deepseek-model")
     expect(createDeepSeekMock).toHaveBeenCalledWith(expect.objectContaining({
       apiKey: "test-key",
+      baseURL: DEFAULT_LLM_PROVIDER_BASE_URLS.deepseek,
     }))
     expect(deepSeekLanguageModelMock).toHaveBeenCalledWith("deepseek-v4-flash")
   })
 
   it("passes custom headers for OpenAI-compatible providers", async () => {
-    getStorageItemMock.mockResolvedValue({
-      providersConfig: [
-        {
-          id: "custom-openai",
-          name: "Custom Provider",
-          enabled: true,
-          provider: "openai-compatible",
-          apiKey: "custom-key",
-          baseURL: "http://127.0.0.1:1234/v1",
-          model: {
-            model: "use-custom-model",
-            isCustomModel: true,
-            customModel: "custom-model",
-          },
-          headers: {
-            "HTTP-Referer": "https://example.com",
-            "X-Title": "Plainly",
-          },
-        },
-      ],
-    })
+    getStorageItemMock.mockResolvedValue(configWith({
+      id: "custom-openai",
+      name: "Custom Provider",
+      enabled: true,
+      provider: "openai-compatible",
+      apiKey: "custom-key",
+      baseURL: "http://127.0.0.1:1234/v1",
+      model: "custom-model",
+      headers: {
+        "HTTP-Referer": "https://example.com",
+        "X-Title": "Plainly",
+      },
+    }))
 
     const { getModelById } = await import("../model")
     const result = await getModelById("custom-openai")

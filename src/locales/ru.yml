@@ -96,9 +96,9 @@ options:
         clickToRetry: Нажмите для повтора
         noModels: Нет доступных моделей
         selectModel: Выбрать модель
-        apiKeyRequired: Сначала добавьте API ключ
         searchModels: Поиск моделей...
         noModelsFound: Модели не найдены
+        required: Введите ID модели.
       featureProviders: Поставщики функций
       advancedOptions: Расширенные настройки
       providerSettingLabels:

@@ -1,24 +1,22 @@
-import type { AllProviderTypes, APIProviderTypes, LLMProviderModels, ProviderConfig, ProvidersConfig } from "@/types/config/provider"
+import type { AllProviderTypes, APIProviderTypes, LLMProviderConfig, LLMProviderTypes, ProviderConfig, ProvidersConfig } from "@/types/config/provider"
 import { API_PROVIDER_TYPES, TRANSLATE_PROVIDER_TYPES } from "@/types/config/provider"
 import { pick } from "@/types/utils"
 
-export const DEFAULT_LLM_PROVIDER_MODELS: LLMProviderModels = {
-  "openai-compatible": {
-    model: "use-custom-model",
-    isCustomModel: true,
-    customModel: null,
-  },
-  "openai": {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
-  "deepseek": {
-    model: "deepseek-v4-flash",
-    isCustomModel: false,
-    customModel: null,
-  },
-}
+export const DEFAULT_LLM_PROVIDER_MODELS = {
+  "openai-compatible": "",
+  "openai": "gpt-5-mini",
+  "deepseek": "deepseek-v4-flash",
+} as const satisfies Record<LLMProviderTypes, LLMProviderConfig["model"]>
+
+/**
+ * The base URL of each provider type when the provider has none. These are
+ * the defaults of the AI SDK providers. A custom provider has no default.
+ */
+export const DEFAULT_LLM_PROVIDER_BASE_URLS = {
+  "openai-compatible": "",
+  "openai": "https://api.openai.com/v1",
+  "deepseek": "https://api.deepseek.com",
+} as const satisfies Record<LLMProviderTypes, string>
 
 export interface ProviderItem {
   name: string

@@ -74,7 +74,6 @@ options:
       baseURL: Base URL
       optional: optional
       model: Model
-      customModel: Type a model name instead
       advanced: "Advanced: temperature, headers, provider options"
       temperature: Temperature
       temperatureHint: Controls randomness in responses. Lower values (0) are more deterministic, higher values are more creative. Range varies by provider. Leave empty to use the provider default.
@@ -98,9 +97,9 @@ options:
         clickToRetry: Click to retry
         noModels: No models available
         selectModel: Select a model
-        apiKeyRequired: Add the API key first
         searchModels: Search models…
         noModelsFound: No models found
+        required: Enter a model ID.
   reading:
     title: Reading
     description: How translations appear on the page.

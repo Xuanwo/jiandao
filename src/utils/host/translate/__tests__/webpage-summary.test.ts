@@ -24,7 +24,7 @@ describe("getOrGenerateWebPageSummary", () => {
         provider: "openai",
         enabled: true,
         apiKey: "sk-test",
-        model: { model: "gpt-5-mini", isCustomModel: false, customModel: null },
+        model: "gpt-5-mini",
       },
       true,
     )

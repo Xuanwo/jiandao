@@ -52,11 +52,7 @@ const baseProviderConfig: APIProviderConfig = {
   name: "OpenAI",
   enabled: true,
   provider: "openai",
-  model: {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
+  model: "gpt-5-mini",
   headers: undefined,
 }
 
@@ -65,11 +61,7 @@ const deepseekProviderConfig: APIProviderConfig = {
   name: "DeepSeek",
   enabled: true,
   provider: "deepseek",
-  model: {
-    model: "deepseek-v4-flash",
-    isCustomModel: false,
-    customModel: null,
-  },
+  model: "deepseek-v4-flash",
   headers: {
     Existing: "1",
   },

@@ -97,9 +97,9 @@ options:
         clickToRetry: Haz clic para reintentar
         noModels: No hay modelos disponibles
         selectModel: Selecciona un modelo
-        apiKeyRequired: Añade primero una clave API
         searchModels: Buscar modelos...
         noModelsFound: No se encontraron modelos
+        required: Introduce un ID de modelo.
       featureProviders: Proveedores de funciones
       advancedOptions: Opciones avanzadas
       providerSettingLabels:

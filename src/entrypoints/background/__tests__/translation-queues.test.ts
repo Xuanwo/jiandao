@@ -54,7 +54,7 @@ const llmProvider: ProviderConfig = {
   provider: "openai",
   enabled: true,
   apiKey: "sk-test",
-  model: { model: "gpt-5-mini", isCustomModel: false, customModel: null },
+  model: "gpt-5-mini",
 }
 
 describe("translation queue helpers", () => {
@@ -88,7 +88,7 @@ describe("translation queue helpers", () => {
       enabled: true,
       apiKey: "key",
       baseURL: "https://api.example.com/v1",
-      model: { model: "use-custom-model", isCustomModel: true, customModel: "custom-model" },
+      model: "custom-model",
     }
 
     expect(shouldUseBatchQueue(customProvider)).toBe(true)

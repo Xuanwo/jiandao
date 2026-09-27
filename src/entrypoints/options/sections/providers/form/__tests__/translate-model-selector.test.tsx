@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import type { APIProviderConfig } from "@/types/config/provider"
 import { useStore } from "@tanstack/react-form"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { useEffect, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
@@ -42,11 +43,7 @@ const baseProviderConfig: APIProviderConfig = {
   name: "OpenAI",
   enabled: true,
   provider: "openai",
-  model: {
-    model: "gpt-5-mini",
-    isCustomModel: true,
-    customModel: "gpt-5-mini",
-  },
+  model: "gpt-5-mini",
   providerOptions: undefined,
 }
 
@@ -61,6 +58,7 @@ function TranslateModelSelectorHarness({
 }: {
   initialConfig?: APIProviderConfig
 }) {
+  const [queryClient] = useState(() => new QueryClient())
   const [providerConfig, setProviderConfig] = useState(initialConfig)
   const [submitCount, setSubmitCount] = useState(0)
   const form = useAppForm({
@@ -78,32 +76,34 @@ function TranslateModelSelectorHarness({
   }, [providerConfig, form])
 
   return (
-    <form.AppForm>
-      <form.AppField
-        name="name"
-        validators={{
-          onChange: ({ value }) => value === duplicateProviderName ? "Duplicate provider name" : undefined,
-        }}
-      >
-        {field => (
-          <input
-            aria-label="provider-name"
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={(event) => {
-              field.handleChange(event.target.value)
-              void form.handleSubmit()
-            }}
-          />
-        )}
-      </form.AppField>
-      <TranslateModelSelector form={form} />
-      <output aria-label="form-name">{formValues.name}</output>
-      <output aria-label="form-provider-options">{JSON.stringify(formValues.providerOptions ?? null)}</output>
-      <output aria-label="persisted-name">{providerConfig.name}</output>
-      <output aria-label="persisted-provider-options">{JSON.stringify(providerConfig.providerOptions ?? null)}</output>
-      <output aria-label="submit-count">{String(submitCount)}</output>
-    </form.AppForm>
+    <QueryClientProvider client={queryClient}>
+      <form.AppForm>
+        <form.AppField
+          name="name"
+          validators={{
+            onChange: ({ value }) => value === duplicateProviderName ? "Duplicate provider name" : undefined,
+          }}
+        >
+          {field => (
+            <input
+              aria-label="provider-name"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(event) => {
+                field.handleChange(event.target.value)
+                void form.handleSubmit()
+              }}
+            />
+          )}
+        </form.AppField>
+        <TranslateModelSelector form={form} />
+        <output aria-label="form-name">{formValues.name}</output>
+        <output aria-label="form-provider-options">{JSON.stringify(formValues.providerOptions ?? null)}</output>
+        <output aria-label="persisted-name">{providerConfig.name}</output>
+        <output aria-label="persisted-provider-options">{JSON.stringify(providerConfig.providerOptions ?? null)}</output>
+        <output aria-label="submit-count">{String(submitCount)}</output>
+      </form.AppForm>
+    </QueryClientProvider>
   )
 }
 

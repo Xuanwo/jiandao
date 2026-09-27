@@ -1,7 +1,6 @@
 import type { LLMProviderConfig } from "@/types/config/provider"
 
-export function resolveModelId(providerModel: LLMProviderConfig["model"]) {
-  return providerModel.isCustomModel
-    ? providerModel.customModel?.trim()
-    : providerModel.model?.trim()
+/** Returns the model ID to send, or undefined when the provider has no model yet. */
+export function resolveModelId(model: LLMProviderConfig["model"]) {
+  return model.trim() || undefined
 }

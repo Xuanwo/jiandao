@@ -4,28 +4,13 @@ import {
   getProviderOptionsWithOverride,
   getRecommendedProviderOptionsMatch,
 } from "../../providers/options"
-import { LLM_PROVIDER_MODELS } from "../models"
 
 describe("getProviderOptions", () => {
-  it("exposes only the supported provider model catalogs", () => {
-    expect(Object.keys(LLM_PROVIDER_MODELS)).toEqual(["openai", "deepseek", "openai-compatible"])
-  })
-
   it("returns options for OpenAI reasoning models", () => {
     expect(getProviderOptions("o1-preview", "openai").openai?.reasoningEffort).toBe("minimal")
     expect(getProviderOptions("o3-mini", "openai").openai?.reasoningEffort).toBe("minimal")
     expect(getProviderOptions("o4-mini", "openai").openai?.reasoningEffort).toBe("minimal")
     expect(getProviderOptions("O4-Mini", "openai").openai?.reasoningEffort).toBe("minimal")
-  })
-
-  it("exposes the supported OpenAI GPT-5.4 model ids", () => {
-    expect(LLM_PROVIDER_MODELS.openai).toEqual(expect.arrayContaining([
-      "gpt-5.4-pro",
-      "gpt-5.4",
-      "gpt-5.4-mini",
-      "gpt-5.4-nano",
-      "gpt-5.3-chat-latest",
-    ]))
   })
 
   it("returns documented GPT-5 reasoning defaults", () => {

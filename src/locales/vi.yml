@@ -96,9 +96,9 @@ options:
         clickToRetry: Nhấp để thử lại
         noModels: Không có mô hình nào
         selectModel: Chọn mô hình
-        apiKeyRequired: Vui lòng thêm khóa API trước
         searchModels: Tìm kiếm mô hình...
         noModelsFound: Không tìm thấy mô hình
+        required: Nhập ID mô hình.
       featureProviders: Nhà cung cấp tính năng
       advancedOptions: Tùy chọn nâng cao
       providerSettingLabels:

@@ -48,11 +48,7 @@ const baseProviderConfig: APIProviderConfig = {
   name: "OpenAI",
   enabled: true,
   provider: "openai",
-  model: {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
+  model: "gpt-5-mini",
   providerOptions: undefined,
 }
 
@@ -166,11 +162,7 @@ describe("providerOptionsField", () => {
         initialConfig={{
           ...baseProviderConfig,
           provider: "deepseek",
-          model: {
-            model: "deepseek-v4-flash",
-            isCustomModel: false,
-            customModel: null,
-          },
+          model: "deepseek-v4-flash",
         }}
       />,
     )
@@ -188,11 +180,7 @@ describe("providerOptionsField", () => {
           ...baseProviderConfig,
           provider: "openai-compatible",
           baseURL: "https://api.example.com/v1",
-          model: {
-            model: "use-custom-model",
-            isCustomModel: true,
-            customModel: "gpt-5-mini",
-          },
+          model: "gpt-5-mini",
         }}
       />,
     )

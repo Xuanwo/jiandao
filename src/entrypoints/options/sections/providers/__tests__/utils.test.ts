@@ -18,11 +18,7 @@ describe("api provider utils", () => {
       temperature: 0.3,
       providerOptions: { reasoningEffort: "minimal" },
       headers: { "x-test": "enabled" },
-      model: {
-        model: "use-custom-model",
-        isCustomModel: true,
-        customModel: "custom-model",
-      },
+      model: "custom-model",
     }
     const existingCopy: CustomProviderConfig = {
       ...sourceProvider,
@@ -54,7 +50,6 @@ describe("api provider utils", () => {
       name: "Custom Provider 2",
     })
     expect(duplicatedProvider).not.toBe(sourceProvider)
-    expect(duplicatedProvider.model).not.toBe(sourceProvider.model)
     expect(duplicatedProvider.providerOptions).not.toBe(sourceProvider.providerOptions)
     expect(duplicatedProvider.headers).not.toBe(sourceProvider.headers)
     expect(setSelectedProviderId).toHaveBeenCalledWith(newProviderId)
