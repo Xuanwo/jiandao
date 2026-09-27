@@ -37,6 +37,14 @@ pnpm type-check
 pnpm build
 ```
 
+`pnpm test:e2e` builds the extension and opens it in headless Chromium through
+[Playwright](https://playwright.dev/), a development dependency. Before the
+first run, run `pnpm exec playwright-core install --no-shell chromium` to
+download Chromium. On Linux, add `--with-deps` to also install the system
+libraries. When a test fails, its report shows the browser logs, the open pages
+and the stored config. Set `E2E_ARTIFACTS` to a directory to also save a
+screenshot of each page. CI runs the same tests.
+
 ## License
 
 Plainly is a modified version of Read Frog. Thanks to the Read Frog authors and

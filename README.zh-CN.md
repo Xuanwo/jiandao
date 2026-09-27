@@ -28,6 +28,8 @@ pnpm type-check
 pnpm build
 ```
 
+`pnpm test:e2e` 会先构建扩展，再通过开发依赖 [Playwright](https://playwright.dev/) 在无头 Chromium 中打开它。首次运行前执行 `pnpm exec playwright-core install --no-shell chromium` 下载 Chromium；Linux 上加 `--with-deps` 同时安装系统库。测试失败时，报告会列出浏览器日志、打开的页面和已保存的配置；把 `E2E_ARTIFACTS` 设为一个目录，还会把每个页面的截图保存到那里。CI 也会运行这些测试。
+
 ## 许可
 
 素读是 Read Frog 的修改版本，感谢 Read Frog 的作者和贡献者提供原始作品。
