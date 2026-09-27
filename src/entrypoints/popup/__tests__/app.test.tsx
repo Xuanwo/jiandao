@@ -66,7 +66,7 @@ describe("popup app", () => {
     expect(screen.getByText(/Not valid JSON/)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
 
-    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "openai", apiKey: "sk-…a9f2" } }) } })
+    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "openai", apiKey: "sk-…a9f2", model: "gpt-6-luna" } }) } })
     expect(screen.getByText(/popup\.setup\.keyMissing/)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
 

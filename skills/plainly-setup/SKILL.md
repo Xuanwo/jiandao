@@ -14,13 +14,15 @@ templates: https://github.com/Xuanwo/plainly/blob/main/docs/agent-setup.md
 
 ## Steps
 
-1. Ask which service (OpenAI, DeepSeek, or an OpenAI-compatible endpoint such
-   as Ollama), where the API key is, and which language the user reads in.
-   If the user pasted a current configuration, change only what they asked.
+1. Ask which service (OpenAI, Anthropic, Gemini, DeepSeek, or an
+   OpenAI-compatible endpoint such as Ollama, OpenRouter or a gateway), where
+   the API key is, and which language the user reads in. If the user pasted a
+   current configuration, change only what they asked.
 2. Load the key into a shell variable from a file or environment variable.
    Never print it, never include it in a message.
 3. Verify with the guide's `curl` template for that service, using the model
-   and options you will configure. Adjust until a request succeeds.
+   and the `body` fields you will configure. Plainly sends the same request.
+   Adjust until a request succeeds.
 4. Build the document with `jq --arg k "$KEY"` and pipe it to the clipboard
    (`pbcopy`, `wl-copy`, `xclip -selection clipboard`, or `clip`). A masked
    key from an export (`sk-…a9f2`) is returned unchanged.
@@ -29,10 +31,14 @@ templates: https://github.com/Xuanwo/plainly/blob/main/docs/agent-setup.md
 
 ## Defaults
 
-- OpenAI: `gpt-6-luna` with `{ "reasoningEffort": "none" }`.
-- DeepSeek: `deepseek-flash` with `{ "thinking": { "type": "disabled" } }`.
-- Ollama / LM Studio: `type: "openai-compatible"`, `baseURL` ending in `/v1`,
-  any non-empty `apiKey`, the model tag the server lists.
+- OpenAI: `gpt-6-luna` with `body: { "reasoning": { "effort": "none" } }`.
+- Anthropic: `claude-haiku-4-5` with `body: { "thinking": { "type": "disabled" } }`; no `temperature`.
+- Gemini: `gemini-3.5-flash-lite` with `body: { "generationConfig": { "thinkingConfig": { "thinkingLevel": "minimal" } } }`.
+- DeepSeek: `deepseek-flash` with `body: { "thinking": { "type": "disabled" } }`.
+- Ollama / LM Studio / other compatible services: `type: "openai-compatible"`,
+  `baseURL` ending in the version path, any non-empty `apiKey`, the model ID
+  the service lists. Add `api: "openai-responses"` for a service that only
+  speaks the Responses API (xAI).
 - Chinese readers: `targetLanguage: "cmn"` (Simplified) or `"cmn-Hant"`.
 - A custom prompt goes in `prompt: { name, systemPrompt, prompt }` with
   `{{input}}` in `prompt`; `prompt: null` restores the built-in one.

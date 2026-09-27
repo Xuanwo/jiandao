@@ -9,7 +9,7 @@ Plainly · [English](./README.md)
 ## 能做什么
 
 - 翻译整个网页和页面标题，支持双语对照和仅译文两种模式。
-- 支持 OpenAI、DeepSeek 以及任何 OpenAI 兼容端点，包括本地和自托管模型。
+- 直接调用 OpenAI、Anthropic、Gemini 和 DeepSeek 的官方 API，以及任何 OpenAI 兼容端点，包括本地和自托管模型。中间没有 SDK，发出的请求就是各家文档里的请求。
 - 可以把页面摘要交给模型，让译文贴合上下文。
 - 可以调整 Prompt、译文样式、请求速率和批量大小。
 

@@ -1,6 +1,5 @@
 import type { CachedWebPageContext } from "./webpage-context"
 import type { ProviderConfig } from "@/types/config/provider"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { sendMessage } from "@/utils/message"
 
 export async function getOrGenerateWebPageSummary(
@@ -8,7 +7,7 @@ export async function getOrGenerateWebPageSummary(
   providerConfig: ProviderConfig,
   enableAIContentAware: boolean,
 ): Promise<string | null> {
-  if (!enableAIContentAware || !isLLMProviderConfig(providerConfig) || !webPageContext) {
+  if (!enableAIContentAware || !webPageContext) {
     return null
   }
 

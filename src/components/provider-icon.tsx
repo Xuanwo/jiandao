@@ -1,4 +1,4 @@
-import type { AllProviderTypes } from "@/types/config/provider"
+import type { ProviderType } from "@/types/config/provider"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { cn } from "@/utils/styles/utils"
 
@@ -17,7 +17,7 @@ const textSizeClass: Record<ProviderIconSize, string> = {
 }
 
 interface ProviderIconProps {
-  providerType: AllProviderTypes
+  providerType: ProviderType
   name?: string
   size?: ProviderIconSize
   className?: string

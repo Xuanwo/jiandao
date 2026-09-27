@@ -3,9 +3,9 @@ import type { ConfigMeta } from "@/types/config/meta"
 import { dequal } from "dequal"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
-import { isAPIProviderConfig } from "@/types/config/provider"
 import { CONFIG_SCHEMA_VERSION, CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
+import { migrateStoredConfig } from "./migrate"
 
 /**
  * Initialize the config, this function should only be called once in the background script
@@ -25,7 +25,7 @@ export async function initializeConfig() {
     didConfigChange = true
   }
   else {
-    config = storedConfig
+    config = migrateStoredConfig(storedConfig) as Config
   }
 
   const parseResult = configSchema.safeParse(config)
@@ -65,10 +65,6 @@ function applyAPIKeysFromEnv(config: Config): { config: Config, changed: boolean
   let changed = false
 
   const providersConfig = config.providersConfig.map((providerConfig) => {
-    if (!isAPIProviderConfig(providerConfig)) {
-      return providerConfig
-    }
-
     const apiKeyEnvName = `WXT_${providerConfig.provider.toUpperCase()}_API_KEY`
     const envApiKey = import.meta.env[apiKeyEnvName] as string | undefined
     if (!envApiKey || providerConfig.apiKey === envApiKey) {

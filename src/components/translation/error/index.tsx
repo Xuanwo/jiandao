@@ -1,9 +1,10 @@
-import type { APICallError } from "ai"
 import { i18n } from "#imports"
+import { getRequestErrorMeta } from "@/utils/request/retry-policy"
 import { RetryButton } from "./retry-button"
 
-function describeError(error: APICallError): string {
-  const status = error.statusCode ? `${error.statusCode} ` : ""
+function describeError(error: Error): string {
+  const { statusCode } = getRequestErrorMeta(error)
+  const status = statusCode ? `${statusCode} ` : ""
   const message = error.message?.trim() || i18n.t("translation.unknownError")
   return `${status}${message}`
 }
@@ -12,7 +13,7 @@ function describeError(error: APICallError): string {
  * Inline replacement for a paragraph whose translation failed: one muted
  * line with the reason and a retry button, nothing floating.
  */
-export function TranslationError({ nodes, error }: { nodes: ChildNode[], error: APICallError }) {
+export function TranslationError({ nodes, error }: { nodes: ChildNode[], error: Error }) {
   const detail = describeError(error)
 
   return (

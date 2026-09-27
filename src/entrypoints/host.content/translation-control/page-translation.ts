@@ -1,8 +1,6 @@
 import type { Config } from "@/types/config/config"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { getLocalConfig } from "@/utils/config/storage"
 import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
-import { resolveProviderConfig } from "@/utils/constants/feature-providers"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { hasNoWalkAncestor, isDontWalkIntoAndDontTranslateAsChildElement, isDontWalkIntoButTranslateAsChildElement, isHTMLElement } from "@/utils/host/dom/filter"
 import { deepQueryTopLevelSelector } from "@/utils/host/dom/find"
@@ -99,8 +97,6 @@ export class PageTranslationManager implements IPageTranslationManager {
       return
     }
 
-    const providerConfig = resolveProviderConfig(config, "translate")
-
     await sendMessage("setAndNotifyPageTranslationStateChangedByManager", {
       enabled: true,
       url: window.location.href,
@@ -109,7 +105,7 @@ export class PageTranslationManager implements IPageTranslationManager {
     this.isPageTranslating = true
     resetTranslationProgress()
     await this.primeDocumentTitleContext(
-      config.translate.enableAIContentAware && isLLMProviderConfig(providerConfig),
+      config.translate.enableAIContentAware,
     )
     this.startDocumentTitleTracking()
 

@@ -1,6 +1,6 @@
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
-import { isTranslateProvider } from "@/types/config/provider"
+import { isProviderType } from "@/types/config/provider"
 import { mergeWithArrayOverwrite } from "../atoms/config"
 import { getProviderConfigById } from "../config/helpers"
 
@@ -18,7 +18,7 @@ export interface FeatureProviderDef {
 
 export const FEATURE_PROVIDER_DEFS = {
   translate: {
-    isProvider: isTranslateProvider,
+    isProvider: isProviderType,
     getProviderId: (c: Config) => c.translate.providerId,
     configPath: ["translate", "providerId"],
   },

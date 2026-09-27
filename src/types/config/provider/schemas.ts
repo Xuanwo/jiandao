@@ -1,75 +1,41 @@
-import type {
-  APIProviderTypes,
-  CustomLLMProviderTypes,
-  LLMProviderTypes,
-  NonCustomLLMProviderTypes,
-  TranslateProviderTypes,
-} from "./constants"
-
 import { z } from "zod"
-
-import { LLM_PROVIDER_MODELS } from "./constants"
+import { PROVIDER_TYPES, REQUEST_APIS } from "./constants"
 
 /* ──────────────────────────────
   Providers config schema
   ────────────────────────────── */
 
-// Helper function to create provider-specific model schema
-function createProviderModelSchema<T extends LLMProviderTypes>(provider: T) {
-  const models = LLM_PROVIDER_MODELS[provider]
-  return z.object({
-    model: z.enum(models),
-    isCustomModel: provider === "openai-compatible" ? z.literal(true) : z.boolean(),
-    customModel: z.string().nullable(),
-  })
-}
+const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
+  z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)]),
+)
 
-// Base schema without models
-export const baseProviderConfigSchema = z.strictObject({
+/**
+ * One translation service. The stored shape mirrors the setup document an
+ * agent writes: what the agent verified with curl is what Plainly sends.
+ */
+export const providerConfigItemSchema = z.strictObject({
   id: z.string().nonempty(),
   name: z.string().nonempty(),
   description: z.string().optional(),
   enabled: z.boolean(),
-})
-
-export const baseAPIProviderConfigSchema = baseProviderConfigSchema.extend({
+  provider: z.enum(PROVIDER_TYPES),
+  /** Wire format; defaults per provider type (see DEFAULT_REQUEST_API). */
+  api: z.enum(REQUEST_APIS).optional(),
   apiKey: z.string().optional(),
+  /** Endpoint base URL up to and including the version path. Required for "openai-compatible". */
   baseURL: z.string().optional(),
+  /** Model ID exactly as the service expects it. Empty only for a service that has not been set up yet. */
+  model: z.string(),
   temperature: z.number().min(0).optional(),
-  providerOptions: z.record(z.string(), z.any()).optional(),
-  headers: z.record(z.string(), z.any()).optional(),
+  /** Extra HTTP headers, sent as given. */
+  headers: z.record(z.string(), z.string()).optional(),
+  /** JSON merged into the request body after Plainly's own fields, so it can add or override any of them. */
+  body: z.record(z.string(), jsonValueSchema).optional(),
+}).superRefine((provider, ctx) => {
+  if (provider.provider === "openai-compatible" && !provider.baseURL) {
+    ctx.addIssue({ code: "custom", path: ["baseURL"], message: "baseURL is required for an openai-compatible service" })
+  }
 })
-
-export const baseCustomLLMProviderConfigSchema = baseAPIProviderConfigSchema.extend({
-  baseURL: z.string(),
-})
-
-const llmProviderConfigSchemaList = [
-  baseCustomLLMProviderConfigSchema.extend({
-    provider: z.literal("openai-compatible"),
-    model: createProviderModelSchema<"openai-compatible">("openai-compatible"),
-  }),
-  baseAPIProviderConfigSchema.extend({
-    provider: z.literal("openai"),
-    model: createProviderModelSchema<"openai">("openai"),
-  }),
-  baseAPIProviderConfigSchema.extend({
-    provider: z.literal("deepseek"),
-    model: createProviderModelSchema<"deepseek">("deepseek"),
-  }),
-] as const
-
-const apiProviderConfigSchemaList = [
-  ...llmProviderConfigSchemaList,
-] as const
-
-export const providerConfigSchemaList = [
-  ...apiProviderConfigSchemaList,
-] as const
-
-export const llmProviderConfigItemSchema = z.discriminatedUnion("provider", llmProviderConfigSchemaList)
-export const apiProviderConfigItemSchema = z.discriminatedUnion("provider", apiProviderConfigSchemaList)
-export const providerConfigItemSchema = z.discriminatedUnion("provider", providerConfigSchemaList)
 
 export const providersConfigSchema = z.array(providerConfigItemSchema).superRefine(
   (providers, ctx) => {
@@ -100,43 +66,3 @@ export const providersConfigSchema = z.array(providerConfigItemSchema).superRefi
 )
 export type ProvidersConfig = z.infer<typeof providersConfigSchema>
 export type ProviderConfig = ProvidersConfig[number]
-export type APIProviderConfig = Extract<ProviderConfig, { provider: APIProviderTypes }>
-export type LLMProviderConfig = Extract<ProviderConfig, { provider: LLMProviderTypes }>
-export type TranslateProviderConfig = Extract<ProviderConfig, { provider: TranslateProviderTypes }>
-export type NonCustomLLMProviderConfig = Extract<ProviderConfig, { provider: NonCustomLLMProviderTypes }>
-export type CustomLLMProviderConfig = Extract<ProviderConfig, { provider: CustomLLMProviderTypes }>
-
-/* ──────────────────────────────
-  unified llm model config helpers
-  ────────────────────────────── */
-
-type ModelTuple = readonly [string, ...string[]] // 至少一个元素才能给 z.enum
-function providerConfigSchema<T extends ModelTuple>(models: T) {
-  return z.object({
-    model: z.enum(models),
-    isCustomModel: z.boolean(),
-    customModel: z.string().nullable(),
-  })
-}
-
-type SchemaShape<M extends Record<string, ModelTuple>> = { [K in keyof M]: ReturnType<typeof providerConfigSchema<M[K]>> }
-
-function buildProviderModelsSchema<M extends Record<string, ModelTuple>>(models: M) {
-  return z.object(
-    // Keep key names and types when building schema dynamically.
-    (Object.keys(models) as (keyof M)[]).reduce((acc, key) => {
-      acc[key] = providerConfigSchema(models[key])
-      return acc
-    }, {} as SchemaShape<M>),
-  )
-}
-
-const { "openai-compatible": _, ...modelsWithoutOpenaiCompatible } = LLM_PROVIDER_MODELS
-export const llmProviderModelsSchema = buildProviderModelsSchema(modelsWithoutOpenaiCompatible).extend({
-  "openai-compatible": z.object({
-    model: z.enum(LLM_PROVIDER_MODELS["openai-compatible"]),
-    isCustomModel: z.literal(true),
-    customModel: z.string().nullable(),
-  }),
-})
-export type LLMProviderModels = z.infer<typeof llmProviderModelsSchema>

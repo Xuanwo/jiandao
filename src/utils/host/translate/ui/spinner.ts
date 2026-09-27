@@ -1,4 +1,3 @@
-import type { APICallError } from "ai"
 import * as React from "react"
 import textSmallCSS from "@/assets/styles/text-small.css?inline"
 import themeCSS from "@/assets/styles/theme.css?inline"
@@ -96,7 +95,7 @@ export async function getTranslatedTextAndRemoveSpinner(
   catch (error) {
     const errorComponent = React.createElement(TranslationError, {
       nodes,
-      error: error as APICallError,
+      error: error instanceof Error ? error : new Error(String(error)),
     })
 
     const container = createReactShadowHost(

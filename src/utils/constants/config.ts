@@ -9,7 +9,7 @@ export const CONFIG_STORAGE_KEY = "config"
 
 export const THEME_STORAGE_KEY = "theme"
 export const DEFAULT_DETECTED_CODE = "eng" as const
-export const CONFIG_SCHEMA_VERSION = 1
+export const CONFIG_SCHEMA_VERSION = 2
 
 export const DEFAULT_CONFIG: Config = {
   language: {

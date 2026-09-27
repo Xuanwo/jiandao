@@ -1,4 +1,4 @@
-import type { APIProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
 import { getTranslatePrompt } from "@/utils/prompts/translate"
@@ -12,7 +12,7 @@ export type ConnectionTestResult
  * settings. The error text is returned verbatim, because the reader may
  * paste it back to the agent that produced the configuration.
  */
-export async function testProviderConnection(providerConfig: APIProviderConfig): Promise<ConnectionTestResult> {
+export async function testProviderConnection(providerConfig: ProviderConfig): Promise<ConnectionTestResult> {
   try {
     await executeTranslate("Hi", DEFAULT_CONFIG.language, providerConfig, getTranslatePrompt)
     return { ok: true }

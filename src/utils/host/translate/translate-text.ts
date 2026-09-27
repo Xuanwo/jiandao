@@ -5,7 +5,6 @@ import type { WebPagePromptContext } from "@/types/content"
 import { toast } from "sonner"
 import { i18n } from "#imports"
 import { LANG_CODE_TO_EN_NAME } from "@/definitions"
-import { isAPIProviderConfig, isLLMProviderConfig } from "@/types/config/provider"
 import { getProviderConfigById } from "@/utils/config/helpers"
 
 import { logger } from "@/utils/logger"
@@ -49,10 +48,6 @@ async function buildWebPageHashComponents(
     partialLangConfig.sourceCode,
     partialLangConfig.targetCode,
   ]
-
-  if (!isLLMProviderConfig(providerConfig)) {
-    return hashComponents
-  }
 
   const targetLangName = LANG_CODE_TO_EN_NAME[partialLangConfig.targetCode]
   const { systemPrompt, prompt } = await getTranslatePrompt(targetLangName, preparedText, {
@@ -151,7 +146,7 @@ export function validateTranslationConfigAndToast(
   }
 
   // check if the API key is configured
-  if (isAPIProviderConfig(providerConfig) && !providerConfig.apiKey?.trim()) {
+  if (!providerConfig.apiKey?.trim()) {
     toast.error(i18n.t("translation.noApiKey"))
     logger.info("validateTranslationConfig: returning false (no API key)")
     return false

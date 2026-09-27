@@ -2,22 +2,27 @@ import type {
   BackgroundGenerateTextPayload,
   BackgroundGenerateTextResponse,
 } from "@/types/background-generate-text"
-import { generateText } from "ai"
+import { getLocalConfig } from "@/utils/config/storage"
 import { logger } from "@/utils/logger"
 import { onMessage } from "@/utils/message"
-import { getModelById } from "@/utils/providers/model"
+import { requestText } from "@/utils/providers/request"
 
+/**
+ * Content scripts cannot reach every service directly (a page's CSP applies to
+ * them), so short requests such as language detection run here with the
+ * stored service config.
+ */
 export async function runGenerateTextInBackground(
   payload: BackgroundGenerateTextPayload,
 ): Promise<BackgroundGenerateTextResponse> {
-  const { providerId, ...generateTextParams } = payload
-  const model = await getModelById(providerId)
+  const { providerId, ...request } = payload
+  const config = await getLocalConfig()
+  const provider = config?.providersConfig.find(candidate => candidate.id === providerId)
+  if (!provider) {
+    throw new Error(`Provider ${providerId} not found`)
+  }
 
-  const { text } = await generateText({
-    ...generateTextParams,
-    model,
-  })
-
+  const text = await requestText(provider, request)
   return { text }
 }
 

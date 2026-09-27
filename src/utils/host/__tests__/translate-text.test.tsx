@@ -193,11 +193,7 @@ describe("translate-text", () => {
       name: "OpenAI",
       provider: "openai" as const,
       apiKey: "sk-test",
-      model: {
-        model: "gpt-5-mini" as const,
-        isCustomModel: false,
-        customModel: null,
-      },
+      model: "gpt-5-mini",
     }
 
     it("should return empty string for empty/whitespace input", async () => {

@@ -2,13 +2,12 @@ import type { SetupPreview } from "@/utils/setup-document"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { i18n } from "#imports"
-import { isAPIProviderConfig, isLLMProviderConfig } from "@/types/config/provider"
 import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
 import { clearClipboard, copyText } from "@/utils/clipboard"
-import { resolveModelId } from "@/utils/providers/model-id"
+import { getRequestHost } from "@/utils/providers/request"
 import { testProviderConnection } from "@/utils/providers/test-connection"
 import { buildAgentInstructions } from "@/utils/setup-agent-instructions"
-import { applySetupDocument, describeSetupDocument, getRequestHost, parseSetupDocument } from "@/utils/setup-document"
+import { applySetupDocument, describeSetupDocument, parseSetupDocument } from "@/utils/setup-document"
 import { cn } from "@/utils/styles/utils"
 import { SettingsGroup, SettingsSection } from "../../components/settings-section"
 
@@ -65,7 +64,7 @@ function PreviewLines({ preview }: { preview: SetupPreview }) {
  */
 export function ServiceSection() {
   const config = useAtomValue(configAtom)
-  const active = config.providersConfig.filter(isAPIProviderConfig).find(p => p.id === config.translate.providerId)
+  const active = config.providersConfig.find(p => p.id === config.translate.providerId)
 
   const [pasting, setPasting] = useState(() => window.location.hash.slice(1) === IMPORT_HASH)
   const [copied, setCopied] = useState(false)
@@ -75,8 +74,8 @@ export function ServiceSection() {
   const connection: Connection = !hasKey
     ? "unconfigured"
     : tested && tested.providerId === active?.id ? tested.result : "configured"
-  const modelId = active && isLLMProviderConfig(active) ? resolveModelId(active.model) : undefined
-  const host = active ? getRequestHost({ type: active.provider, baseURL: active.baseURL }) : ""
+  const modelId = active?.model.trim()
+  const host = active ? getRequestHost(active) : ""
 
   const copyInstructions = async () => {
     if (await copyText(buildAgentInstructions(config))) {
@@ -186,7 +185,7 @@ function PasteBox({ onApplied, onCancel }: { onApplied: (outcome: TestOutcome) =
       await setConfig(next)
       await clearClipboard()
       const provider = next.providersConfig.find(p => p.id === providerId)
-      if (!provider || !isAPIProviderConfig(provider))
+      if (!provider)
         throw new Error("The applied service is not available")
       const result = await testProviderConnection(provider)
       if (!result.ok)

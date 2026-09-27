@@ -41,7 +41,7 @@ it("user sets up the service from the popup: Given no key, When the agent's docu
 
   // A document the agent got wrong is refused line by line, with the JSON path.
   const box = page.getByLabel("Configuration from your agent")
-  await box.fill(`{"plainly":1,"provider":{"type":"openai-compatible","apiKey":"local"}}`)
+  await box.fill(`{"plainly":1,"provider":{"type":"openai-compatible","apiKey":"local","model":"fake-model"}}`)
   await page.getByText(/provider\.baseURL: baseURL is required/).waitFor()
   assert.equal(await page.getByRole("button", { name: "Apply" }).isDisabled(), true)
 
@@ -57,7 +57,7 @@ it("user sets up the service from the popup: Given no key, When the agent's docu
   assert.ok(stored, "the service is stored")
   assert.equal(stored.apiKey, "local-secret-key")
   assert.equal(stored.baseURL, `${service.origin}/v1`)
-  assert.deepEqual(stored.model, { model: "use-custom-model", isCustomModel: true, customModel: "fake-model" })
+  assert.equal(stored.model, "fake-model")
   assert.equal(config.translate.providerId, stored.id)
   assert.equal((await readClipboardWrites(page)).at(-1), "", "the clipboard is cleared after applying")
 })
@@ -79,7 +79,7 @@ it("user changes the service from settings: Given a stored key, When a document 
   assert.equal(await section.getByText("OpenAI", { exact: true }).count(), 0, "keyless defaults are not shown")
 
   const edited = setupDocumentFor(service.origin, {
-    provider: { apiKey: "…-key", model: "fake-model-2", providerOptions: { reasoningEffort: "none" } },
+    provider: { apiKey: "…-key", model: "fake-model-2", body: { reasoning_effort: "none" } },
     prompt: { name: "Terse", prompt: "Translate tersely: {{input}}" },
   })
   await page.getByLabel("Configuration from your agent").fill(JSON.stringify(edited, null, 2))
@@ -93,8 +93,8 @@ it("user changes the service from settings: Given a stored key, When a document 
   const stored = config.providersConfig.filter(provider => provider.name === "Local gateway")
   assert.equal(stored.length, 1, "replaced, not duplicated")
   assert.equal(stored[0].apiKey, "local-secret-key", "the masked key kept the stored key")
-  assert.equal(stored[0].model.customModel, "fake-model-2")
-  assert.deepEqual(stored[0].providerOptions, { reasoningEffort: "none" })
+  assert.equal(stored[0].model, "fake-model-2")
+  assert.deepEqual(stored[0].body, { reasoning_effort: "none" })
   assert.equal(config.translate.customPromptsConfig.patterns[0]?.name, "Terse")
   await page.locator("#quality").getByText("Terse").waitFor()
 

@@ -1,20 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { DEFAULT_CONFIG } from "@/utils/constants/config"
 
 const onMessageMock = vi.fn()
-const getModelByIdMock = vi.fn()
-const generateTextMock = vi.fn()
+const getLocalConfigMock = vi.fn()
+const requestTextMock = vi.fn()
 const loggerErrorMock = vi.fn()
 
 vi.mock("@/utils/message", () => ({
   onMessage: onMessageMock,
 }))
 
-vi.mock("@/utils/providers/model", () => ({
-  getModelById: getModelByIdMock,
+vi.mock("@/utils/config/storage", () => ({
+  getLocalConfig: getLocalConfigMock,
 }))
 
-vi.mock("ai", () => ({
-  generateText: generateTextMock,
+vi.mock("@/utils/providers/request", () => ({
+  requestText: requestTextMock,
 }))
 
 vi.mock("@/utils/logger", () => ({
@@ -31,39 +32,43 @@ function getRegisteredMessageHandler(name: string) {
   return registration[1] as (message: { data: Record<string, unknown> }) => Promise<{ text: string }>
 }
 
+const storedProvider = { ...DEFAULT_CONFIG.providersConfig[0], apiKey: "sk-test" }
+
 describe("llm-generate-text", () => {
   beforeEach(() => {
     vi.resetModules()
     vi.clearAllMocks()
+    getLocalConfigMock.mockResolvedValue({ ...DEFAULT_CONFIG, providersConfig: [storedProvider] })
   })
 
-  it("runs generateText with resolved model in background", async () => {
-    getModelByIdMock.mockResolvedValue("mock-model")
-    generateTextMock.mockResolvedValue({ text: "eng" })
+  it("sends the request with the stored service config", async () => {
+    requestTextMock.mockResolvedValue("eng")
 
     const { runGenerateTextInBackground } = await import("../llm-generate-text")
     const result = await runGenerateTextInBackground({
-      providerId: "openai-default",
+      providerId: storedProvider.id,
       system: "system",
       prompt: "hello world",
       temperature: 0.2,
-      maxRetries: 0,
     })
 
-    expect(getModelByIdMock).toHaveBeenCalledWith("openai-default")
-    expect(generateTextMock).toHaveBeenCalledWith({
-      model: "mock-model",
+    expect(requestTextMock).toHaveBeenCalledWith(storedProvider, {
       system: "system",
       prompt: "hello world",
       temperature: 0.2,
-      maxRetries: 0,
     })
     expect(result).toEqual({ text: "eng" })
   })
 
+  it("fails for an unknown service without sending anything", async () => {
+    const { runGenerateTextInBackground } = await import("../llm-generate-text")
+
+    await expect(runGenerateTextInBackground({ providerId: "missing", prompt: "hello" })).rejects.toThrow("Provider missing not found")
+    expect(requestTextMock).not.toHaveBeenCalled()
+  })
+
   it("registers backgroundGenerateText message handler", async () => {
-    getModelByIdMock.mockResolvedValue("mock-model")
-    generateTextMock.mockResolvedValue({ text: "cmn" })
+    requestTextMock.mockResolvedValue("cmn")
 
     const { setupLLMGenerateTextMessageHandlers } = await import("../llm-generate-text")
     setupLLMGenerateTextMessageHandlers()
@@ -71,7 +76,7 @@ describe("llm-generate-text", () => {
     const handler = getRegisteredMessageHandler("backgroundGenerateText")
     const result = await handler({
       data: {
-        providerId: "openai-default",
+        providerId: storedProvider.id,
         prompt: "你好",
       },
     })
@@ -80,7 +85,7 @@ describe("llm-generate-text", () => {
   })
 
   it("logs and rethrows handler errors", async () => {
-    getModelByIdMock.mockRejectedValue(new Error("provider unavailable"))
+    requestTextMock.mockRejectedValue(new Error("provider unavailable"))
 
     const { setupLLMGenerateTextMessageHandlers } = await import("../llm-generate-text")
     setupLLMGenerateTextMessageHandlers()
@@ -88,7 +93,7 @@ describe("llm-generate-text", () => {
 
     await expect(handler({
       data: {
-        providerId: "openai-default",
+        providerId: storedProvider.id,
         prompt: "test",
       },
     })).rejects.toThrow("provider unavailable")

@@ -1,6 +1,5 @@
 import type { Config } from "@/types/config/config"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { isAPIProviderConfig } from "@/types/config/provider"
 import { CONFIG_SCHEMA_VERSION, DEFAULT_CONFIG } from "@/utils/constants/config"
 
 const getItemMock = vi.fn()
@@ -36,10 +35,6 @@ vi.mock("@/utils/logger", () => ({
 function buildStableConfig(): Config {
   const config = structuredClone(DEFAULT_CONFIG)
   config.providersConfig = config.providersConfig.map((providerConfig) => {
-    if (!isAPIProviderConfig(providerConfig)) {
-      return providerConfig
-    }
-
     const apiKeyEnvName = `WXT_${providerConfig.provider.toUpperCase()}_API_KEY`
     const envApiKey = import.meta.env[apiKeyEnvName] as string | undefined
     if (!envApiKey) {

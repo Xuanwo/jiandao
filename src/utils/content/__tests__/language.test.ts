@@ -1,4 +1,4 @@
-import type { LLMProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { sendMessage } from "@/utils/message"
 import { detectLanguageWithSource } from "../language"
@@ -13,19 +13,14 @@ vi.mock("@/utils/config/storage", () => ({
 
 const mockSendMessage = vi.mocked(sendMessage)
 
-const providerConfig: LLMProviderConfig = {
+const providerConfig: ProviderConfig = {
   id: "openai-default",
   name: "OpenAI",
   description: "OpenAI",
   enabled: true,
   provider: "openai",
   apiKey: "test-api-key",
-  model: {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
-  providerOptions: {},
+  model: "gpt-5-mini",
   temperature: 0,
 }
 

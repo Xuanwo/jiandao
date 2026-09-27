@@ -13,8 +13,9 @@ the [privacy policy](./PRIVACY.md).
 
 - Translates the whole page, including its title, in bilingual or
   translation-only mode.
-- Works with OpenAI, DeepSeek, or any OpenAI-compatible endpoint, including
-  local and self-hosted models.
+- Talks to OpenAI, Anthropic, Gemini and DeepSeek directly, and to any
+  OpenAI-compatible endpoint, including local and self-hosted models. No SDK
+  in between: the request is the one documented by the service.
 - Can give the model a summary of the page, so translations fit the context.
 - Lets you adjust the prompt, translation style, request rate, and batching.
 

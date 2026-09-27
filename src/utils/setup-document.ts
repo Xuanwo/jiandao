@@ -1,16 +1,16 @@
 import type { LangCodeISO6393 } from "@/definitions"
 import type { Config } from "@/types/config/config"
-import type { APIProviderConfig, APIProviderTypes, LLMProviderConfig, ProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig, ProviderType, RequestApi } from "@/types/config/provider"
 import type { TranslationMode } from "@/types/config/translate"
 import { z } from "zod"
 import { langCodeISO6393Schema } from "@/definitions"
 import { configSchema } from "@/types/config/config"
-import { API_PROVIDER_TYPES, isAPIProviderConfig, isLLMProviderConfig, LLM_PROVIDER_MODELS } from "@/types/config/provider"
+import { PROVIDER_TYPES, REQUEST_APIS } from "@/types/config/provider"
 import { translationModeSchema } from "@/types/config/translate"
-import { DEFAULT_LLM_PROVIDER_MODELS, PROVIDER_ITEMS } from "@/utils/constants/providers"
+import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { getUniqueName } from "@/utils/name"
-import { resolveModelId } from "@/utils/providers/model-id"
+import { getRequestHost, resolveBaseURL, resolveRequestApi } from "@/utils/providers/request"
 
 /**
  * The setup document is the only way a translation service gets configured.
@@ -25,21 +25,18 @@ const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
 )
 
 export const setupProviderSchema = z.strictObject({
-  type: z.enum(API_PROVIDER_TYPES).describe("Which kind of service. \"openai-compatible\" is any endpoint that speaks the OpenAI chat completions API, such as Ollama, LM Studio or a gateway."),
+  type: z.enum(PROVIDER_TYPES).describe("Which service. \"openai\", \"anthropic\", \"gemini\" and \"deepseek\" are the official APIs. \"openai-compatible\" is any other endpoint that speaks the OpenAI chat completions API, such as Ollama, LM Studio, OpenRouter or a gateway; it needs baseURL."),
+  api: z.enum(REQUEST_APIS).optional().describe("Wire format. Defaults per type: openai → openai-responses, anthropic → anthropic, gemini → gemini, deepseek and openai-compatible → openai-chat. Set \"openai-responses\" for a compatible service that only speaks the Responses API, such as xAI."),
   name: z.string().trim().min(1).optional().describe("Display name. Defaults to the service type's name."),
   apiKey: z.string().trim().min(1).optional().describe("The API key. Required for a new service. Endpoints without authentication still need a non-empty value, e.g. \"local\". When updating an existing service, the masked value from an export (such as \"sk-…a9f2\") keeps the stored key."),
-  model: z.string().trim().min(1).optional().describe("Model ID as the service expects it. Required for openai-compatible. Defaults to Plainly's default model for openai and deepseek."),
-  baseURL: z.url().optional().describe("Endpoint base URL including the API version path, e.g. \"http://localhost:11434/v1\". Required for openai-compatible. Omit for the official OpenAI or DeepSeek API."),
+  model: z.string().trim().min(1).describe("Model ID exactly as the service expects it, e.g. \"gpt-6-luna\", \"claude-haiku-4-5\", \"gemini-3.5-flash-lite\", \"deepseek-flash\", \"qwen3:8b\"."),
+  baseURL: z.url().optional().describe("Endpoint base URL up to and including the version path, e.g. \"http://localhost:11434/v1\". Required for openai-compatible. Omit for an official API."),
   headers: z.record(z.string(), z.string()).optional().describe("Extra HTTP headers sent with every request."),
-  providerOptions: z.record(z.string(), jsonValueSchema).optional().describe("Provider-specific request options, for example { \"reasoningEffort\": \"none\" } for OpenAI or { \"thinking\": { \"type\": \"disabled\" } } for DeepSeek."),
-  temperature: z.number().min(0).optional().describe("Sampling temperature. Omit to use the service default."),
+  body: z.record(z.string(), jsonValueSchema).optional().describe("JSON merged into every request body, exactly as the API documents it. Use it to turn thinking off: { \"reasoning\": { \"effort\": \"none\" } } for OpenAI, { \"thinking\": { \"type\": \"disabled\" } } for Anthropic and DeepSeek, { \"generationConfig\": { \"thinkingConfig\": { \"thinkingLevel\": \"minimal\" } } } for Gemini, { \"reasoning_effort\": \"none\" } for openai-compatible services that accept it."),
+  temperature: z.number().min(0).optional().describe("Sampling temperature. Omit to use the service default; Anthropic's current models reject values other than 1."),
 }).superRefine((provider, ctx) => {
-  if (provider.type === "openai-compatible") {
-    if (!provider.baseURL)
-      ctx.addIssue({ code: "custom", path: ["baseURL"], message: "baseURL is required for an openai-compatible service" })
-    if (!provider.model)
-      ctx.addIssue({ code: "custom", path: ["model"], message: "model is required for an openai-compatible service" })
-  }
+  if (provider.type === "openai-compatible" && !provider.baseURL)
+    ctx.addIssue({ code: "custom", path: ["baseURL"], message: "baseURL is required for an openai-compatible service" })
 })
 
 export const setupPromptSchema = z.strictObject({
@@ -120,53 +117,48 @@ export function isMaskedApiKey(apiKey: string): boolean {
   Matching a document to stored providers
   ────────────────────────────── */
 
-export const DEFAULT_PROVIDER_HOSTS: Record<APIProviderTypes, string> = {
-  "openai": "api.openai.com",
-  "deepseek": "api.deepseek.com",
-  "openai-compatible": "",
-}
-
-function normalizeBaseURL(baseURL: string | undefined): string {
-  return (baseURL ?? "").trim().replace(/\/+$/, "")
+function toProviderShape(provider: Pick<SetupProvider, "type" | "baseURL">): Pick<ProviderConfig, "provider" | "baseURL"> {
+  return { provider: provider.type, baseURL: provider.baseURL }
 }
 
 /**
  * The provider a document replaces: same type and same endpoint. Two OpenAI
  * entries with different relay URLs are different services.
  */
-export function findMatchingProvider(providersConfig: ProviderConfig[], provider: SetupProvider): APIProviderConfig | undefined {
-  const wanted = normalizeBaseURL(provider.baseURL)
-  return providersConfig.find((candidate): candidate is APIProviderConfig =>
-    isAPIProviderConfig(candidate)
-    && candidate.provider === provider.type
-    && normalizeBaseURL(candidate.baseURL) === wanted,
+export function findMatchingProvider(providersConfig: ProviderConfig[], provider: SetupProvider): ProviderConfig | undefined {
+  const wanted = resolveBaseURL(toProviderShape(provider))
+  return providersConfig.find(candidate =>
+    candidate.provider === provider.type
+    && resolveBaseURL(candidate) === wanted,
   )
 }
 
-/** Host that page text will be sent to, shown prominently before applying. */
-export function getRequestHost(provider: Pick<SetupProvider, "type" | "baseURL">): string {
-  if (provider.baseURL) {
-    try {
-      return new URL(provider.baseURL).host
-    }
-    catch {
-      return provider.baseURL
-    }
-  }
-  return DEFAULT_PROVIDER_HOSTS[provider.type]
+function readPath(value: unknown, path: string[]): unknown {
+  return path.reduce<unknown>((current, key) => (typeof current === "object" && current !== null ? (current as Record<string, unknown>)[key] : undefined), value)
 }
 
-/** True when the options turn thinking off for this provider type; null when the document sets no options. */
-export function describesThinkingOff(providerOptions: SetupProvider["providerOptions"]): boolean | null {
-  if (!providerOptions)
+/** True when the body turns thinking off or down for this wire format; null when the document sets no body. */
+export function describesThinkingOff(body: SetupProvider["body"], api: RequestApi): boolean | null {
+  if (!body)
     return null
-  const effort = providerOptions.reasoningEffort ?? providerOptions.reasoning_effort
-  if (effort === "none" || effort === "minimal")
-    return true
-  const thinking = providerOptions.thinking
-  if (typeof thinking === "object" && thinking !== null && (thinking as { type?: unknown }).type === "disabled")
-    return true
-  return false
+  switch (api) {
+    case "openai-responses": {
+      const effort = readPath(body, ["reasoning", "effort"])
+      return effort === "none" || effort === "minimal"
+    }
+    case "openai-chat": {
+      const effort = body.reasoning_effort
+      if (effort === "none" || effort === "minimal")
+        return true
+      return readPath(body, ["thinking", "type"]) === "disabled" || body.enable_thinking === false
+    }
+    case "anthropic":
+      return readPath(body, ["thinking", "type"]) === "disabled" || readPath(body, ["output_config", "effort"]) === "low"
+    case "gemini": {
+      const config = readPath(body, ["generationConfig", "thinkingConfig"])
+      return readPath(config, ["thinkingBudget"]) === 0 || readPath(config, ["thinkingLevel"]) === "minimal"
+    }
+  }
 }
 
 /* ──────────────────────────────
@@ -178,20 +170,6 @@ export class SetupDocumentError extends Error {
     super(message)
     this.name = "SetupDocumentError"
   }
-}
-
-function buildModel(type: APIProviderTypes, model: string | undefined): LLMProviderConfig["model"] {
-  if (type === "openai-compatible") {
-    return { model: "use-custom-model", isCustomModel: true, customModel: model ?? null }
-  }
-  // The catalog in the config schema only lists known IDs; anything else is stored as a custom model.
-  const defaults = DEFAULT_LLM_PROVIDER_MODELS[type] as LLMProviderConfig["model"]
-  if (!model)
-    return defaults
-  const catalog: readonly string[] = LLM_PROVIDER_MODELS[type]
-  if (catalog.includes(model))
-    return { model, isCustomModel: false, customModel: null } as LLMProviderConfig["model"]
-  return { model: defaults.model, isCustomModel: true, customModel: model } as LLMProviderConfig["model"]
 }
 
 export interface ApplySetupDocumentResult {
@@ -223,18 +201,19 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
   const otherNames = new Set(config.providersConfig.filter(p => p.id !== existing?.id).map(p => p.name))
   const name = provider.name ?? existing?.name ?? getUniqueName(PROVIDER_ITEMS[provider.type].name, otherNames)
 
-  const next: APIProviderConfig = {
+  const next: ProviderConfig = {
     id: existing?.id ?? getRandomUUID(),
     name: otherNames.has(name) ? getUniqueName(name, otherNames) : name,
     enabled: true,
     provider: provider.type,
+    ...(provider.api && { api: provider.api }),
     apiKey,
-    model: buildModel(provider.type, provider.model),
-    ...(provider.baseURL && { baseURL: normalizeBaseURL(provider.baseURL) }),
+    model: provider.model,
+    ...(provider.baseURL && { baseURL: resolveBaseURL(toProviderShape(provider)) }),
     ...(provider.headers && { headers: provider.headers }),
-    ...(provider.providerOptions && { providerOptions: provider.providerOptions as Record<string, any> }),
+    ...(provider.body && { body: provider.body }),
     ...(provider.temperature !== undefined && { temperature: provider.temperature }),
-  } as APIProviderConfig
+  }
 
   const providersConfig = existing
     ? config.providersConfig.map(p => p.id === existing.id ? next : p)
@@ -270,7 +249,8 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
   ────────────────────────────── */
 
 export interface SetupPreview {
-  type: APIProviderTypes
+  type: ProviderType
+  api: RequestApi
   providerName: string
   modelId: string
   host: string
@@ -289,14 +269,16 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
   const { provider } = document
   const existing = findMatchingProvider(config.providersConfig, provider)
   const hasDocumentKey = !!provider.apiKey && !isMaskedApiKey(provider.apiKey)
+  const api = resolveRequestApi({ provider: provider.type, api: provider.api })
 
   return {
     type: provider.type,
+    api,
     providerName: provider.name ?? existing?.name ?? PROVIDER_ITEMS[provider.type].name,
-    modelId: resolveModelId(buildModel(provider.type, provider.model)) ?? "",
-    host: getRequestHost(provider),
+    modelId: provider.model,
+    host: getRequestHost(toProviderShape(provider)),
     keyStatus: hasDocumentKey ? "new" : existing?.apiKey ? "reused" : "missing",
-    thinkingOff: describesThinkingOff(provider.providerOptions),
+    thinkingOff: describesThinkingOff(provider.body, api),
     targetLanguage: document.targetLanguage,
     sourceLanguage: document.sourceLanguage,
     mode: document.mode,
@@ -311,10 +293,9 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
  */
 export function exportSetupDocument(config: Config): SetupDocument | null {
   const provider = config.providersConfig.find(p => p.id === config.translate.providerId)
-  if (!provider || !isAPIProviderConfig(provider))
+  if (!provider)
     return null
 
-  const modelId = isLLMProviderConfig(provider) ? resolveModelId(provider.model) : undefined
   const { promptId, patterns } = config.translate.customPromptsConfig
   const prompt = promptId ? patterns.find(pattern => pattern.id === promptId) : undefined
 
@@ -322,12 +303,13 @@ export function exportSetupDocument(config: Config): SetupDocument | null {
     plainly: SETUP_DOCUMENT_VERSION,
     provider: {
       type: provider.provider,
+      ...(provider.api && { api: provider.api }),
       name: provider.name,
       ...(provider.apiKey && { apiKey: maskApiKey(provider.apiKey) }),
-      ...(modelId && { model: modelId }),
+      model: provider.model,
       ...(provider.baseURL && { baseURL: provider.baseURL }),
-      ...(provider.headers && { headers: provider.headers as Record<string, string> }),
-      ...(provider.providerOptions && { providerOptions: provider.providerOptions }),
+      ...(provider.headers && { headers: provider.headers }),
+      ...(provider.body && { body: provider.body }),
       ...(provider.temperature !== undefined && { temperature: provider.temperature }),
     },
     ...(prompt && { prompt: { name: prompt.name, ...(prompt.systemPrompt && { systemPrompt: prompt.systemPrompt }), prompt: prompt.prompt } }),

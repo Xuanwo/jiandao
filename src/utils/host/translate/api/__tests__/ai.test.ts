@@ -1,38 +1,23 @@
-import type { LLMProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { getRequestErrorMeta } from "@/utils/request/retry-policy"
 import { aiTranslate } from "../ai"
 
 const mocks = vi.hoisted(() => ({
-  generateText: vi.fn(),
-  getModelById: vi.fn(),
-  resolveModelId: vi.fn(),
-  getProviderOptionsWithOverride: vi.fn(),
+  requestText: vi.fn(),
 }))
 
-vi.mock("ai", () => ({
-  generateText: mocks.generateText,
+vi.mock("@/utils/providers/request", () => ({
+  requestText: mocks.requestText,
 }))
 
-vi.mock("@/utils/providers/model", () => ({
-  getModelById: mocks.getModelById,
-}))
-
-vi.mock("@/utils/providers/model-id", () => ({
-  resolveModelId: mocks.resolveModelId,
-}))
-
-vi.mock("@/utils/providers/options", () => ({
-  getProviderOptionsWithOverride: mocks.getProviderOptionsWithOverride,
-}))
-
-const providerConfig: LLMProviderConfig = {
+const providerConfig: ProviderConfig = {
   id: "openai-default",
   name: "OpenAI",
   provider: "openai",
   enabled: true,
   apiKey: "sk-test",
-  model: { model: "gpt-5-mini", isCustomModel: false, customModel: null },
+  model: "gpt-6-luna",
+  temperature: 0.3,
 }
 
 const promptResolver = vi.fn().mockResolvedValue({
@@ -43,49 +28,27 @@ const promptResolver = vi.fn().mockResolvedValue({
 describe("aiTranslate", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getModelById.mockResolvedValue("model")
-    mocks.resolveModelId.mockReturnValue("gpt-5-mini")
-    mocks.getProviderOptionsWithOverride.mockReturnValue({})
   })
 
-  it("preserves AI SDK error metadata for retry policy decisions", async () => {
-    const rateLimitedError = Object.assign(new Error("Too Many Requests"), {
-      statusCode: 429,
-      isRetryable: true,
-      responseHeaders: {
-        "retry-after": "2",
-      },
-    })
-    mocks.generateText.mockRejectedValue(rateLimitedError)
+  it("sends the resolved prompts with the service's temperature", async () => {
+    mocks.requestText.mockResolvedValue("你好")
 
-    const error = await aiTranslate("hello", "Chinese", providerConfig, promptResolver).catch(error => error)
+    await expect(aiTranslate("hello", "Chinese", providerConfig, promptResolver)).resolves.toBe("你好")
 
-    expect(error).toBe(rateLimitedError)
-    expect(getRequestErrorMeta(error)).toEqual(expect.objectContaining({
-      statusCode: 429,
-      isRetryable: true,
-      retryAfterMs: 2000,
-      kind: "rate-limit",
-    }))
+    expect(promptResolver).toHaveBeenCalledWith("Chinese", "hello", undefined)
+    expect(mocks.requestText).toHaveBeenCalledWith(providerConfig, { system: "system", prompt: "prompt", temperature: 0.3 })
   })
 
-  it("preserves response body as the display message when the AI SDK message is generic", async () => {
-    const responseBody = "{\"code\":404,\"message\":\"模型 Kimi-K2-Instruct-09051 无效\",\"data\":{}}"
-    const invalidModelError = Object.assign(new Error("Something went wrong"), {
-      statusCode: 404,
-      isRetryable: false,
-      responseBody,
-    })
-    mocks.generateText.mockRejectedValue(invalidModelError)
+  it("keeps only the text after an inline reasoning block", async () => {
+    mocks.requestText.mockResolvedValue("<think>thinking hard</think>\n你好")
 
-    const error = await aiTranslate("hello", "Chinese", providerConfig, promptResolver).catch(error => error)
+    await expect(aiTranslate("hello", "Chinese", providerConfig, promptResolver)).resolves.toBe("\n你好")
+  })
 
-    expect(error).toBe(invalidModelError)
-    expect(error.message).toBe(responseBody)
-    expect(getRequestErrorMeta(error)).toEqual(expect.objectContaining({
-      statusCode: 404,
-      isRetryable: false,
-      kind: "bad-request",
-    }))
+  it("passes request errors through unchanged so the queue can read their metadata", async () => {
+    const error = new Error("Too Many Requests")
+    mocks.requestText.mockRejectedValue(error)
+
+    await expect(aiTranslate("hello", "Chinese", providerConfig, promptResolver)).rejects.toBe(error)
   })
 })

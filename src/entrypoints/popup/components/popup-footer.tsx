@@ -2,19 +2,17 @@ import type { ProviderConfig } from "@/types/config/provider"
 import { IconSettings } from "@tabler/icons-react"
 import { useAtomValue } from "jotai"
 import { i18n } from "#imports"
-import { isAPIProviderConfig, isLLMProviderConfig } from "@/types/config/provider"
 import { featureProviderConfigAtom } from "@/utils/atoms/provider"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { openOptionsPage } from "@/utils/navigation"
-import { resolveModelId } from "@/utils/providers/model-id"
 import { cn } from "@/utils/styles/utils"
 
 function isProviderReady(provider: ProviderConfig): boolean {
-  return !isAPIProviderConfig(provider) || !!provider.apiKey?.trim()
+  return !!provider.apiKey?.trim()
 }
 
 function describeProvider(provider: ProviderConfig): string {
-  const modelId = isLLMProviderConfig(provider) ? resolveModelId(provider.model) : null
+  const modelId = provider.model.trim()
   const displayName = provider.name || PROVIDER_ITEMS[provider.provider].name
   return modelId ? `${displayName} · ${modelId}` : displayName
 }

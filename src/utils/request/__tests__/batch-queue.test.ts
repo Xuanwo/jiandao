@@ -51,7 +51,7 @@ const sampleProviderConfig: ProviderConfig = {
   provider: "openai",
   enabled: true,
   apiKey: "test-key",
-  model: { model: "gpt-4o-mini", isCustomModel: false, customModel: null },
+  model: "gpt-4o-mini",
 }
 
 interface TranslateBatchData {

@@ -1,10 +1,10 @@
 import type { PartialDeep } from "type-fest"
 import type { FeatureKey } from "../constants/feature-providers"
-import type { LLMProviderConfig, ProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import { deepmerge } from "deepmerge-ts"
 import { atom } from "jotai"
 import { atomFamily } from "jotai-family"
-import { llmProviderConfigItemSchema, providerConfigItemSchema } from "@/types/config/provider"
+import { providerConfigItemSchema } from "@/types/config/provider"
 import { getProviderConfigById } from "../config/helpers"
 import { FEATURE_PROVIDER_DEFS } from "../constants/feature-providers"
 import { configAtom, configFieldsAtomMap } from "./config"
@@ -39,14 +39,6 @@ export const providerConfigAtom = atomFamily((id: string) =>
 
 function mergeUnknown(base: unknown, updates: unknown): unknown {
   return (deepmerge as (base: unknown, updates: unknown) => unknown)(base, updates)
-}
-
-export function updateLLMProviderConfig(
-  config: LLMProviderConfig,
-  updates: PartialDeep<LLMProviderConfig>,
-): LLMProviderConfig {
-  const result = mergeUnknown(config, updates) as LLMProviderConfig
-  return llmProviderConfigItemSchema.parse(result)
 }
 
 export function updateProviderConfig(

@@ -54,7 +54,7 @@ const llmProvider: ProviderConfig = {
   provider: "openai",
   enabled: true,
   apiKey: "sk-test",
-  model: { model: "gpt-5-mini", isCustomModel: false, customModel: null },
+  model: "gpt-5-mini",
 }
 
 describe("translation queue helpers", () => {
@@ -76,23 +76,6 @@ describe("translation queue helpers", () => {
     articleSummaryCachePutMock.mockResolvedValue(undefined)
     translationCacheGetMock.mockResolvedValue(undefined)
     translationCachePutMock.mockResolvedValue(undefined)
-  })
-
-  it("routes supported providers through the batch queue", async () => {
-    const { shouldUseBatchQueue } = await import("../translation-queues")
-
-    const customProvider: ProviderConfig = {
-      id: "custom-openai",
-      name: "Custom Provider",
-      provider: "openai-compatible",
-      enabled: true,
-      apiKey: "key",
-      baseURL: "https://api.example.com/v1",
-      model: { model: "use-custom-model", isCustomModel: true, customModel: "custom-model" },
-    }
-
-    expect(shouldUseBatchQueue(customProvider)).toBe(true)
-    expect(shouldUseBatchQueue(llmProvider)).toBe(true)
   })
 
   it("passes webpage context through the translation queue without generating a new summary", async () => {

@@ -1,5 +1,4 @@
 import type { Config } from "@/types/config/config"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { resolveProviderConfig } from "@/utils/constants/feature-providers"
 import { getLocalConfig } from "../../config/storage"
 import { prepareTranslationText } from "./text-preparation"
@@ -20,10 +19,6 @@ async function getWebPagePromptContext(
   enableAIContentAware: boolean,
   includeSummary: boolean,
 ): Promise<{ webTitle: string, webDescription?: string, webContent: string, webSummary?: string } | undefined> {
-  if (!isLLMProviderConfig(providerConfig)) {
-    return undefined
-  }
-
   const webPageContext = await getOrCreateWebPageContext()
   if (!webPageContext) {
     return undefined

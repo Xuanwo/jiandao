@@ -36,7 +36,7 @@ describe("setup document JSON Schema", () => {
     expect(Object.keys(properties)).toEqual(["plainly", "provider", "prompt", "targetLanguage", "sourceLanguage", "mode"])
     expect(schema.additionalProperties).toBe(false)
     const provider = properties.provider as { properties: Record<string, unknown>, additionalProperties: boolean }
-    expect(Object.keys(provider.properties)).toEqual(["type", "name", "apiKey", "model", "baseURL", "headers", "providerOptions", "temperature"])
+    expect(Object.keys(provider.properties)).toEqual(["type", "api", "name", "apiKey", "model", "baseURL", "headers", "body", "temperature"])
     expect(provider.additionalProperties).toBe(false)
   })
 })

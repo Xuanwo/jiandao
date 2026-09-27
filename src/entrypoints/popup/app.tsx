@@ -1,7 +1,6 @@
 import { useAtom, useAtomValue } from "jotai"
 import { i18n } from "#imports"
 import { SegmentedControl } from "@/components/segmented-control"
-import { isAPIProviderConfig } from "@/types/config/provider"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { featureProviderConfigAtom } from "@/utils/atoms/provider"
 import { AgentSetupCard } from "./components/agent-setup-card"
@@ -34,7 +33,7 @@ function DisplayModeControl() {
 export default function App() {
   usePopupSync()
   const providerConfig = useAtomValue(featureProviderConfigAtom("translate"))
-  const needsApiKey = !!providerConfig && isAPIProviderConfig(providerConfig) && !providerConfig.apiKey?.trim()
+  const needsApiKey = !!providerConfig && !providerConfig.apiKey?.trim()
 
   return (
     <div className="flex min-h-[300px] flex-col justify-between">

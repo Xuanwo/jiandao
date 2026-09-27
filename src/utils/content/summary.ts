@@ -1,9 +1,6 @@
-import type { LLMProviderConfig } from "@/types/config/provider"
-import { generateText } from "ai"
+import type { ProviderConfig } from "@/types/config/provider"
 import { logger } from "@/utils/logger"
-import { getModelById } from "@/utils/providers/model"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getProviderOptionsWithOverride } from "@/utils/providers/options"
+import { requestText } from "@/utils/providers/request"
 import { cleanText } from "./utils"
 
 /**
@@ -12,7 +9,7 @@ import { cleanText } from "./utils"
 export async function generateArticleSummary(
   title: string,
   textContent: string,
-  providerConfig: LLMProviderConfig,
+  providerConfig: ProviderConfig,
 ): Promise<string | null> {
   const preparedText = cleanText(textContent)
 
@@ -21,11 +18,6 @@ export async function generateArticleSummary(
   }
 
   try {
-    const { model: providerModel, provider, providerOptions: userProviderOptions, temperature } = providerConfig
-    const modelName = resolveModelId(providerModel)
-    const providerOptions = getProviderOptionsWithOverride(modelName ?? "", provider, userProviderOptions)
-    const model = await getModelById(providerConfig.id)
-
     const prompt = `Summarize the following article in 2-3 sentences. Focus on the main topic and key points. Return ONLY the summary, no explanations or formatting.
 
 Title: ${title}
@@ -33,12 +25,7 @@ Title: ${title}
 Content:
 ${preparedText}`
 
-    const { text: summary } = await generateText({
-      model,
-      prompt,
-      temperature,
-      providerOptions,
-    })
+    const summary = await requestText(providerConfig, { prompt, temperature: providerConfig.temperature })
 
     const cleanedSummary = summary.trim()
     logger.info("Generated article summary:", `${cleanedSummary.slice(0, 100)}...`)

@@ -16,11 +16,23 @@
         "type": {
           "type": "string",
           "enum": [
-            "openai-compatible",
             "openai",
-            "deepseek"
+            "anthropic",
+            "gemini",
+            "deepseek",
+            "openai-compatible"
           ],
-          "description": "Which kind of service. \"openai-compatible\" is any endpoint that speaks the OpenAI chat completions API, such as Ollama, LM Studio or a gateway."
+          "description": "Which service. \"openai\", \"anthropic\", \"gemini\" and \"deepseek\" are the official APIs. \"openai-compatible\" is any other endpoint that speaks the OpenAI chat completions API, such as Ollama, LM Studio, OpenRouter or a gateway; it needs baseURL."
+        },
+        "api": {
+          "description": "Wire format. Defaults per type: openai → openai-responses, anthropic → anthropic, gemini → gemini, deepseek and openai-compatible → openai-chat. Set \"openai-responses\" for a compatible service that only speaks the Responses API, such as xAI.",
+          "type": "string",
+          "enum": [
+            "openai-chat",
+            "openai-responses",
+            "anthropic",
+            "gemini"
+          ]
         },
         "name": {
           "description": "Display name. Defaults to the service type's name.",
@@ -33,12 +45,12 @@
           "minLength": 1
         },
         "model": {
-          "description": "Model ID as the service expects it. Required for openai-compatible. Defaults to Plainly's default model for openai and deepseek.",
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Model ID exactly as the service expects it, e.g. \"gpt-6-luna\", \"claude-haiku-4-5\", \"gemini-3.5-flash-lite\", \"deepseek-flash\", \"qwen3:8b\"."
         },
         "baseURL": {
-          "description": "Endpoint base URL including the API version path, e.g. \"http://localhost:11434/v1\". Required for openai-compatible. Omit for the official OpenAI or DeepSeek API.",
+          "description": "Endpoint base URL up to and including the version path, e.g. \"http://localhost:11434/v1\". Required for openai-compatible. Omit for an official API.",
           "type": "string",
           "format": "uri"
         },
@@ -52,8 +64,8 @@
             "type": "string"
           }
         },
-        "providerOptions": {
-          "description": "Provider-specific request options, for example { \"reasoningEffort\": \"none\" } for OpenAI or { \"thinking\": { \"type\": \"disabled\" } } for DeepSeek.",
+        "body": {
+          "description": "JSON merged into every request body, exactly as the API documents it. Use it to turn thinking off: { \"reasoning\": { \"effort\": \"none\" } } for OpenAI, { \"thinking\": { \"type\": \"disabled\" } } for Anthropic and DeepSeek, { \"generationConfig\": { \"thinkingConfig\": { \"thinkingLevel\": \"minimal\" } } } for Gemini, { \"reasoning_effort\": \"none\" } for openai-compatible services that accept it.",
           "type": "object",
           "propertyNames": {
             "type": "string"
@@ -63,13 +75,14 @@
           }
         },
         "temperature": {
-          "description": "Sampling temperature. Omit to use the service default.",
+          "description": "Sampling temperature. Omit to use the service default; Anthropic's current models reject values other than 1.",
           "type": "number",
           "minimum": 0
         }
       },
       "required": [
-        "type"
+        "type",
+        "model"
       ],
       "additionalProperties": false
     },

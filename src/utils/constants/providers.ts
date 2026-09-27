@@ -1,24 +1,4 @@
-import type { AllProviderTypes, APIProviderTypes, LLMProviderModels, ProviderConfig, ProvidersConfig } from "@/types/config/provider"
-import { API_PROVIDER_TYPES, TRANSLATE_PROVIDER_TYPES } from "@/types/config/provider"
-import { pick } from "@/types/utils"
-
-export const DEFAULT_LLM_PROVIDER_MODELS: LLMProviderModels = {
-  "openai-compatible": {
-    model: "use-custom-model",
-    isCustomModel: true,
-    customModel: null,
-  },
-  "openai": {
-    model: "gpt-5-mini",
-    isCustomModel: false,
-    customModel: null,
-  },
-  "deepseek": {
-    model: "deepseek-v4-flash",
-    isCustomModel: false,
-    customModel: null,
-  },
-}
+import type { ProviderConfig, ProviderType } from "@/types/config/provider"
 
 export interface ProviderItem {
   name: string
@@ -27,64 +7,44 @@ export interface ProviderItem {
   website: string
 }
 
-export const PROVIDER_ITEMS: Record<AllProviderTypes, ProviderItem> = {
-  "openai-compatible": {
-    name: "Custom Provider",
-    monogram: "AI",
-    website: "",
-  },
+export const PROVIDER_ITEMS: Record<ProviderType, ProviderItem> = {
   "openai": {
     name: "OpenAI",
     monogram: "O",
     website: "https://platform.openai.com",
+  },
+  "anthropic": {
+    name: "Anthropic",
+    monogram: "A",
+    website: "https://platform.claude.com",
+  },
+  "gemini": {
+    name: "Gemini",
+    monogram: "G",
+    website: "https://aistudio.google.com",
   },
   "deepseek": {
     name: "DeepSeek",
     monogram: "D",
     website: "https://platform.deepseek.com",
   },
+  "openai-compatible": {
+    name: "Custom Provider",
+    monogram: "AI",
+    website: "",
+  },
 }
 
-export const DEFAULT_PROVIDER_CONFIG = {
-  "openai-compatible": {
-    id: "openai-compatible-default",
-    name: PROVIDER_ITEMS["openai-compatible"].name,
-    enabled: true,
-    provider: "openai-compatible",
-    baseURL: "https://api.example.com/v1",
-    model: DEFAULT_LLM_PROVIDER_MODELS["openai-compatible"],
-  },
-  "openai": {
-    id: "openai-default",
-    name: PROVIDER_ITEMS.openai.name,
-    enabled: true,
-    provider: "openai",
-    model: DEFAULT_LLM_PROVIDER_MODELS.openai,
-  },
-  "deepseek": {
-    id: "deepseek-default",
-    name: PROVIDER_ITEMS.deepseek.name,
-    enabled: true,
-    provider: "deepseek",
-    model: DEFAULT_LLM_PROVIDER_MODELS.deepseek,
-  },
-} as const satisfies Record<AllProviderTypes, ProviderConfig>
+/**
+ * A fresh install has one service without a key, so the popup shows the
+ * setup card. The agent's document replaces it or adds to it.
+ */
+export const DEFAULT_PROVIDER_CONFIG: ProviderConfig = {
+  id: "openai-default",
+  name: PROVIDER_ITEMS.openai.name,
+  enabled: true,
+  provider: "openai",
+  model: "gpt-6-luna",
+}
 
-export const DEFAULT_PROVIDER_CONFIG_LIST: ProvidersConfig = [
-  DEFAULT_PROVIDER_CONFIG.openai,
-  DEFAULT_PROVIDER_CONFIG.deepseek,
-  DEFAULT_PROVIDER_CONFIG["openai-compatible"],
-]
-
-export const TRANSLATE_PROVIDER_ITEMS = pick(
-  PROVIDER_ITEMS,
-  TRANSLATE_PROVIDER_TYPES,
-)
-
-export const API_PROVIDER_ITEMS = pick(
-  PROVIDER_ITEMS,
-  API_PROVIDER_TYPES,
-)
-
-/** Order providers are offered in the "add a service" menu. */
-export const ADDABLE_PROVIDER_TYPES: readonly APIProviderTypes[] = ["openai", "deepseek", "openai-compatible"]
+export const DEFAULT_PROVIDER_CONFIG_LIST: ProviderConfig[] = [DEFAULT_PROVIDER_CONFIG]

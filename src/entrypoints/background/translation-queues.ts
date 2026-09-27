@@ -1,9 +1,8 @@
 import type { Config } from "@/types/config/config"
-import type { LLMProviderConfig, ProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import type { BatchQueueConfig, RequestQueueConfig } from "@/types/config/translate"
 import type { WebPagePromptContext } from "@/types/content"
 import type { PromptResolver } from "@/utils/host/translate/api/ai"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { BATCH_SEPARATOR, BATCH_SEPARATOR_LINE_PATTERN } from "@/utils/constants/prompt"
 import { generateArticleSummary } from "@/utils/content/summary"
@@ -23,10 +22,6 @@ export function parseBatchResult(result: string): string[] {
   return result.trim().split(BATCH_SEPARATOR_LINE_PATTERN).map(t => t.trim())
 }
 
-export function shouldUseBatchQueue(providerConfig: ProviderConfig): boolean {
-  return isLLMProviderConfig(providerConfig)
-}
-
 export async function executeBatchTranslation<TContext>(
   dataList: TranslateBatchData<TContext>[],
   promptResolver: PromptResolver<TContext>,
@@ -42,7 +37,7 @@ export async function executeBatchTranslation<TContext>(
 async function getOrGenerateWebPageSummary(
   webTitle: string,
   webContent: string,
-  providerConfig: LLMProviderConfig,
+  providerConfig: ProviderConfig,
   requestQueue: RequestQueue,
 ): Promise<string | null> {
   const preparedText = cleanText(webContent)
@@ -190,15 +185,8 @@ export async function setUpWebPageTranslationQueue() {
       webSummary: normalizePromptContextValue(webSummary),
     }
 
-    if (shouldUseBatchQueue(providerConfig)) {
-      const data = { text, langConfig, providerConfig, hash, scheduleAt, context }
-      result = await batchQueue.enqueue(data)
-    }
-    else {
-      // Create thunk based on type and params
-      const thunk = () => executeTranslate(text, langConfig, providerConfig, getTranslatePrompt)
-      result = await requestQueue.enqueue(thunk, scheduleAt, hash)
-    }
+    const data = { text, langConfig, providerConfig, hash, scheduleAt, context }
+    result = await batchQueue.enqueue(data)
 
     // Cache the translation result if successful
     if (result && hash) {
@@ -215,7 +203,7 @@ export async function setUpWebPageTranslationQueue() {
   onMessage("getOrGenerateWebPageSummary", async (message) => {
     const { webTitle, webContent, providerConfig } = message.data
 
-    if (!isLLMProviderConfig(providerConfig) || !webTitle || !webContent) {
+    if (!webTitle || !webContent) {
       return null
     }
 

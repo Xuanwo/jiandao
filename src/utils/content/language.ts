@@ -1,14 +1,11 @@
 import type { LangCodeISO6393 } from "@/definitions"
 import type { BackgroundGenerateTextPayload } from "@/types/background-generate-text"
 import type { Config } from "@/types/config/config"
-import type { LLMProviderConfig } from "@/types/config/provider"
-import { isLLMProviderConfig } from "@/types/config/provider"
+import type { ProviderConfig } from "@/types/config/provider"
 import { getLocalConfig } from "@/utils/config/storage"
 import { logger } from "@/utils/logger"
 import { sendMessage } from "@/utils/message"
 import { getLanguageDetectionSystemPrompt, parseDetectedLanguageCode } from "@/utils/prompts/language-detection"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getProviderOptionsWithOverride } from "@/utils/providers/options"
 import { cleanText } from "./utils"
 
 const DEFAULT_MIN_LENGTH = 10
@@ -20,7 +17,7 @@ export interface DetectLanguageOptions {
   /** Minimum text length to attempt detection (default: 10) */
   minLength?: number
   /** LLM provider config for detection (non-LLM providers not supported) */
-  providerConfig?: LLMProviderConfig
+  providerConfig?: ProviderConfig
   /** Max text length for LLM detection (default: 500) */
   maxLengthForLLM?: number
 }
@@ -75,13 +72,13 @@ export async function detectLanguage(
   return result.code === "und" ? null : result.code
 }
 
-function selectLanguageDetectionProvider(config: Config): LLMProviderConfig | undefined {
+function selectLanguageDetectionProvider(config: Config): ProviderConfig | undefined {
   const translateProvider = config.providersConfig.find(provider => provider.id === config.translate.providerId)
-  if (translateProvider?.enabled && isLLMProviderConfig(translateProvider)) {
+  if (translateProvider?.enabled) {
     return translateProvider
   }
 
-  return config.providersConfig.find(provider => provider.enabled && isLLMProviderConfig(provider)) as LLMProviderConfig | undefined
+  return config.providersConfig.find(provider => provider.enabled)
 }
 
 /**
@@ -92,7 +89,7 @@ function selectLanguageDetectionProvider(config: Config): LLMProviderConfig | un
  */
 export async function detectLanguageWithLLM(
   text: string,
-  providerConfig?: LLMProviderConfig,
+  providerConfig?: ProviderConfig,
 ): Promise<LangCodeISO6393 | "und" | null> {
   const MAX_ATTEMPTS = 3 // 1 original + 2 retries
 
@@ -102,7 +99,7 @@ export async function detectLanguageWithLLM(
   }
 
   // Get provider config - use passed or fall back to global
-  let config: LLMProviderConfig | undefined = providerConfig
+  let config: ProviderConfig | undefined = providerConfig
 
   if (!config) {
     try {
@@ -125,16 +122,11 @@ export async function detectLanguageWithLLM(
   }
 
   try {
-    const { model: providerModel, provider, providerOptions: userProviderOptions, temperature } = config
-    const modelName = resolveModelId(providerModel)
-    const providerOptions = getProviderOptionsWithOverride(modelName ?? "", provider, userProviderOptions)
     const payload: BackgroundGenerateTextPayload = {
       providerId: config.id,
       system: getLanguageDetectionSystemPrompt(),
       prompt: text,
-      temperature,
-      providerOptions,
-      maxRetries: 0,
+      temperature: config.temperature,
     }
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {

@@ -2,56 +2,36 @@ import type { PartialDeep } from "type-fest"
 import type { ProviderConfig } from "@/types/config/provider"
 import { describe, expect, it } from "vitest"
 import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
-import { updateLLMProviderConfig, updateProviderConfig } from "../provider"
-
-type OpenAIProviderConfig = Extract<ProviderConfig, { provider: "openai" }>
+import { updateProviderConfig } from "../provider"
 
 describe("provider config updates", () => {
-  it("merges nested LLM model updates without changing untouched fields", () => {
-    const result = updateLLMProviderConfig(DEFAULT_PROVIDER_CONFIG.openai, {
-      model: {
-        customModel: "gpt-5-custom",
-        isCustomModel: true,
-      },
+  it("merges request body objects and preserves the rest of the config", () => {
+    const result = updateProviderConfig({ ...DEFAULT_PROVIDER_CONFIG, body: { reasoning: { effort: "low" }, seed: 1 } }, {
+      body: { reasoning: { effort: "none" } },
     })
 
-    expect(result.model).toEqual({
-      ...DEFAULT_PROVIDER_CONFIG.openai.model,
-      customModel: "gpt-5-custom",
-      isCustomModel: true,
-    })
-    expect(result.provider).toBe("openai")
-  })
-
-  it("merges provider option objects and preserves the rest of the config", () => {
-    const result = updateProviderConfig(DEFAULT_PROVIDER_CONFIG.openai, {
-      providerOptions: {
-        reasoningEffort: "minimal",
-      },
-    }) as OpenAIProviderConfig
-
-    expect(result.providerOptions).toEqual({ reasoningEffort: "minimal" })
-    expect(result.model).toEqual(DEFAULT_PROVIDER_CONFIG.openai.model)
+    expect(result.body).toEqual({ reasoning: { effort: "none" }, seed: 1 })
+    expect(result.model).toBe(DEFAULT_PROVIDER_CONFIG.model)
     expect(result.provider).toBe("openai")
   })
 
   it("merges provider headers and preserves the rest of the config", () => {
-    const result = updateProviderConfig(DEFAULT_PROVIDER_CONFIG.openai, {
+    const result = updateProviderConfig(DEFAULT_PROVIDER_CONFIG, {
       headers: {
         "X-Test": "1",
       },
-    }) as OpenAIProviderConfig
+    })
 
     expect(result.headers).toEqual({ "X-Test": "1" })
-    expect(result.model).toEqual(DEFAULT_PROVIDER_CONFIG.openai.model)
-    expect(result.provider).toBe("openai")
+    expect(result.model).toBe(DEFAULT_PROVIDER_CONFIG.model)
   })
 
   it("rejects merged configs that no longer match the provider schema", () => {
     const invalidUpdates = {
-      provider: "openai",
+      provider: "openai-compatible",
     } as PartialDeep<ProviderConfig>
 
-    expect(() => updateProviderConfig(DEFAULT_PROVIDER_CONFIG.deepseek, invalidUpdates)).toThrow()
+    // An openai-compatible service needs a base URL.
+    expect(() => updateProviderConfig(DEFAULT_PROVIDER_CONFIG, invalidUpdates)).toThrow()
   })
 })
