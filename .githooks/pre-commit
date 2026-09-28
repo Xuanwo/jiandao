@@ -1,8 +1,0 @@
-#!/bin/sh
-# Lints and formats the staged files, then re-stages them.
-# Installed by `pnpm install` through the `prepare` script (git config core.hooksPath .githooks).
-set -e
-files=$(git diff --cached --name-only --diff-filter=ACMR)
-[ -z "$files" ] && exit 0
-echo "$files" | xargs pnpm exec eslint --fix --no-warn-ignored
-echo "$files" | xargs git add

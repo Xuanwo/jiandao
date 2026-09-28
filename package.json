@@ -25,7 +25,6 @@
     "zip:edge": "wxt zip -b edge",
     "zip:firefox": "wxt zip -b firefox --mv3",
     "zip:all": "pnpm zip && pnpm zip:edge && pnpm zip:firefox",
-    "prepare": "git config core.hooksPath .githooks",
     "schema:setup": "UPDATE_SETUP_SCHEMA=1 vitest run src/utils/__tests__/setup-schema.test.ts"
   },
   "dependencies": {

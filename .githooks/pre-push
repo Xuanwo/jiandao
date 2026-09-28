@@ -1,5 +1,0 @@
-#!/bin/sh
-# The checks CI runs, before the push leaves the machine.
-set -e
-pnpm type-check
-pnpm test
