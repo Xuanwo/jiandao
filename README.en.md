@@ -1,0 +1,66 @@
+# Jiandao
+
+简道翻译 · [中文](./README.zh-CN.md)
+
+Jiandao translates the web page you are reading, and does nothing else.
+
+The translation sits under each paragraph, or replaces the original if you
+prefer. Settings stay in your browser. Text goes straight to the model provider
+you configure. There is no Jiandao server, no account, and no telemetry. See
+the [privacy policy](./PRIVACY.md).
+
+## What It Does
+
+- Translates the whole page, including its title, in bilingual or
+  translation-only mode.
+- Talks to OpenAI, Anthropic, Gemini and DeepSeek directly, and to any
+  OpenAI-compatible endpoint, including local and self-hosted models. No SDK
+  in between: the request is the one documented by the service.
+- Can give the model a summary of the page, so translations fit the context.
+- Lets you adjust the prompt, translation style, request rate, and batching.
+
+## Setting Up
+
+Jiandao has no settings form for the translation service. Your coding agent
+configures it: click **Copy instructions for your agent** in the popup, paste
+the text into Claude Code, Codex or any agent with shell access, and it will
+verify a configuration with your API key and put it on your clipboard. Paste
+that into the popup and apply. The details for agents are in
+[docs/agent-setup.md](./docs/agent-setup.md); a ready-made skill is in
+[skills/jiandao-setup](./skills/jiandao-setup/SKILL.md).
+
+## What It Leaves Out
+
+Jiandao began as a fork of [Read Frog](https://github.com/mengxi-ream/read-frog)
+and removed everything that is not reading a page: video subtitles, input box
+translation, floating toolbars, text to speech, custom AI actions, hosted
+storage and accounts, config sync, statistics, and experimental switches.
+
+If you need those, Read Frog and similar tools do them well. Jiandao stays
+small so that the page stays quiet.
+
+## Development
+
+```bash
+pnpm install
+pnpm test
+pnpm type-check
+pnpm build
+```
+
+`pnpm test:e2e` builds the extension and opens it in headless Chromium through
+[Playwright](https://playwright.dev/), a development dependency. Before the
+first run, run `pnpm exec playwright-core install --no-shell chromium` to
+download Chromium. On Linux, add `--with-deps` to also install the system
+libraries. When a test fails, its report shows the browser logs, the open pages
+and the stored config. Set `E2E_ARTIFACTS` to a directory to also save a
+screenshot of each page. CI runs the same tests.
+
+## License
+
+Jiandao is a modified version of Read Frog. Thanks to the Read Frog authors and
+contributors for the original work.
+
+Jiandao is distributed under the GNU General Public License version 3, the same
+license as upstream. See [LICENSE](./LICENSE). Please report problems here
+rather than to the Read Frog project.

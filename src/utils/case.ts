@@ -13,10 +13,6 @@ export function camelCase(text: string): string {
   return first.toLowerCase() + rest.map(capitalize).join("")
 }
 
-export function pascalCase(text: string): string {
-  return words(text).map(capitalize).join("")
-}
-
 export function kebabCase(text: string): string {
   return words(text).map(word => word.toLowerCase()).join("-")
 }

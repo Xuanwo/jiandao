@@ -1,7 +1,7 @@
 import { DEFAULT_REQUEST_API, isProviderType } from "@/types/config/provider"
 
 /**
- * Jiandao 1.0 stored the model as `{ model, isCustomModel, customModel }` and
+ * Plainly 1.0 stored the model as `{ model, isCustomModel, customModel }` and
  * request options in the AI SDK's own vocabulary (`providerOptions`). Both
  * became plain values: `model` is the ID the service expects, `body` is JSON
  * merged into the request. This runs on every stored config before schema
@@ -68,8 +68,31 @@ function migrateProvider(provider: unknown): unknown {
   return next
 }
 
+/**
+ * The extension was renamed from Plainly to Jiandao after 1.0, and the names
+ * it puts on the page changed with it. Custom CSS written against the 1.0
+ * selectors and variables (`data-plainly-*`, `.plainly-*`, `--plainly-*`) is
+ * rewritten to the new names so it keeps matching.
+ */
+function migrateTranslationNodeStyle(translate: unknown): unknown {
+  if (!isRecord(translate) || !isRecord(translate.translationNodeStyle))
+    return translate
+  const style = translate.translationNodeStyle
+  if (typeof style.customCSS !== "string")
+    return translate
+  const customCSS = style.customCSS.replace(/(data-|\.|--)plainly-/g, "$1jiandao-")
+  if (customCSS === style.customCSS)
+    return translate
+  return { ...translate, translationNodeStyle: { ...style, customCSS } }
+}
+
 export function migrateStoredConfig(stored: unknown): unknown {
-  if (!isRecord(stored) || !Array.isArray(stored.providersConfig))
+  if (!isRecord(stored))
     return stored
-  return { ...stored, providersConfig: stored.providersConfig.map(migrateProvider) }
+  const next: Record<string, unknown> = { ...stored }
+  if (Array.isArray(stored.providersConfig))
+    next.providersConfig = stored.providersConfig.map(migrateProvider)
+  if ("translate" in stored)
+    next.translate = migrateTranslationNodeStyle(stored.translate)
+  return next
 }

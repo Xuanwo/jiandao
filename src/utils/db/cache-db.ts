@@ -1,9 +1,6 @@
-import { pascalCase } from "@/utils/case"
-import { APP_NAME } from "@/utils/constants/app"
-
 /**
  * The translation and summary caches in IndexedDB. The database name and
- * version match what Jiandao 1.0 created through Dexie (which stores its
+ * version match what Plainly 1.0 created through Dexie (which stores its
  * schema version times ten), so existing caches open as they are.
  */
 
@@ -19,7 +16,7 @@ export interface ArticleSummaryCacheRecord {
   createdAt: Date
 }
 
-const DB_NAME = `${pascalCase(APP_NAME)}DB`
+const DB_NAME = "PlainlyDB"
 const DB_VERSION = 50
 const STORES = ["translationCache", "articleSummaryCache"] as const
 type StoreName = typeof STORES[number]

@@ -3,7 +3,7 @@ import { configSchema } from "@/types/config/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { migrateStoredConfig } from "../migrate"
 
-/** The three services Jiandao 1.0 stored on a fresh install, with a key added to one. */
+/** The three services Plainly 1.0 stored on a fresh install, with a key added to one. */
 const legacyConfig = {
   ...DEFAULT_CONFIG,
   providersConfig: [
@@ -57,6 +57,17 @@ describe("migrateStoredConfig", () => {
       expect.objectContaining({ id: "openai-compatible-default", model: "", body: { reasoning_effort: "low" } }),
     ])
     expect(parsed.data.providersConfig[0]).not.toHaveProperty("providerOptions")
+  })
+
+  it("rewrites the 1.0 selectors and variables in custom CSS to the renamed ones", () => {
+    const customCSS = `[data-plainly-custom-translation-style='custom'] { color: var(--plainly-brand); }\n.plainly-translated-block-content { margin: 0; }`
+    const stored = { ...DEFAULT_CONFIG, translate: { ...DEFAULT_CONFIG.translate, translationNodeStyle: { preset: "line", isCustom: true, customCSS } } }
+    const migrated = migrateStoredConfig(stored) as typeof DEFAULT_CONFIG
+
+    expect(migrated.translate.translationNodeStyle.customCSS).toBe(
+      `[data-jiandao-custom-translation-style='custom'] { color: var(--jiandao-brand); }\n.jiandao-translated-block-content { margin: 0; }`,
+    )
+    expect(configSchema.safeParse(migrated).success).toBe(true)
   })
 
   it("leaves a config that is already in the current shape untouched", () => {
