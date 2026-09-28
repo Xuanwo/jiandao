@@ -1,0 +1,132 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {
+      "h": 400,
+      "title": "弹窗 · 就绪",
+      "w": 320,
+      "x": 800,
+      "y": 0
+    },
+    "Page.dc.html": {
+      "h": 600,
+      "title": "页面内 · 双语对照 + 工具栏状态点",
+      "w": 880,
+      "x": 0,
+      "y": 780
+    },
+    "Popup-Dark.dc.html": {
+      "h": 400,
+      "title": "弹窗 · 深色",
+      "w": 320,
+      "x": 1600,
+      "y": 0
+    },
+    "Popup-Translating.dc.html": {
+      "h": 400,
+      "title": "弹窗 · 翻译中",
+      "w": 320,
+      "x": 1200,
+      "y": 0
+    },
+    "Settings.dc.html": {
+      "h": 1480,
+      "title": "设置 · 单页（高级展开）",
+      "w": 1120,
+      "x": 0,
+      "y": 1760
+    },
+    "Popup-Setup-Agent.dc.html": {
+      "h": 440,
+      "title": "弹窗 · 首次配置（未粘贴）",
+      "w": 320,
+      "x": 0,
+      "y": 0
+    },
+    "Agent-Flow.dc.html": {
+      "h": 700,
+      "title": "流程 · 用户 → agent → 粘贴 → 预览 → 应用",
+      "w": 880,
+      "x": 1600,
+      "y": 3700
+    },
+    "Settings-Agent.dc.html": {
+      "h": 580,
+      "title": "设置 · 翻译服务 · 粘贴配置后预览",
+      "w": 720,
+      "x": 0,
+      "y": 3700
+    },
+    "Popup-Setup-Pasted.dc.html": {
+      "h": 470,
+      "title": "弹窗 · 首次配置（已粘贴，一行预览）",
+      "w": 320,
+      "x": 400,
+      "y": 0
+    },
+    "Settings-Failed.dc.html": {
+      "h": 580,
+      "title": "设置 · 翻译服务 · 应用后连接失败",
+      "w": 720,
+      "x": 800,
+      "y": 3700
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-23T00:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t-page": {
+      "kind": "title1",
+      "maxW": 1520,
+      "text": "页面内：只留下译文、一根细线和一个状态点",
+      "w": 240,
+      "x": 0,
+      "y": 520
+    },
+    "t-popup": {
+      "kind": "title1",
+      "maxW": 1920,
+      "text": "弹窗：一句话式的顺序，从哪种语言 → 译成什么 → 怎么显示 → 翻译",
+      "w": 240,
+      "x": 0,
+      "y": -260
+    },
+    "t-settings": {
+      "kind": "title1",
+      "maxW": 1520,
+      "text": "设置：一页到底，按使用频率排序，专家参数折叠",
+      "w": 240,
+      "x": 0,
+      "y": 1500
+    },
+    "t-agent": {
+      "kind": "title1",
+      "maxW": 2480,
+      "text": "Agent 配置：agent 产出一份 JSON，用户粘贴一次；简道翻译只负责预览和应用",
+      "w": 240,
+      "x": 0,
+      "y": 3440
+    }
+  },
+  "order": [
+    "Popup-Setup-Agent.dc.html",
+    "Popup-Setup-Pasted.dc.html",
+    "Main.dc.html",
+    "Popup-Translating.dc.html",
+    "Popup-Dark.dc.html",
+    "Page.dc.html",
+    "Settings.dc.html",
+    "Settings-Agent.dc.html",
+    "Settings-Failed.dc.html",
+    "Agent-Flow.dc.html"
+  ],
+  "pages": [],
+  "title": "Jiandao UI Redesign"
+}

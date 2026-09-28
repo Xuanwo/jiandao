@@ -6,6 +6,8 @@ export default antfu({
   },
   ignores: [
     "**/skills/**",
+    // Exported from the design canvas, which owns their formatting.
+    "design/**",
   ],
   rules: {
     "unused-imports/no-unused-imports": "error",

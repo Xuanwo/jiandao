@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Agent 配置流程</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FBFAF7}
+a{color:#8A6A1F}a:hover{color:#6B5218}
+</style>
+</helmet>
+<div style="width: 880px; height: 700px; box-sizing: border-box; background: #FBFAF7; color: #1C1B18; font-size: 13px; padding: 40px; display: flex; flex-direction: column; gap: 22px;">
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600;">agent 拿着 Key 对真实接口验证到通过，再把配置放进剪贴板</h2>
+    <p style="margin: 0; font-size: 12px; color: #6B665C;">检查循环发生在 agent 一侧。简道翻译只收一份已验证的配置，不需要回传结果的通道。</p>
+  </div>
+  <div style="background: #1C1B18; color: #E8E4DC; border-radius: 12px; padding: 16px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 2px;">
+    <div><span style="color: #D9AA4C;">&gt;</span> [粘贴“复制给 agent 的说明”的内容] 我用 DeepSeek，Key 在 ~/.secrets/deepseek</div>
+    <div style="color: #A19B90;">读取 docs/agent-setup.md … KEY=$(cat ~/.secrets/deepseek)，不打印</div>
+    <div style="color: #A19B90;">curl api.deepseek.com/chat/completions  model=deepseek-flash  body.thinking.type=disabled  → 成功</div>
+    <div style="color: #A19B90;">jq -n --arg k "$KEY" '{ jiandao: 1, provider: { … } }' | pbcopy</div>
+    <div style="margin-top: 6px;">已验证并复制到剪贴板。打开简道翻译弹窗，粘贴，点“应用并翻译此页”。</div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch;">
+    <div style="border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; color: #6B665C;">1 · 用户</div>
+      <div style="font-weight: 600;">复制说明交给 agent</div>
+      <div style="font-size: 12px; color: #6B665C; line-height: 17px;">弹窗和设置页都有“复制给 agent 的说明”。说明里是指南链接和当前配置（Key 已脱敏）。</div>
+    </div>
+    <div style="border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; color: #6B665C;">2 · agent</div>
+      <div style="font-weight: 600;">问清需求，用 Key 验证到通过</div>
+      <div style="font-size: 12px; color: #6B665C; line-height: 17px;">问用哪家、Key 在哪、读什么语言。按指南里的请求模板发请求，被拒就换模型或去掉 body 字段再试。</div>
+    </div>
+    <div style="border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; color: #6B665C;">3 · agent</div>
+      <div style="font-weight: 600;">配置进剪贴板</div>
+      <div style="font-size: 12px; color: #6B665C; line-height: 17px;">用 jq 生成 JSON 写入剪贴板，Key 不出现在 agent 的输出里。不走 URL，因为浏览器历史会记下完整地址。</div>
+    </div>
+    <div style="border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-size: 11px; color: #6B665C;">4 · 用户 · 简道翻译</div>
+      <div style="font-weight: 600;">粘贴，看预览，应用</div>
+      <div style="font-size: 12px; color: #6B665C; line-height: 17px;">预览一行：服务 · 模型 · 主机。弹窗里应用后直接翻译此页；设置页里应用后发一条短请求确认连接。两处都会清空剪贴板。</div>
+    </div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-size: 12px; color: #6B665C;">之后要换服务、模型或参数：再点一次“复制给 agent 的说明”。说明末尾附当前配置，Key 只剩前缀和末四位；agent 原样带回，简道翻译沿用已存的 Key。</div>
+    <div style="border: 1px dashed #D9D4CA; border-radius: 10px; padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 18px; color: #1C1B18; background: #FFFFFF;">{ "jiandao": 1, "provider": { "type": "deepseek", "name": "DeepSeek", "apiKey": "sk-…a9f2", "model": "deepseek-flash", "body": { "thinking": { "type": "disabled" } } }, "targetLanguage": "cmn", "sourceLanguage": "auto", "mode": "bilingual" }</div>
+    <div style="font-size: 12px; color: #6B665C; line-height: 17px;">provider.type：openai · anthropic · gemini · deepseek · openai-compatible（需 baseURL）。可选 api：openai-responses · openai-chat · anthropic · gemini。可选 prompt：自定义提示词，null 恢复默认。</div>
+    <div style="font-size: 12px; color: #6B665C;">所以只有首次配置和换 Key 时，剪贴板里才会出现明文 Key。</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":700}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

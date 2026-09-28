@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>弹窗 · 首次配置（已粘贴）</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FBFAF7}
+a{color:#8A6A1F}a:hover{color:#6B5218}
+button,textarea{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="width: 320px; height: 470px; box-sizing: border-box; background: #FBFAF7; color: #1C1B18; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between;">
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+    <div style="display: flex; align-items: center; gap: 8px; opacity: 0.6;">
+      <button type="button" aria-label="源语言" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; text-align: left; background: #FFFFFF; border: 1px solid #E7E3DB; border-radius: 10px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; color: #1C1B18;">
+        <span style="font-size: 14px; font-weight: 600; line-height: 18px;">英语</span>
+        <span style="font-size: 11px; line-height: 14px; color: #6B665C;">自动检测</span>
+      </button>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B665C" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      <button type="button" aria-label="目标语言" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; text-align: left; background: #FFFFFF; border: 1px solid #E7E3DB; border-radius: 10px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; color: #1C1B18;">
+        <span style="font-size: 14px; font-weight: 600; line-height: 18px;">简体中文</span>
+        <span style="font-size: 11px; line-height: 14px; color: #6B665C;">译成</span>
+      </button>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E7E3DB; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-size: 14px; font-weight: 600; line-height: 20px;">还没有翻译服务</div>
+        <div style="font-size: 12px; line-height: 17px; color: #6B665C;">把说明交给你的 agent，它会用你的密钥验证一份配置并放进剪贴板，贴到下面就行。</div>
+      </div>
+      <button type="button" style="height: 36px; border: 1px solid #D9D4CA; border-radius: 9px; background: #FBFAF7; color: #1C1B18; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V6a2 2 0 0 1 2-2h9"></path></svg>
+        <span>复制给 agent 的说明</span>
+      </button>
+      <label for="setup-paste-filled" style="font-size: 11px; color: #6B665C; margin-top: 2px;">agent 生成的配置</label>
+      <textarea id="setup-paste-filled" spellcheck="false" style="height: 64px; box-sizing: border-box; resize: none; border: 1px solid #D9D4CA; border-radius: 8px; padding: 8px 10px; font-size: 12px; line-height: 16px; background: #FBFAF7; color: #1C1B18; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">{
+  "jiandao": 1,
+  "provider": {
+    "type": "deepseek",
+    "apiKey": "[YOUR KEY]",
+    "model": "deepseek-flash",
+    "body": { "thinking": { "type": "disabled" } }
+  },
+  "targetLanguage": "cmn",
+  "mode": "bilingual"
+}</textarea>
+      <div style="font-size: 12px; line-height: 16px; color: #6B665C;">DeepSeek · deepseek-flash · api.deepseek.com</div>
+      <button type="button" style="height: 40px; border: none; border-radius: 9px; background: #1C1B18; color: #FBFAF7; font-size: 14px; font-weight: 600;">应用并翻译此页</button>
+    </div>
+  </div>
+  <div style="border-top: 1px solid #E7E3DB; padding: 8px 10px 8px 16px; display: flex; align-items: center; justify-content: space-between;">
+    <span style="display: flex; align-items: center; gap: 6px; color: #6B665C; font-size: 12px;">
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: #C7863C; display: inline-block;"></span>
+      <span>OpenAI · 未配置</span>
+    </span>
+    <button type="button" aria-label="设置" style="width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #6B665C;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":320,"height":470}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
