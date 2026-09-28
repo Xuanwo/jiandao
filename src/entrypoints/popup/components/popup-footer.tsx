@@ -6,6 +6,7 @@ import { featureProviderConfigAtom } from "@/utils/atoms/provider"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { openOptionsPage } from "@/utils/navigation"
 import { cn } from "@/utils/styles/utils"
+import { WordPrefixEmphasisToggle } from "./word-prefix-emphasis-toggle"
 
 function isProviderReady(provider: ProviderConfig): boolean {
   return !!provider.apiKey?.trim()
@@ -17,7 +18,7 @@ function describeProvider(provider: ProviderConfig): string {
   return modelId ? `${displayName} · ${modelId}` : displayName
 }
 
-/** Which service translates, as a status line. Changing it is the agent's job, through settings. */
+/** Which service translates, as a status line, and the quick toggles. Changing the service is the agent's job, through settings. */
 export function PopupFooter() {
   const current = useAtomValue(featureProviderConfigAtom("translate"))
   const ready = !!current && isProviderReady(current)
@@ -32,15 +33,18 @@ export function PopupFooter() {
             : i18n.t("popup.provider.none")}
         </span>
       </span>
-      <button
-        type="button"
-        aria-label={i18n.t("popup.settings")}
-        title={i18n.t("popup.settings")}
-        onClick={() => void openOptionsPage()}
-        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        <IconSettings className="size-4" stroke={1.75} />
-      </button>
+      <div className="flex shrink-0 items-center gap-0.5">
+        <WordPrefixEmphasisToggle />
+        <button
+          type="button"
+          aria-label={i18n.t("popup.settings")}
+          title={i18n.t("popup.settings")}
+          onClick={() => void openOptionsPage()}
+          className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          <IconSettings className="size-4" stroke={1.75} />
+        </button>
+      </div>
     </div>
   )
 }

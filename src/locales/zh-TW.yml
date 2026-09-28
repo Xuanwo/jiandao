@@ -21,6 +21,7 @@ popup:
   failedCount: $1 段失敗
   notTranslatable: 這個頁面無法翻譯。
   settings: 設定
+  wordPrefixEmphasis: 英文字首加粗
   provider:
     none: 尚無服務
     missingKey: 尚未設定金鑰
@@ -78,12 +79,15 @@ options:
     applying: 檢查中…
   reading:
     title: 閱讀
+    whileTranslating: 翻譯時
+    allPages: 所有網頁
     mode:
       title: 顯示方式
       bilingual: 雙語對照
       translationOnly: 僅顯示譯文
     wordPrefixEmphasis:
-      title: 詞首強調
+      title: 英文字首加粗
+      description: 將每個英文單字的前半部分加粗。
     style:
       title: 譯文樣式
       custom: 自訂 CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS 存在語法錯誤
         tooLong: CSS 過長
         allSaved: 所有變更已儲存
-    shortcut:
-      title: 快速鍵
   quality:
     title: 譯文品質
     context:
@@ -131,6 +133,9 @@ options:
       restore: 恢復預設
       cancel: 取消
       apply: 套用
+  shortcut:
+    title: 快速鍵
+    togglePage: 翻譯此頁 / 顯示原文
 translation:
   sameLanguage: 來源語言和目標語言必須不同
   noApiKey: 尚未填入 API 金鑰。請點一下工具列上的簡道翻譯圖示進行設定。

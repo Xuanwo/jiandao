@@ -21,6 +21,7 @@ popup:
   failedCount: $1 başarısız
   notTranslatable: Bu sayfa çevrilemez.
   settings: Ayarlar
+  wordPrefixEmphasis: İngilizce kelime başlarını kalın yap
   provider:
     none: Henüz hizmet yok
     missingKey: anahtar yok
@@ -78,12 +79,15 @@ options:
     applying: Kontrol ediliyor…
   reading:
     title: Okuma
+    whileTranslating: Çevirirken
+    allPages: Tüm sayfalar
     mode:
       title: Görünüm
       bilingual: İki dilli
       translationOnly: Yalnızca çeviri
     wordPrefixEmphasis:
-      title: Kelime başlarını vurgula
+      title: İngilizce kelime başlarını kalın yap
+      description: Her İngilizce kelimenin ilk yarısını kalın yapar.
     style:
       title: Çeviri stili
       custom: Özel CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS sözdizimi hataları içeriyor
         tooLong: CSS çok uzun
         allSaved: Tüm değişiklikler kaydedildi
-    shortcut:
-      title: Kısayol
   quality:
     title: Çeviri kalitesi
     context:
@@ -131,6 +133,9 @@ options:
       restore: Varsayılana döndür
       cancel: İptal
       apply: Uygula
+  shortcut:
+    title: Kısayol
+    togglePage: Bu sayfayı çevir / Orijinali göster
 translation:
   sameLanguage: Kaynak ve hedef diller farklı olmalıdır
   noApiKey: Önce bir API anahtarı ekleyin. Ayarlamak için araç çubuğundaki Jiandao simgesine tıklayın.

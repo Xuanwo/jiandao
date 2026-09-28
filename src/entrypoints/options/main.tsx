@@ -13,6 +13,7 @@ import { renderPersistentReactRoot } from "@/utils/react-root"
 import { applyTheme, getSystemTheme } from "@/utils/theme"
 import App from "./app"
 import "@/assets/styles/theme.css"
+import "@/assets/styles/word-prefix-emphasis.css"
 import "./style.css"
 
 function HydrateAtoms({

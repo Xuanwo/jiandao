@@ -3,6 +3,7 @@ import { SettingsHeader } from "./sections/header"
 import { QualitySection } from "./sections/quality"
 import { ReadingSection } from "./sections/reading"
 import { ServiceSection } from "./sections/service"
+import { ShortcutSection } from "./sections/shortcut"
 
 function useScrollToHashSection() {
   useEffect(() => {
@@ -14,7 +15,7 @@ function useScrollToHashSection() {
 
 /**
  * One page, ordered by how often a setting is touched: the service you
- * translate with, how translations read, and what the model is told.
+ * translate with, how pages read, what the model is told, and the shortcut.
  * Everything else adapts on its own; see design/Adaptive.dc.html.
  */
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
       <ServiceSection />
       <ReadingSection />
       <QualitySection />
+      <ShortcutSection />
     </main>
   )
 }

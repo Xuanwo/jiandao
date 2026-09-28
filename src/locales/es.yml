@@ -21,6 +21,7 @@ popup:
   failedCount: $1 con error
   notTranslatable: Esta página no se puede traducir.
   settings: Configuración
+  wordPrefixEmphasis: Negrita al inicio de las palabras en inglés
   provider:
     none: Aún no hay servicio
     missingKey: sin clave
@@ -78,12 +79,15 @@ options:
     applying: Comprobando…
   reading:
     title: Lectura
+    whileTranslating: Al traducir
+    allPages: Todas las páginas
     mode:
       title: Visualización
       bilingual: Bilingüe
       translationOnly: Solo traducción
     wordPrefixEmphasis:
-      title: Resaltar el inicio de las palabras
+      title: Negrita al inicio de las palabras en inglés
+      description: Pone en negrita la primera mitad de cada palabra en inglés.
     style:
       title: Estilo de la traducción
       custom: CSS personalizado
@@ -113,8 +117,6 @@ options:
         syntaxError: El CSS tiene errores de sintaxis
         tooLong: El CSS es demasiado largo
         allSaved: Todos los cambios guardados
-    shortcut:
-      title: Atajo
   quality:
     title: Calidad de la traducción
     context:
@@ -131,6 +133,9 @@ options:
       restore: Restablecer el predeterminado
       cancel: Cancelar
       apply: Aplicar
+  shortcut:
+    title: Atajo
+    togglePage: Traducir esta página / Mostrar original
 translation:
   sameLanguage: Los idiomas de origen y destino deben ser diferentes
   noApiKey: Primero añade una clave API. Haz clic en el icono de Jiandao en la barra de herramientas para configurarla.

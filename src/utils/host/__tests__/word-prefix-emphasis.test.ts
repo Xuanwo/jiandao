@@ -38,7 +38,7 @@ it("user reads Latin words and other scripts: Given a mixed text, When emphasis 
   const markup = document.body.innerHTML
 
   // When
-  stop = startWordPrefixEmphasis(document)
+  stop = startWordPrefixEmphasis(document.body)
 
   // Then: a letter with its combining marks counts as one letter, and so does an apostrophe.
   expect(highlightedPrefixes()).toEqual(["ca", "rea", "quie", "naï", "él", "don", "scr"])
@@ -56,7 +56,7 @@ it("user keeps code, controls and headings plain: Given a page with them, When e
     <div class="${TRANSLATION_ERROR_CONTAINER_CLASS}">Translation failed</div>`
 
   // When
-  stop = startWordPrefixEmphasis(document)
+  stop = startWordPrefixEmphasis(document.body)
 
   // Then
   expect(highlightedPrefixes()).toEqual(["Read", "lin", "te"])
@@ -65,7 +65,7 @@ it("user keeps code, controls and headings plain: Given a page with them, When e
 it("user reads a page that changes: Given emphasis on, When the page changes, adds, moves, removes and merges text, Then the highlight follows the page and keeps no range of removed text", async () => {
   // Given
   document.body.innerHTML = "<p id=\"first\">Original sentence.</p><p id=\"second\">Hello wonderful</p><div id=\"box\"></div>"
-  stop = startWordPrefixEmphasis(document)
+  stop = startWordPrefixEmphasis(document.body)
 
   // When
   select("#first").firstChild!.textContent = "Updated passage."
@@ -95,7 +95,7 @@ it("user reads a page that changes: Given emphasis on, When the page changes, ad
 it("user edits text in place: Given emphasized text, When the page makes it editable and then not, Then the text is plain while editable and highlighted again after", async () => {
   // Given
   document.body.innerHTML = "<div id=\"title\"><span>Editable title</span></div>"
-  stop = startWordPrefixEmphasis(document)
+  stop = startWordPrefixEmphasis(document.body)
 
   // When
   select("#title").setAttribute("contenteditable", "true")
@@ -119,21 +119,45 @@ it("user reads split accents: Given a text node that starts with a combining mar
   select("p").append("Quiet e", "́lan today")
 
   // When
-  stop = startWordPrefixEmphasis(document)
+  stop = startWordPrefixEmphasis(document.body)
 
   // Then
   expect(highlightedPrefixes()).toEqual(["Qui", "tod"])
 })
 
-it("user opens a page where emphasis cannot run: Given an SVG document or a browser without the Highlight API, When emphasis starts and stops, Then nothing fails", () => {
+it("user opens a page where emphasis cannot run: Given an SVG document or a browser without the Highlight API, When emphasis turns on and off, Then nothing fails", () => {
   // Given
   const svg = document.implementation.createDocument("http://www.w3.org/2000/svg", "svg")
   document.body.innerHTML = "<p>Reading needs practice</p>"
+  const svgEmphasis = createWordPrefixEmphasisController(svg)
 
   // When / Then
-  expect(() => startWordPrefixEmphasis(svg)()).not.toThrow()
+  expect(() => {
+    svgEmphasis.setEnabled(true)
+    svgEmphasis.setEnabled(false)
+  }).not.toThrow()
   vi.stubGlobal("Highlight", undefined)
-  expect(() => startWordPrefixEmphasis(document)()).not.toThrow()
+  expect(() => startWordPrefixEmphasis(document.body)()).not.toThrow()
+})
+
+it("user sees two previews with emphasis: Given two emphasized regions of one page, When one of them stops, Then the other keeps its prefixes, and the highlight goes when both stop", () => {
+  // Given
+  document.body.innerHTML = "<p id=\"first\">Reading needs</p><p id=\"second\">practice daily</p>"
+  const stopFirst = startWordPrefixEmphasis(select("#first"))
+  const stopSecond = startWordPrefixEmphasis(select("#second"))
+  expect(highlightedPrefixes()).toEqual(["Read", "nee", "prac", "dai"])
+
+  // When
+  stopFirst()
+
+  // Then
+  expect(highlightedPrefixes()).toEqual(["prac", "dai"])
+
+  // When
+  stopSecond()
+
+  // Then
+  expect(isWordPrefixHighlightRegistered()).toBe(false)
 })
 
 it("user switches emphasis in the settings: Given a page, When the setting turns emphasis on twice and then off, Then the words get one set of prefixes and stay plain after later updates", async () => {

@@ -39,21 +39,43 @@ export function wordPrefixRanges(text: Text): StaticRange[] {
   return ranges
 }
 
+/** The highlight that every emphasized root of a page adds its ranges to, and the number of those roots. */
+const sharedHighlights = new WeakMap<HighlightRegistry, { highlight: Highlight, roots: number }>()
+
+function acquireHighlight(registry: HighlightRegistry): Highlight {
+  let shared = sharedHighlights.get(registry)
+  if (!shared) {
+    shared = { highlight: new Highlight(), roots: 0 }
+    sharedHighlights.set(registry, shared)
+  }
+  if (shared.roots++ === 0)
+    registry.set(WORD_PREFIX_HIGHLIGHT, shared.highlight)
+  return shared.highlight
+}
+
+function releaseHighlight(registry: HighlightRegistry) {
+  const shared = sharedHighlights.get(registry)
+  if (!shared || --shared.roots > 0)
+    return
+  if (registry.get(WORD_PREFIX_HIGHLIGHT) === shared.highlight)
+    registry.delete(WORD_PREFIX_HIGHLIGHT)
+  sharedHighlights.delete(registry)
+}
+
 /**
- * Registers the word prefixes of the document body as the highlight that the
- * preset styles paint with ::highlight(jiandao-word-prefix). The page DOM does
- * not change, so page scripts, page CSS, copied text and translation see the
- * original page. Returns the function that removes the highlight.
+ * Registers the word prefixes under root in the highlight that the page styles
+ * paint with ::highlight(jiandao-word-prefix), and keeps them up to date. The
+ * DOM does not change, so page scripts, page CSS, copied text and translation
+ * see the original page. Returns the function that removes the prefixes.
  */
-export function startWordPrefixEmphasis(doc: Document): () => void {
-  // SVG and XML documents have no body; browsers without the CSS Custom Highlight API keep the page plain.
-  const body = doc.body
-  if (!body || typeof Highlight === "undefined" || !CSS.highlights)
+export function startWordPrefixEmphasis(root: HTMLElement): () => void {
+  // Browsers without the CSS Custom Highlight API keep the page plain.
+  if (typeof Highlight === "undefined" || !CSS.highlights)
     return () => {}
 
+  const doc = root.ownerDocument
   const registry = CSS.highlights
-  const highlight = new Highlight()
-  registry.set(WORD_PREFIX_HIGHLIGHT, highlight)
+  const highlight = acquireHighlight(registry)
   // Static ranges cost nothing when the page changes the DOM; the observer below replaces the ranges of changed text.
   const rangesOfText = new Map<Text, StaticRange[]>()
 
@@ -71,16 +93,16 @@ export function startWordPrefixEmphasis(doc: Document): () => void {
     rangesOfText.set(text, ranges)
   }
 
-  /** Calls onText for each text node under root, root included, and skips excluded subtrees when skipExcluded is set. */
-  function eachText(root: Node, skipExcluded: boolean, onText: (text: Text) => void) {
-    if (isTextNode(root)) {
-      onText(root)
+  /** Calls onText for each text node under node, node included, and skips excluded subtrees when skipExcluded is set. */
+  function eachText(node: Node, skipExcluded: boolean, onText: (text: Text) => void) {
+    if (isTextNode(node)) {
+      onText(node)
       return
     }
-    const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-      acceptNode(node) {
-        if (isElement(node))
-          return skipExcluded && node.matches(EXCLUDED_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP
+    const walker = doc.createTreeWalker(node, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode(candidate) {
+        if (isElement(candidate))
+          return skipExcluded && candidate.matches(EXCLUDED_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP
         return NodeFilter.FILTER_ACCEPT
       },
     })
@@ -88,16 +110,16 @@ export function startWordPrefixEmphasis(doc: Document): () => void {
       onText(walker.currentNode as Text)
   }
 
-  function emphasize(root: Node) {
-    // The walker rejects excluded subtrees, so only the ancestors of root need a check.
-    const element = isElement(root) ? root : root.parentElement
-    if (!root.isConnected || !element || element.closest(EXCLUDED_SELECTOR))
+  function emphasize(node: Node) {
+    // The walker rejects excluded subtrees, so only the ancestors of node need a check.
+    const element = isElement(node) ? node : node.parentElement
+    if (!node.isConnected || !element || element.closest(EXCLUDED_SELECTOR))
       return
-    eachText(root, true, emphasizeText)
+    eachText(node, true, emphasizeText)
   }
 
-  function forget(root: Node) {
-    eachText(root, false, forgetText)
+  function forget(node: Node) {
+    eachText(node, false, forgetText)
   }
 
   const observer = new MutationObserver((records) => {
@@ -115,18 +137,18 @@ export function startWordPrefixEmphasis(doc: Document): () => void {
     }
     touched.forEach(emphasize)
   })
-  emphasize(body)
-  observer.observe(body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: EXCLUSION_ATTRIBUTES })
+  emphasize(root)
+  observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: EXCLUSION_ATTRIBUTES })
 
   return () => {
     observer.disconnect()
-    if (registry.get(WORD_PREFIX_HIGHLIGHT) === highlight)
-      registry.delete(WORD_PREFIX_HIGHLIGHT)
+    rangesOfText.forEach(ranges => ranges.forEach(range => highlight.delete(range)))
     rangesOfText.clear()
+    releaseHighlight(registry)
   }
 }
 
-/** Turns word-prefix emphasis on the document on and off. */
+/** Turns word-prefix emphasis on the body of the document on and off. */
 export function createWordPrefixEmphasisController(doc: Document) {
   let stopEmphasis: (() => void) | undefined
   const setEnabled = (enabled: boolean) => {
@@ -134,8 +156,9 @@ export function createWordPrefixEmphasisController(doc: Document) {
       stopEmphasis?.()
       stopEmphasis = undefined
     }
-    else if (!stopEmphasis) {
-      stopEmphasis = startWordPrefixEmphasis(doc)
+    // SVG and XML documents have no body to emphasize.
+    else if (!stopEmphasis && doc.body) {
+      stopEmphasis = startWordPrefixEmphasis(doc.body)
     }
   }
   return { setEnabled }

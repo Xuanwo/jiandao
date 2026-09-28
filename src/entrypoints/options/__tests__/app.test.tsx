@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import { configAtom } from "@/utils/atoms/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
 import { DEFAULT_TRANSLATE_PROMPT } from "@/utils/constants/prompt"
+import { highlightedPrefixes, isWordPrefixHighlightRegistered, stubHighlightRegistry } from "@/utils/host/__tests__/highlight-registry-fake"
 import { checkConnection } from "@/utils/providers/test-connection"
 import App from "../app"
 
@@ -62,13 +63,39 @@ describe("settings page", () => {
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
+    vi.unstubAllGlobals()
   })
 
-  it("has three sections in usage order and no advanced or appearance settings", async () => {
+  it("has four sections in usage order and no advanced or appearance settings", async () => {
     const { container } = await renderSettings(configured)
 
-    expect([...container.querySelectorAll("section[id]")].map(section => section.id)).toEqual(["service", "reading", "quality"])
+    expect([...container.querySelectorAll("section[id]")].map(section => section.id)).toEqual(["service", "reading", "quality", "shortcut"])
     expect(screen.queryByText(/options\.advanced|options\.appearance/)).toBeNull()
+    // The shortcut is named after the action it runs.
+    expect(screen.getByLabelText("options.shortcut.togglePage")).toBeInTheDocument()
+  })
+
+  it("previews each reading group above its settings and follows each change", async () => {
+    stubHighlightRegistry()
+    const { store } = await renderSettings(configured)
+    const translationPreview = screen.getByText(/^Reading and experience train your model of the world\.$/).parentElement!
+    const englishPreview = screen.getByText(/Even if you forget what you read/)
+
+    // Translation only shows the translation alone, and the translation style, which applies to bilingual display only, goes away.
+    expect(screen.getByRole("group", { name: "options.reading.style.title" })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "options.reading.mode.translationOnly" }))
+    await waitFor(() => expect(translationPreview).not.toHaveTextContent("Reading and experience"))
+    expect(translationPreview).toHaveTextContent("阅读和经历训练的是你对世界的模型。")
+    expect(screen.queryByRole("group", { name: "options.reading.style.title" })).toBeNull()
+
+    // The emphasis switch changes the English preview the way it changes pages.
+    expect(highlightedPrefixes(englishPreview)).toEqual([])
+    fireEvent.click(screen.getByRole("switch", { name: "options.reading.wordPrefixEmphasis.title" }))
+    await waitFor(() => expect(highlightedPrefixes(englishPreview).slice(0, 3)).toEqual(["Read", "an", "exper"]))
+    expect(store.get(configAtom).reading.wordPrefixEmphasis).toBe(true)
+
+    fireEvent.click(screen.getByRole("switch", { name: "options.reading.wordPrefixEmphasis.title" }))
+    await waitFor(() => expect(isWordPrefixHighlightRegistered()).toBe(false))
   })
 
   it("shows an empty editor right away when no service is configured", async () => {

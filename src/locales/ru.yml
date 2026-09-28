@@ -21,6 +21,7 @@ popup:
   failedCount: "Ошибок: $1"
   notTranslatable: Эту страницу нельзя перевести.
   settings: Настройки
+  wordPrefixEmphasis: Жирное начало английских слов
   provider:
     none: Сервиса пока нет
     missingKey: нет ключа
@@ -78,12 +79,15 @@ options:
     applying: Проверка…
   reading:
     title: Чтение
+    whileTranslating: При переводе
+    allPages: Все страницы
     mode:
       title: Отображение
       bilingual: Двуязычный
       translationOnly: Только перевод
     wordPrefixEmphasis:
-      title: Выделение начала слов
+      title: Жирное начало английских слов
+      description: Выделяет жирным первую половину каждого английского слова.
     style:
       title: Стиль перевода
       custom: Свой CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS содержит синтаксические ошибки
         tooLong: CSS слишком длинный
         allSaved: Все изменения сохранены
-    shortcut:
-      title: Горячая клавиша
   quality:
     title: Качество перевода
     context:
@@ -131,6 +133,9 @@ options:
       restore: Вернуть по умолчанию
       cancel: Отмена
       apply: Применить
+  shortcut:
+    title: Горячая клавиша
+    togglePage: Перевести страницу / Показать оригинал
 translation:
   sameLanguage: Исходный и целевой языки должны различаться
   noApiKey: Сначала добавьте API-ключ. Нажмите на значок Jiandao на панели инструментов, чтобы настроить его.

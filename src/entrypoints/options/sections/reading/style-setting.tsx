@@ -1,10 +1,7 @@
 import type { TranslationNodeStylePreset } from "@/types/config/translate"
 import { useAtom } from "jotai"
-import { useEffect, useRef } from "react"
 import { i18n } from "#imports"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
-import { BLOCK_CONTENT_CLASS, CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
-import { decorateTranslationNode } from "@/utils/host/translate/ui/decorate-translation"
 import { deepMerge } from "@/utils/object"
 import { cn } from "@/utils/styles/utils"
 import { SettingsRow } from "../../components/settings-section"
@@ -30,9 +27,6 @@ const OFFERED_PRESETS: readonly TranslationNodeStylePreset[] = ["line", "default
 
 const CUSTOM_CHOICE = "custom"
 
-const PREVIEW_SOURCE = "Reading and experience train your model of the world."
-const PREVIEW_TRANSLATION = "阅读和经历训练的是你对世界的模型。"
-
 function Chip({ selected, onClick, children }: { selected: boolean, onClick: () => void, children: React.ReactNode }) {
   return (
     <button
@@ -46,26 +40,6 @@ function Chip({ selected, onClick, children }: { selected: boolean, onClick: () 
     >
       {children}
     </button>
-  )
-}
-
-function StylePreview() {
-  const [translateConfig] = useAtom(configFieldsAtomMap.translate)
-  const { translationNodeStyle } = translateConfig
-  const previewRef = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    if (previewRef.current)
-      void decorateTranslationNode(previewRef.current, translationNodeStyle)
-  }, [translationNodeStyle])
-
-  return (
-    <div className="flex flex-col gap-1.5 rounded-lg bg-muted/50 px-3.5 py-3 text-sm leading-relaxed">
-      <p className="m-0 font-serif">{PREVIEW_SOURCE}</p>
-      <span className={CONTENT_WRAPPER_CLASS} lang="zh" dir="ltr">
-        <span ref={previewRef} className={cn("text-[13px]", BLOCK_CONTENT_CLASS)}>{PREVIEW_TRANSLATION}</span>
-      </span>
-    </div>
   )
 }
 
@@ -92,7 +66,6 @@ export function StyleSetting() {
         </Chip>
       </div>
       {translationNodeStyle.isCustom && <CSSEditor />}
-      <StylePreview />
     </SettingsRow>
   )
 }

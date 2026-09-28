@@ -21,6 +21,7 @@ popup:
   failedCount: $1 段失败
   notTranslatable: 这个页面不能翻译。
   settings: 设置
+  wordPrefixEmphasis: 英文词首加粗
   provider:
     none: 尚无服务
     missingKey: 未配置
@@ -78,12 +79,15 @@ options:
     applying: 检查中…
   reading:
     title: 阅读
+    whileTranslating: 翻译时
+    allPages: 所有网页
     mode:
       title: 显示方式
       bilingual: 双语对照
       translationOnly: 仅译文
     wordPrefixEmphasis:
-      title: 词首强调
+      title: 英文词首加粗
+      description: 加粗每个英文单词的前半部分。
     style:
       title: 译文样式
       custom: 自定义 CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS 存在语法错误
         tooLong: CSS 过长
         allSaved: 所有更改已保存
-    shortcut:
-      title: 快捷键
   quality:
     title: 译文质量
     context:
@@ -131,6 +133,9 @@ options:
       restore: 恢复默认
       cancel: 取消
       apply: 应用
+  shortcut:
+    title: 快捷键
+    togglePage: 翻译此页 / 显示原文
 translation:
   sameLanguage: 源语言和目标语言必须不同
   noApiKey: 还没有填写 API Key。点击工具栏里的简道翻译图标即可设置。

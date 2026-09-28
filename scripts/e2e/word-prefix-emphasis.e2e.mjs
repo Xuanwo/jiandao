@@ -5,7 +5,7 @@ import { CONTENT_WRAPPER_CLASS, WORD_PREFIX_HIGHLIGHT } from "../../src/utils/co
 import { configureService, launchBrowser, pressTranslateShortcut, reportFailure } from "./browser.mjs"
 import { setupDocumentFor, startFakeService } from "./fake-service.mjs"
 
-const SWITCH = "Word-prefix emphasis"
+const SWITCH = "Bold English word starts"
 const MODE_LABELS = { bilingual: "Bilingual", translationOnly: "Translation only" }
 const PASSAGE = "Reading unfamiliar words takes practice. Keep the whole sentence in view."
 const PASSAGE_PREFIXES = ["Read", "unfam", "wor", "tak", "prac", "Ke", "th", "who", "sent", "i", "vi"]
@@ -181,8 +181,11 @@ it("user chooses word-prefix emphasis: Given an open article, When the switch is
   await article.reload()
   await waitForPrefixes(article, "#passage", PASSAGE_PREFIXES)
 
-  // When: the pointer turns the switch off.
-  await setEmphasis(options, false)
+  // When: the toggle in the popup turns the emphasis off.
+  const popup = await context.newPage()
+  await popup.goto(options.url().replace(/options\.html.*$/, "popup.html"))
+  await popup.getByRole("button", { name: SWITCH, pressed: true }).click()
+  await popup.getByRole("button", { name: SWITCH, pressed: false }).waitFor()
 
   // Then
   await article.waitForFunction(name => !CSS.highlights.has(name), WORD_PREFIX_HIGHLIGHT)

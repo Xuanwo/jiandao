@@ -21,6 +21,7 @@ popup:
   failedCount: $1 lỗi
   notTranslatable: Không thể dịch trang này.
   settings: Cài đặt
+  wordPrefixEmphasis: In đậm đầu từ tiếng Anh
   provider:
     none: Chưa có dịch vụ
     missingKey: chưa có khóa
@@ -78,12 +79,15 @@ options:
     applying: Đang kiểm tra…
   reading:
     title: Đọc
+    whileTranslating: Khi dịch
+    allPages: Mọi trang
     mode:
       title: Hiển thị
       bilingual: Song ngữ
       translationOnly: Chỉ bản dịch
     wordPrefixEmphasis:
-      title: Nhấn mạnh đầu từ
+      title: In đậm đầu từ tiếng Anh
+      description: In đậm nửa đầu của mỗi từ tiếng Anh.
     style:
       title: Kiểu bản dịch
       custom: CSS tùy chỉnh
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS có lỗi cú pháp
         tooLong: CSS quá dài
         allSaved: Đã lưu mọi thay đổi
-    shortcut:
-      title: Phím tắt
   quality:
     title: Chất lượng bản dịch
     context:
@@ -131,6 +133,9 @@ options:
       restore: Khôi phục mặc định
       cancel: Hủy
       apply: Áp dụng
+  shortcut:
+    title: Phím tắt
+    togglePage: Dịch trang này / Hiển thị bản gốc
 translation:
   sameLanguage: Ngôn ngữ nguồn và đích phải khác nhau
   noApiKey: Hãy thêm API Key trước. Nhấp vào biểu tượng Jiandao trên thanh công cụ để cài đặt.

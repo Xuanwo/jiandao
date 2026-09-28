@@ -21,6 +21,7 @@ popup:
   failedCount: $1 failed
   notTranslatable: This page can't be translated.
   settings: Settings
+  wordPrefixEmphasis: Bold English word starts
   provider:
     none: No service yet
     missingKey: no key yet
@@ -78,12 +79,15 @@ options:
     applying: Checking…
   reading:
     title: Reading
+    whileTranslating: While translating
+    allPages: All pages
     mode:
       title: Display
       bilingual: Bilingual
       translationOnly: Translation only
     wordPrefixEmphasis:
-      title: Word-prefix emphasis
+      title: Bold English word starts
+      description: Makes the first half of each English word bold.
     style:
       title: Translation style
       custom: Custom CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS has syntax errors
         tooLong: CSS is too long
         allSaved: All changes saved
-    shortcut:
-      title: Shortcut
   quality:
     title: Translation quality
     context:
@@ -131,6 +133,9 @@ options:
       restore: Restore default
       cancel: Cancel
       apply: Apply
+  shortcut:
+    title: Shortcut
+    togglePage: Translate this page / Show original
 translation:
   sameLanguage: Source and target languages must be different
   noApiKey: Add an API key first. Click the Jiandao icon in the toolbar to set it up.

@@ -21,6 +21,7 @@ popup:
   failedCount: $1 件失敗
   notTranslatable: このページは翻訳できません。
   settings: 設定
+  wordPrefixEmphasis: 英単語の前半を太字に
   provider:
     none: サービスがまだありません
     missingKey: キー未設定
@@ -78,12 +79,15 @@ options:
     applying: 確認中…
   reading:
     title: 閲覧
+    whileTranslating: 翻訳時
+    allPages: すべてのページ
     mode:
       title: 表示
       bilingual: バイリンガル
       translationOnly: 翻訳のみ
     wordPrefixEmphasis:
-      title: 単語の先頭を強調
+      title: 英単語の前半を太字に
+      description: 英単語ごとに前半を太字にします。
     style:
       title: 翻訳のスタイル
       custom: カスタム CSS
@@ -113,8 +117,6 @@ options:
         syntaxError: CSS に構文エラーがあります
         tooLong: CSS が長すぎます
         allSaved: すべての変更が保存されました
-    shortcut:
-      title: ショートカット
   quality:
     title: 翻訳の品質
     context:
@@ -131,6 +133,9 @@ options:
       restore: デフォルトに戻す
       cancel: キャンセル
       apply: 適用
+  shortcut:
+    title: ショートカット
+    togglePage: このページを翻訳 / 原文を表示
 translation:
   sameLanguage: ソース言語とターゲット言語は異なる必要があります
   noApiKey: まず API キーを追加してください。ツールバーの Jiandao アイコンをクリックすると設定できます。

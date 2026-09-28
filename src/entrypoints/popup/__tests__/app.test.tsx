@@ -83,6 +83,18 @@ describe("popup app", () => {
     expect(screen.getByText("popup.notTranslatable")).toBeInTheDocument()
   })
 
+  it("turns English word-prefix emphasis on and off from the footer, with or without a service", async () => {
+    await storage.setItem(`local:${CONFIG_STORAGE_KEY}`, DEFAULT_CONFIG)
+    renderPopup()
+    const toggle = screen.getByRole("button", { name: "popup.wordPrefixEmphasis" })
+    expect(toggle).toHaveAttribute("aria-pressed", "false")
+
+    fireEvent.click(toggle)
+
+    await waitFor(() => expect(toggle).toHaveAttribute("aria-pressed", "true"))
+    await waitFor(async () => expect((await storage.getItem<Config>(`local:${CONFIG_STORAGE_KEY}`))?.reading.wordPrefixEmphasis).toBe(true))
+  })
+
   it("catches up with progress that finished while it was opening", async () => {
     // The last report reached the background after the popup read it and before the popup listened.
     vi.mocked(sendMessage).mockImplementation(((type: string) => Promise.resolve(
