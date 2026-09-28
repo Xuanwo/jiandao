@@ -12,6 +12,8 @@
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FFFFFF}
 a{color:#2B45B8}a:hover{color:#1B2455}
 button{font-family:inherit;cursor:pointer}
+/* The extension paints each word prefix with ::highlight(jiandao-word-prefix): a text shadow of the text color, which keeps the glyph widths. */
+article p b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
 </style>
 </helmet>
 <div style="width: 880px; height: 680px; box-sizing: border-box; background: #FFFFFF; color: #151A2D; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #E3E6EC; border-radius: 12px;">
