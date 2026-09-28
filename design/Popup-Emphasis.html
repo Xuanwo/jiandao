@@ -2,58 +2,48 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>弹窗 · 未配置</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
+<title>弹窗 · 英文词首加粗已打开</title>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
-button,textarea{font-family:inherit}
-button{cursor:pointer}
+button{font-family:inherit;cursor:pointer}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 320px; height: 300px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between;">
   <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
-    <div style="display: flex; align-items: center; gap: 8px; opacity: 0.6;">
-      <button type="button" aria-label="源语言" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; text-align: left; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 10px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; color: #151A2D;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button type="button" aria-label="源语言" style="flex-grow: 1; min-width: 0; text-align: left; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 10px; padding: 9px 12px; display: flex; flex-direction: column; gap: 2px; color: #151A2D;">
         <span style="font-size: 14px; font-weight: 600; line-height: 18px;">英语</span>
         <span style="font-size: 11px; line-height: 14px; color: #626978;">自动检测</span>
       </button>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#626978" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
-      <button type="button" aria-label="目标语言" style="flex-grow: 1; min-width: 0; height: 44px; box-sizing: border-box; text-align: left; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 10px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; gap: 2px; color: #151A2D;">
+      <button type="button" aria-label="目标语言" style="flex-grow: 1; min-width: 0; text-align: left; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 10px; padding: 9px 12px; display: flex; flex-direction: column; gap: 2px; color: #151A2D;">
         <span style="font-size: 14px; font-weight: 600; line-height: 18px;">简体中文</span>
         <span style="font-size: 11px; line-height: 14px; color: #626978;">译成</span>
       </button>
     </div>
-    <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; flex-direction: column; gap: 4px;">
-        <div style="font-size: 14px; font-weight: 600; line-height: 20px;">还没有翻译服务</div>
-        <div style="font-size: 12px; line-height: 17px; color: #626978;">在设置页贴入 agent 生成的配置，就能翻译。</div>
-      </div>
-      <button type="button" style="height: 40px; border: none; border-radius: 9px; background: #1B2455; color: #FFFFFF; font-size: 14px; font-weight: 600;">去设置里配置</button>
+    <div role="group" aria-label="显示方式" style="display: flex; background: #EEF0F4; border-radius: 9px; padding: 3px; gap: 2px;">
+      <button type="button" aria-pressed="true" style="flex-grow: 1; height: 30px; border: 1px solid #E3E6EC; border-radius: 7px; background: #FFFFFF; color: #151A2D; font-size: 13px; font-weight: 500;">双语对照</button>
+      <button type="button" aria-pressed="false" style="flex-grow: 1; height: 30px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #626978; font-size: 13px; font-weight: 500;">仅译文</button>
     </div>
+    <button type="button" style="height: 44px; border: none; border-radius: 10px; background: #1B2455; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 0 14px 0 16px;">
+      <span style="font-size: 14px; font-weight: 600;">翻译此页</span>
+      <span style="font-size: 11px; color: rgba(255, 255, 255, 0.7); letter-spacing: 0.04em;">⌥E</span>
+    </button>
   </div>
   <div style="border-top: 1px solid #E3E6EC; padding: 8px 10px 8px 16px; display: flex; align-items: center; justify-content: space-between;">
     <span style="display: flex; align-items: center; gap: 6px; color: #626978; font-size: 12px;">
-      <span style="width: 6px; height: 6px; border-radius: 50%; background: #C7863C; display: inline-block;"></span>
-      <span>OpenAI · 未配置</span>
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: #3F8F5A; display: inline-block;"></span>
+      <span>OpenAI · gpt-6-luna</span>
     </span>
     <div style="display: flex; align-items: center; gap: 2px;">
-    <button type="button" aria-pressed="false" aria-label="英文词首加粗" title="英文词首加粗" style="width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #626978; font-family: Georgia, serif; font-size: 14px; line-height: 1;"><span aria-hidden="true"><span style="font-weight: 700;">A</span>b</span></button>
+    <button type="button" aria-pressed="true" aria-label="英文词首加粗" title="英文词首加粗" style="width: 28px; height: 28px; border: none; background: #E8EBF3; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #1B2455; font-family: Georgia, serif; font-size: 14px; line-height: 1;"><span aria-hidden="true"><span style="font-weight: 700;">A</span>b</span></button>
     <button type="button" aria-label="设置" style="width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #626978;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
     </button>
     </div>
   </div>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":320,"height":300}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

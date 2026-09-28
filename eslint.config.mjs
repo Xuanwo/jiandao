@@ -6,7 +6,7 @@ export default antfu({
   },
   ignores: [
     "**/skills/**",
-    // Exported from the design canvas, which owns their formatting.
+    // Design boards are hand-written HTML at fixed sizes, not application code.
     "design/**",
   ],
   rules: {

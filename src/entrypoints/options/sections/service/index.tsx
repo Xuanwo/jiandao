@@ -25,7 +25,7 @@ const MONO = "font-mono text-xs text-muted-foreground"
  * otherwise after "Edit". Its text is the service part of a setup document;
  * applying it first checks the connection and saves only when that works,
  * so a failed attempt never replaces the service in use. See
- * design/Service-States.dc.html.
+ * design/Service-States.html.
  */
 export function ServiceSection() {
   const config = useAtomValue(configAtom)
@@ -184,6 +184,17 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
   const [text, setText] = useState(initial)
   const [applying, setApplying] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
+  // A first setup shows the preview as soon as the service is saved, which
+  // unmounts this editor before apply() returns. Closing then would close an
+  // editor the reader has opened again since.
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
 
   useEffect(() => {
     const textarea = textareaRef.current
@@ -216,7 +227,8 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
       const saved = withConnectionCheck(next, providerId, check)
       await setConfig({ providersConfig: saved.providersConfig, translate: saved.translate })
       await clearClipboard()
-      onDone()
+      if (mountedRef.current)
+        onDone()
     }
     catch (error) {
       setFailure(error instanceof Error ? error.message : String(error))

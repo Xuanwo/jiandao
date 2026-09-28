@@ -98,7 +98,7 @@ export interface TranslateBatchData<TContext = unknown> {
  * One request queue per service and model, each with the pace that service
  * tolerates. The pace and the batch sizes a service handles are learned while
  * translating and kept in `limits`, so the next session starts from them
- * instead of probing again (design/Adaptive.dc.html).
+ * instead of probing again (design/Adaptive.html).
  */
 function createTranslationQueues<TContext>(promptResolver: PromptResolver<TContext>, limits: ServiceLimitsStore) {
   const requestQueues = new Map<string, RequestQueue>()

@@ -1330,6 +1330,31 @@ describe("translate", () => {
       expect(node.querySelector(`.${CONTENT_WRAPPER_CLASS}`)).toBeFalsy()
       expect(node.textContent).toBe(MOCK_ORIGINAL_TEXT)
     })
+    it.each([
+      ["bilingual", BILINGUAL_CONFIG],
+      ["translationOnly", TRANSLATION_ONLY_CONFIG],
+    ] as const)("%s mode: a walk that ends before its translation is placed leaves the page unchanged", async (_mode, config) => {
+      render(
+        <div data-testid="test-node">
+          {MOCK_ORIGINAL_TEXT}
+        </div>,
+      )
+      const node = screen.getByTestId("test-node")
+      const walkId = crypto.randomUUID()
+      const walk = new AbortController()
+      walkAndLabelElement(document.body, walkId, config)
+
+      await act(async () => {
+        // The page translation stops, as a change of mode does, after the walk has queued its wrapper.
+        const translation = translateWalkedElement(document.body, walkId, config, false, walk.signal)
+        walk.abort()
+        await translation
+        flushBatchedOperations()
+      })
+
+      expect(node.querySelector(`.${CONTENT_WRAPPER_CLASS}`)).toBeFalsy()
+      expect(node.textContent).toBe(MOCK_ORIGINAL_TEXT)
+    })
   })
 
   describe("translation errors", () => {

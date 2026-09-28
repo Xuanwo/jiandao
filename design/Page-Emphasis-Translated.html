@@ -3,11 +3,6 @@
 <head>
 <meta charset="utf-8">
 <title>页面内 · 词首强调 · 双语对照</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FFFFFF}
 a{color:#2B45B8}a:hover{color:#1B2455}
@@ -15,7 +10,8 @@ button{font-family:inherit;cursor:pointer}
 /* The extension paints each word prefix with ::highlight(jiandao-word-prefix): a text shadow of the text color, which keeps the glyph widths. */
 article p b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 880px; height: 680px; box-sizing: border-box; background: #FFFFFF; color: #151A2D; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #E3E6EC; border-radius: 12px;">
   <div style="height: 44px; box-sizing: border-box; background: #F1F3F6; border-bottom: 1px solid #E3E6EC; display: flex; align-items: center; gap: 10px; padding: 0 14px;">
     <div style="display: flex; gap: 6px;" aria-hidden="true">
@@ -53,11 +49,5 @@ article p b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
     </article>
   </div>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":680}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

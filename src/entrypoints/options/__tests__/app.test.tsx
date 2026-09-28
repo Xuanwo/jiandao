@@ -3,10 +3,11 @@ import type { Config } from "@/types/config/config"
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { fakeBrowser } from "wxt/testing"
+import { fakeBrowser } from "wxt/testing/fake-browser"
 import { storage } from "#imports"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { configAtom } from "@/utils/atoms/config"
+import { clearClipboard } from "@/utils/clipboard"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
 import { DEFAULT_TRANSLATE_PROMPT } from "@/utils/constants/prompt"
 import { highlightedPrefixes, isWordPrefixHighlightRegistered, stubHighlightRegistry } from "@/utils/host/__tests__/highlight-registry-fake"
@@ -20,6 +21,11 @@ vi.mock("@/utils/message", () => ({
 
 vi.mock("@/components/ui/css-code-editor", () => ({
   CSSCodeEditor: () => <textarea aria-label="css-editor" readOnly />,
+}))
+
+vi.mock("@/utils/clipboard", async importOriginal => ({
+  ...await importOriginal<typeof import("@/utils/clipboard")>(),
+  clearClipboard: vi.fn(),
 }))
 
 vi.mock("@/utils/providers/test-connection", async importOriginal => ({
@@ -58,6 +64,7 @@ describe("settings page", () => {
   beforeEach(() => {
     fakeBrowser.reset()
     vi.mocked(checkConnection).mockResolvedValue({ ok: true, checkedAt: 1_000 })
+    vi.mocked(clearClipboard).mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -158,6 +165,26 @@ describe("settings page", () => {
     const service = saved.providersConfig.find(p => p.id === saved.translate.providerId)
     expect(service).toMatchObject({ provider: "deepseek", apiKey: "sk-test", connectionCheck: { ok: true, checkedAt: 1_000 } })
     expect(vi.mocked(checkConnection).mock.calls[0][0]).toMatchObject({ provider: "deepseek", apiKey: "sk-test" })
+  })
+
+  it("keeps the editor open when it is opened again before the first setup finishes", async () => {
+    let finishClearing!: () => void
+    vi.mocked(clearClipboard).mockReturnValue(new Promise<void>((resolve) => {
+      finishClearing = resolve
+    }))
+    await renderSettings()
+    fireEvent.change(editor(), { target: { value: JSON.stringify({ type: "deepseek", apiKey: "sk-test", model: "deepseek-flash" }) } })
+
+    await act(async () => {
+      fireEvent.click(applyButton())
+    })
+    // Saved: the preview is shown while the clipboard is still being cleared.
+    fireEvent.click(await screen.findByRole("button", { name: "options.service.edit" }))
+    await act(async () => {
+      finishClearing()
+    })
+
+    expect(editor()).toBeInTheDocument()
   })
 
   it("keeps the current service and stays in the editor when the check fails", async () => {

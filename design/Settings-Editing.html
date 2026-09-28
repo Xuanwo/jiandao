@@ -3,18 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>翻译服务 · 修改中</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
 button,textarea{font-family:inherit}
 button{cursor:pointer}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 720px; height: 420px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column;">
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务</h2>
@@ -26,11 +22,5 @@ button{cursor:pointer}
 }</textarea><div style="display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: baseline;"><span style="font-size: 12px; color: #626978;">应用后</span><div style="min-width: 0; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 12px; color: #626978;">与当前相同。已全选，粘贴即可整体替换，也可以只改一个字段。</span></div></div><div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;"><div style="flex-grow: 1;"><button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; color: #626978;">复制给 agent 的说明</button></div><button type="button" style="height: 32px; padding: 0 14px; border: 1px solid #D5D9E1; border-radius: 8px; background: #FFFFFF; color: #151A2D; font-size: 13px;">取消</button><button type="button" disabled style="height: 32px; padding: 0 16px; border: none; border-radius: 8px; background: #1B2455; color: #FFFFFF; font-size: 13px; font-weight: 600; opacity: 0.4; cursor: not-allowed;">应用</button></div></div>
     </section>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":420}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

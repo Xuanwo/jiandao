@@ -27,9 +27,12 @@ export const OTHER_REQUEST_PREFIXES = { languageDetection: "You are a language d
  * 400 answer, like a service that does not know the model.
  * Every request is recorded in `requests` for assertions; `messages()` and
  * `translationRequests()` give the messages of the recorded requests.
+ * `holdAnswers()` keeps the answers back until the function it returns is
+ * called, like a slow service.
  */
 export async function startFakeService() {
   const requests = []
+  let heldAnswers
   const server = http.createServer(async (request, response) => {
     const url = new URL(request.url, "http://localhost")
     if (request.method === "GET" && url.pathname === "/article") {
@@ -41,6 +44,7 @@ export async function startFakeService() {
     for await (const chunk of request)
       body += chunk
     requests.push({ method: request.method, url: request.url, authorization: request.headers.authorization, body })
+    await heldAnswers
     if (request.method === "POST" && request.url === "/v1/chat/completions") {
       const json = JSON.parse(body)
       if (json.model === "rejected-model") {
@@ -80,6 +84,14 @@ export async function startFakeService() {
     completions,
     messages,
     translationRequests: () => messages().filter(([message]) => !otherPrefixes.some(prefix => message.content.startsWith(prefix))),
+    holdAnswers() {
+      let release
+      heldAnswers = new Promise(resolve => release = resolve)
+      return () => {
+        heldAnswers = undefined
+        release()
+      }
+    },
     close: () => new Promise(resolve => server.close(resolve)),
   }
 }

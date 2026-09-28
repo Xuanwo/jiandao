@@ -1,5 +1,5 @@
 /* global chrome -- worker.evaluate() runs a callback in the extension service worker. */
-import { mkdir } from "node:fs/promises"
+import { access, mkdir } from "node:fs/promises"
 import { resolve } from "node:path"
 import process from "node:process"
 import { chromium } from "playwright-core"
@@ -11,6 +11,10 @@ export const extensionPath = resolve(".output/chrome-mv3")
  * Returns the browser context, its first page and the extension ID.
  */
 export async function launchBrowser() {
+  // Without a build, Chromium loads no extension, and the wait for its service worker only times out.
+  await access(resolve(extensionPath, "manifest.json")).catch(() => {
+    throw new Error(`no built extension in ${extensionPath}; run pnpm build first`)
+  })
   // An empty path makes Playwright create a temporary profile and delete it on close.
   const context = await chromium.launchPersistentContext("", {
     // Headless Chromium loads extensions; the headless shell does not.
@@ -21,8 +25,15 @@ export async function launchBrowser() {
     args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
   })
   recordBrowserEvents(context)
-  const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker")
-  return { context, page: context.pages()[0], extensionId: new URL(worker.url()).host }
+  try {
+    const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker")
+    return { context, page: context.pages()[0], extensionId: new URL(worker.url()).host }
+  }
+  catch (error) {
+    // The caller gets no context to close. An open browser keeps node --test from exiting.
+    await context.close()
+    throw error
+  }
 }
 
 const MAX_EVENTS = 200

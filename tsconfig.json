@@ -4,7 +4,9 @@
     "incremental": true,
     "tsBuildInfoFile": "./.wxt/tsconfig.typecheck.tsbuildinfo",
     "jsx": "react-jsx",
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    // WXT 0.21 enables this check. The existing code has about 250 unchecked index reads.
+    "noUncheckedIndexedAccess": false
   },
   "exclude": ["repos"]
 }

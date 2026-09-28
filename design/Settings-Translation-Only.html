@@ -3,11 +3,6 @@
 <head>
 <meta charset="utf-8">
 <title>阅读 · 仅译文</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
@@ -16,7 +11,8 @@ button{cursor:pointer}
 /* The extension paints each word prefix with ::highlight(jiandao-word-prefix): a text shadow of the text color, which keeps the glyph widths. */
 b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 720px; height: 440px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 32px 40px;">
   <section style="display: flex; flex-direction: column; gap: 12px;">
         <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
@@ -43,11 +39,5 @@ b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
         </div>
       </section>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

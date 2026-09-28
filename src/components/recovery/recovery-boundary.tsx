@@ -16,13 +16,13 @@ interface RecoveryBoundaryState {
  * the recovery screen, which can reset the config and try again.
  */
 export class RecoveryBoundary extends Component<RecoveryBoundaryProps, RecoveryBoundaryState> {
-  state: RecoveryBoundaryState = { error: null }
+  override state: RecoveryBoundaryState = { error: null }
 
   static getDerivedStateFromError(error: unknown): RecoveryBoundaryState {
     return { error: error instanceof Error ? error : new Error(String(error)) }
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo) {
+  override componentDidCatch(error: Error, info: ErrorInfo) {
     logger.error("Render failed", error, info.componentStack)
   }
 
@@ -30,7 +30,7 @@ export class RecoveryBoundary extends Component<RecoveryBoundaryProps, RecoveryB
     this.setState({ error: null })
   }
 
-  render() {
+  override render() {
     if (this.state.error) {
       return <RecoveryFallback error={this.state.error} onRecovered={this.reset} />
     }

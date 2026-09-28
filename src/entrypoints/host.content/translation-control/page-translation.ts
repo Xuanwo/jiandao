@@ -53,6 +53,8 @@ export class PageTranslationManager implements IPageTranslationManager {
   private intersectionObserver: IntersectionObserver | null = null
   private mutationObservers: MutationObserver[] = []
   private walkId: string | null = null
+  /** Aborts when the walk ends, so that its pending translations no longer change the page. */
+  private walkController: AbortController | null = null
   private intersectionOptions: IntersectionObserverInit
   private walkBlockedElementsCache = new WeakSet<HTMLElement>()
   private titleObserver: MutationObserver | null = null
@@ -112,6 +114,8 @@ export class PageTranslationManager implements IPageTranslationManager {
     // Listen to existing elements when they enter the viewport
     const walkId = getRandomUUID()
     this.walkId = walkId
+    const walkController = new AbortController()
+    this.walkController = walkController
     this.intersectionObserver = new IntersectionObserver(async (entries, observer) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
@@ -122,7 +126,7 @@ export class PageTranslationManager implements IPageTranslationManager {
                 logger.error("Global config is not initialized")
                 return
               }
-              void translateWalkedElement(entry.target, walkId, currentConfig)
+              void translateWalkedElement(entry.target, walkId, currentConfig, false, walkController.signal)
             }
           }
           observer.unobserve(entry.target)
@@ -167,6 +171,8 @@ export class PageTranslationManager implements IPageTranslationManager {
 
     this.isPageTranslating = false
     this.walkId = null
+    this.walkController?.abort()
+    this.walkController = null
     this.walkBlockedElementsCache = new WeakSet()
     this.stopDocumentTitleTracking()
     resetTranslationProgress()

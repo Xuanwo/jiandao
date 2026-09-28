@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jiandao Design</title>
+<style>
+:root {
+  --ground: #eceef2;
+  --ink: #151a2d;
+  --muted: #626978;
+  --line: #d5d9e1;
+  --accent: #2b45b8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0f1116;
+    --ink: #eceef4;
+    --muted: #9097a6;
+    --line: #2a2e3a;
+    --accent: #9fb0ff;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  color: var(--ink);
+  font: 13px/1.4 -apple-system, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", system-ui, sans-serif;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+header h1 { margin: 0; font-size: 14px; font-weight: 600; }
+header p { margin: 0; flex: 1; min-width: 200px; color: var(--muted); }
+.zoom { display: flex; gap: 4px; }
+.zoom button {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.zoom button:hover { border-color: var(--accent); color: var(--accent); }
+#viewport { flex: 1; overflow: auto; overscroll-behavior: contain; cursor: grab; }
+#viewport.dragging { cursor: grabbing; user-select: none; }
+#sizer { position: relative; }
+#canvas { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.note {
+  position: absolute;
+  margin: 0;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.board { position: absolute; }
+.board a {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding-bottom: 10px;
+  color: var(--muted);
+  font-size: 20px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.board a:hover { color: var(--accent); }
+.board iframe {
+  display: block;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08), 0 8px 24px rgb(0 0 0 / 0.06);
+  /* Boards are pictures here: wheel and pinch go to the canvas, not into a board. */
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <p>拖动平移，捏合或按住 ⌘/Ctrl 滚动缩放，<kbd>+</kbd> <kbd>-</kbd> <kbd>0</kbd> 也可以。点画板标题单独打开，布局在 canvas.js。</p>
+  <div class="zoom" role="group" aria-label="缩放">
+    <button type="button" data-action="out" aria-label="缩小">−</button>
+    <button type="button" data-action="reset" aria-label="恢复到 100%" id="zoom-level">100%</button>
+    <button type="button" data-action="in" aria-label="放大">+</button>
+    <button type="button" data-action="fit">适应宽度</button>
+  </div>
+</header>
+<div id="viewport"><div id="sizer"><div id="canvas"></div></div></div>
+<script src="canvas.js"></script>
+<script>
+/*
+ * Lays the boards out as the canvas they were designed on. Each board is an
+ * iframe of its own file at its designed size; the whole canvas is scaled.
+ * The sizer takes the scaled size so the viewport scrolls over exactly the
+ * visible canvas at any zoom.
+ */
+const layout = window.JIANDAO_CANVAS
+const MIN_ZOOM = 0.1
+const MAX_ZOOM = 3
+const STEP = 1.25
+const PADDING = 48
+const LABEL_SPACE = 48
+const STORAGE_KEY = "jiandao-design-zoom"
+
+document.title = layout.title
+document.getElementById("title").textContent = layout.title
+
+const viewport = document.getElementById("viewport")
+const sizer = document.getElementById("sizer")
+const canvas = document.getElementById("canvas")
+const zoomLevel = document.getElementById("zoom-level")
+
+const items = [...layout.boards.map(b => ({ ...b, top: b.y - LABEL_SPACE, bottom: b.y + b.h })), ...layout.notes.map(n => ({ ...n, w: 0, top: n.y, bottom: n.y + 72 }))]
+const minX = Math.min(...items.map(i => i.x)) - PADDING
+const minY = Math.min(...items.map(i => i.top)) - PADDING
+const width = Math.max(...items.map(i => i.x + i.w)) - minX + PADDING
+const height = Math.max(...items.map(i => i.bottom)) - minY + PADDING
+canvas.style.width = `${width}px`
+canvas.style.height = `${height}px`
+
+for (const note of layout.notes) {
+  const el = document.createElement("h2")
+  el.className = "note"
+  el.textContent = note.text
+  Object.assign(el.style, { left: `${note.x - minX}px`, top: `${note.y - minY}px` })
+  canvas.append(el)
+}
+
+for (const board of layout.boards) {
+  const el = document.createElement("section")
+  el.className = "board"
+  Object.assign(el.style, { left: `${board.x - minX}px`, top: `${board.y - minY}px`, width: `${board.w}px` })
+  const link = document.createElement("a")
+  link.href = board.file
+  link.textContent = board.title
+  const frame = document.createElement("iframe")
+  frame.src = board.file
+  frame.title = board.title
+  frame.loading = "lazy"
+  frame.width = String(board.w)
+  frame.height = String(board.h)
+  frame.scrolling = "no"
+  el.append(link, frame)
+  canvas.append(el)
+}
+
+let zoom = 1
+
+const clamp = value => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, value))
+
+/** Zooms to `next`, keeping the canvas point under (clientX, clientY) where it is. */
+function setZoom(next, clientX, clientY) {
+  next = clamp(next)
+  const rect = viewport.getBoundingClientRect()
+  const anchorX = (clientX ?? rect.left + rect.width / 2) - rect.left
+  const anchorY = (clientY ?? rect.top + rect.height / 2) - rect.top
+  const canvasX = (viewport.scrollLeft + anchorX) / zoom
+  const canvasY = (viewport.scrollTop + anchorY) / zoom
+
+  zoom = next
+  canvas.style.transform = `scale(${zoom})`
+  sizer.style.width = `${width * zoom}px`
+  sizer.style.height = `${height * zoom}px`
+  viewport.scrollLeft = canvasX * zoom - anchorX
+  viewport.scrollTop = canvasY * zoom - anchorY
+  zoomLevel.textContent = `${Math.round(zoom * 100)}%`
+  try {
+    localStorage.setItem(STORAGE_KEY, String(zoom))
+  }
+  catch {}
+}
+
+function fitWidth() {
+  setZoom(viewport.clientWidth / width)
+  viewport.scrollLeft = 0
+  viewport.scrollTop = 0
+}
+
+// Trackpad pinch arrives as a wheel event with ctrlKey set; ⌘/Ctrl + wheel zooms the same way.
+viewport.addEventListener("wheel", (event) => {
+  if (!event.ctrlKey && !event.metaKey)
+    return
+  event.preventDefault()
+  setZoom(zoom * Math.exp(-event.deltaY * 0.01), event.clientX, event.clientY)
+}, { passive: false })
+
+// Safari reports pinch as gesture events instead.
+let gestureStart = 1
+viewport.addEventListener("gesturestart", (event) => {
+  event.preventDefault()
+  gestureStart = zoom
+})
+viewport.addEventListener("gesturechange", (event) => {
+  event.preventDefault()
+  setZoom(gestureStart * event.scale, event.clientX, event.clientY)
+})
+
+window.addEventListener("keydown", (event) => {
+  if (event.target instanceof HTMLInputElement)
+    return
+  const key = event.key
+  if (key === "+" || key === "=") {
+    event.preventDefault()
+    setZoom(zoom * STEP)
+  }
+  else if (key === "-" || key === "_") {
+    event.preventDefault()
+    setZoom(zoom / STEP)
+  }
+  else if (key === "0") {
+    event.preventDefault()
+    setZoom(1)
+  }
+})
+
+// Dragging anywhere on the canvas pans it. A drag that started on a board title does not open it.
+let drag = null
+let suppressClick = false
+viewport.addEventListener("click", (event) => {
+  if (suppressClick)
+    event.preventDefault()
+  suppressClick = false
+}, { capture: true })
+viewport.addEventListener("pointerdown", (event) => {
+  if (event.button !== 0)
+    return
+  suppressClick = false
+  drag = { x: event.clientX, y: event.clientY, left: viewport.scrollLeft, top: viewport.scrollTop, moved: false, id: event.pointerId }
+})
+viewport.addEventListener("pointermove", (event) => {
+  if (!drag || event.pointerId !== drag.id)
+    return
+  const dx = event.clientX - drag.x
+  const dy = event.clientY - drag.y
+  if (!drag.moved && Math.hypot(dx, dy) < 4)
+    return
+  if (!drag.moved) {
+    drag.moved = true
+    try {
+      // Keeps the pan going when the pointer leaves the window mid-drag.
+      viewport.setPointerCapture(event.pointerId)
+    }
+    catch {}
+    viewport.classList.add("dragging")
+  }
+  viewport.scrollLeft = drag.left - dx
+  viewport.scrollTop = drag.top - dy
+})
+function endDrag(event) {
+  if (!drag || event.pointerId !== drag.id)
+    return
+  suppressClick = drag.moved
+  drag = null
+  viewport.classList.remove("dragging")
+}
+viewport.addEventListener("pointerup", endDrag)
+viewport.addEventListener("pointercancel", endDrag)
+// Links and images would otherwise start the browser's own drag and swallow the pan.
+viewport.addEventListener("dragstart", event => event.preventDefault())
+
+document.querySelector(".zoom").addEventListener("click", (event) => {
+  const action = event.target.closest("button")?.dataset.action
+  if (action === "in")
+    setZoom(zoom * STEP)
+  else if (action === "out")
+    setZoom(zoom / STEP)
+  else if (action === "reset")
+    setZoom(1)
+  else if (action === "fit")
+    fitWidth()
+})
+
+let stored = Number.NaN
+try {
+  stored = Number(localStorage.getItem(STORAGE_KEY))
+}
+catch {}
+if (Number.isFinite(stored) && stored > 0)
+  setZoom(stored)
+else
+  fitWidth()
+</script>
+</body>
+</html>

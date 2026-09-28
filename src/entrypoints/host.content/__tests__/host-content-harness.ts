@@ -70,17 +70,21 @@ export function nextAnimationFrame(): Promise<void> {
  * the IntersectionObserver fake, and message handlers in place of the
  * background. The background translates each text to "translated: <text>".
  * pageTranslation tells whether page translation is on for the tab when the
- * content script starts. Each test ends the content script that it started.
+ * content script starts. A test can hold the answers to keep translations in
+ * flight. Each test ends the content script that it started.
  */
 export function setUpHostContentTests({ pageTranslation = true } = {}) {
   let removeBackground = () => {}
   let ctx: ContentScriptContext | undefined
   /** Each page translation state that the content script sends to the background, oldest first. */
   const stateMessages: boolean[] = []
+  /** While set, the background answers translation requests only after it resolves. */
+  let heldAnswers: Promise<void> | undefined
 
   beforeEach(() => {
     fakeBrowser.reset()
     stateMessages.length = 0
+    heldAnswers = undefined
     vi.stubGlobal("IntersectionObserver", VisibleIntersectionObserver)
     const removers = [
       onMessage("getEnablePageTranslationFromContentScript", () => pageTranslation),
@@ -89,7 +93,10 @@ export function setUpHostContentTests({ pageTranslation = true } = {}) {
         stateMessages.push(message.data.enabled)
       }),
       onMessage("reportTranslationProgress", () => {}),
-      onMessage("enqueueTranslateRequest", message => `translated: ${message.data.text}`),
+      onMessage("enqueueTranslateRequest", async (message) => {
+        await heldAnswers
+        return `translated: ${message.data.text}`
+      }),
     ]
     removeBackground = () => removers.forEach(remove => remove())
   })
@@ -109,6 +116,15 @@ export function setUpHostContentTests({ pageTranslation = true } = {}) {
       ctx = new ContentScriptContext("host")
       await hostContentScript.main(ctx)
       return ctx
+    },
+    /** Holds the answers to translation requests until the returned function is called. */
+    holdTranslations() {
+      let release = () => {}
+      heldAnswers = new Promise(resolve => release = resolve)
+      return () => {
+        heldAnswers = undefined
+        release()
+      }
     },
     /** Ends the content script, as an extension update or removal does. */
     invalidate() {

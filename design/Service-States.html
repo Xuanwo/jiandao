@@ -3,16 +3,12 @@
 <head>
 <meta charset="utf-8">
 <title>翻译服务 · 状态</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 1520px; height: 620px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column; gap: 16px;">
   <div style="display: flex; flex-direction: column; gap: 4px;">
     <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务一节：平时只有预览，需要时才原地出现编辑框</h2>
@@ -66,11 +62,5 @@ a{color:#2B45B8}a:hover{color:#1B2455}
   </svg>
   <p style="margin: 0; font-size: 12px; line-height: 18px; color: #626978;">在“待应用”或“应用失败”时点“取消”，回到进入编辑前的状态（未配置或已配置）。应用时先测试连接，通过才保存，所以失败不会替换正在用的服务。<br>连接结果和检查时间随服务一起保存：应用成功时写入，“测试连接”随时重测并覆盖。打开设置页不发请求，只显示上次结果；从未检查过的服务显示“未检查”。</p>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":620}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>
