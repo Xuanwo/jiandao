@@ -54,7 +54,7 @@ async function buildWebPageHashComponents(
     context: normalizedWebPageContext,
   })
   // The rendered prompts contain all webpage context that the model receives.
-  hashComponents.push(systemPrompt, prompt)
+  hashComponents.push(systemPrompt ?? "", prompt)
 
   return hashComponents
 }

@@ -104,3 +104,18 @@ it("user translates a copy of an article: Given page context is on and the built
   assert.deepEqual(copy, first)
   assert.equal(translationRequests().length, requestsAfterFirst, "the copy sent no new translation request")
 })
+
+it("user translates a page into Chinese with the built-in prompt: Given Simplified Chinese as the target, When the article is translated, Then each translation request asks in Chinese with the page title and keeps the standalone %% lines", async () => {
+  await setUpService()
+
+  const requestsBefore = translationRequests().length
+  await translateArticle()
+
+  const requests = translationRequests().slice(requestsBefore)
+  assert.ok(requests.length >= 1, "the article reached the service")
+  for (const messages of requests) {
+    // The built-in prompt has no system prompt: the only message is the user message.
+    assert.deepEqual(messages.map(message => message.role), ["user"])
+    assert.ok(messages.at(-1).content.startsWith("【背景信息】\n标题: Reading and Experience\n\n请结合背景信息将以下文本翻译为简体中文，注意只需要输出翻译后的结果，不要额外解释。\n你必须在译文中保留等量的分隔符（单独一行的 %%），绝对不可遗漏、转义或翻译该符号，并注意分隔符的位置。\n\n【待翻译文本】\n"), messages.at(-1).content)
+  }
+})

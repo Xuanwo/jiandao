@@ -123,7 +123,7 @@ describe("translation cache key", () => {
   it.each([
     ["title", { webTitle: "Changelog" }],
     ["summary", { webSummary: "The release removes an old setting." }],
-  ])("user gets a new translation: Given the default prompt, which uses {{webTitle}} and {{webSummary}}, When the page %s is different, Then the translations use different cache entries", async (_field, pageChanges) => {
+  ])("user gets a new translation: Given the default prompt, which sends the page title and summary to the model, When the page %s is different, Then the translations use different cache entries", async (_field, pageChanges) => {
     const firstKey = await cacheKeyFor({})
     const secondKey = await cacheKeyFor(pageChanges)
 
