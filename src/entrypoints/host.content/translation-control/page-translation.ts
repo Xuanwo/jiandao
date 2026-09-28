@@ -4,7 +4,6 @@ import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { hasNoWalkAncestor, isDontWalkIntoAndDontTranslateAsChildElement, isDontWalkIntoButTranslateAsChildElement, isHTMLElement } from "@/utils/host/dom/filter"
 import { deepQueryTopLevelSelector } from "@/utils/host/dom/find"
-import { isOwnedPresentationElement } from "@/utils/host/dom/owned-presentation"
 import { walkAndLabelElement } from "@/utils/host/dom/traversal"
 import { removeAllTranslatedWrapperNodes, translateWalkedElement } from "@/utils/host/translate/node-manipulation"
 import { validateTranslationConfigAndToast } from "@/utils/host/translate/translate-text"
@@ -41,11 +40,6 @@ interface IPageTranslationManager {
    * the tab-level page translation session.
    */
   restart: () => Promise<void>
-}
-
-/** Presentation elements of the extension only rewrap the text of a paragraph that is already observed. */
-function isPageNode(node: Node): boolean {
-  return !isOwnedPresentationElement(node)
 }
 
 export class PageTranslationManager implements IPageTranslationManager {
@@ -433,21 +427,15 @@ export class PageTranslationManager implements IPageTranslationManager {
   }
 
   private async handleMutationRecords(records: MutationRecord[]): Promise<void> {
-    // A record that adds no page node, for example a record of the word-prefix emphasis, needs no work. Skip it before the config read.
-    const pageRecords = records.filter(rec => rec.type !== "childList" || [...rec.addedNodes].some(isPageNode))
-    if (pageRecords.length === 0)
-      return
-
     const config = await getLocalConfig()
     if (!config) {
       logger.error("Global config is not initialized")
       return
     }
 
-    for (const rec of pageRecords) {
+    for (const rec of records) {
       if (rec.type === "childList") {
-        const pageNodes = [...rec.addedNodes].filter(isPageNode)
-        pageNodes.forEach((node) => {
+        rec.addedNodes.forEach((node) => {
           if (isHTMLElement(node)) {
             this.addWalkBlockedElements(node)
             void this.observeTopLevelParagraphs(node, config)

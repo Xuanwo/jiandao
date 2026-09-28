@@ -1,0 +1,8 @@
+/*
+ * Word-prefix emphasis (src/utils/host/word-prefix-emphasis.ts). A highlight
+ * cannot change font-weight, so a text shadow of the text color thickens each
+ * prefix. The glyph widths stay the same, so the page does not reflow.
+ */
+::highlight(jiandao-word-prefix) {
+  text-shadow: 0.045em 0 0 currentColor;
+}

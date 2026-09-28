@@ -1,194 +1,128 @@
-import { OWNED_PRESENTATION_SELECTOR, REACT_SHADOW_HOST_CLASS, TRANSLATION_ERROR_CONTAINER_CLASS, WORD_PREFIX_TAG, WORD_PREFIX_TEXT_TAG } from "@/utils/constants/dom-labels"
+import { REACT_SHADOW_HOST_CLASS, TRANSLATION_ERROR_CONTAINER_CLASS, WORD_PREFIX_HIGHLIGHT } from "@/utils/constants/dom-labels"
 import { isElement, isTextNode } from "./dom/filter"
-import { unwrapOwnedPresentation } from "./dom/owned-presentation"
 
+// Text in these elements keeps its look: code, controls, editable text, headings and text that is already bold.
 const EXCLUDED_SELECTOR = [
   "script", "style", "noscript", "template", "svg", "math",
   "pre", "code", "kbd", "samp", "input", "textarea", "select", "button",
-  "[contenteditable]", "[role=textbox]", "[role=button]", "[hidden]", "[inert]", "[aria-hidden=true]",
+  "[contenteditable]", "[role=textbox]", "[role=button]",
   "b", "strong", "h1", "h2", "h3", "h4", "h5", "h6",
   `.${REACT_SHADOW_HOST_CLASS}`, `.${TRANSLATION_ERROR_CONTAINER_CLASS}`,
 ].join(",")
-const SKIPPED_SELECTOR = `${EXCLUDED_SELECTOR},${OWNED_PRESENTATION_SELECTOR}`
+// A change of these attributes can move text into or out of an excluded element.
+const EXCLUSION_ATTRIBUTES = ["contenteditable", "role"]
 // A word starts with a letter: a leading combining mark belongs to the previous text node.
 const LATIN_WORD = /^\p{Script=Latin}[\p{Script=Latin}\p{M}]*(?:['’][\p{Script=Latin}\p{M}]+)*$/u
-const TEXT_PARTS = /[\p{L}\p{M}\p{N}]+(?:['’][\p{L}\p{M}\p{N}]+)*|[^\p{L}\p{M}\p{N}]+/gu
+const WORDS = /[\p{L}\p{M}\p{N}]+(?:['’][\p{L}\p{M}\p{N}]+)*/gu
 const LETTERS = /\P{M}\p{M}*/gu
 const HAS_LATIN = /\p{Script=Latin}/u
 
-function createOwnedElement(doc: Document, tag: string): HTMLElement {
-  const element = doc.createElement(tag)
-  // Inline !important declarations win over every page rule, including `*` and `:last-child`.
-  element.style.setProperty("all", "unset", "important")
-  return element
+/**
+ * The prefix of each Latin word in the text: the first half, rounded up, of
+ * its letters. A letter with its combining marks counts as one letter, and so
+ * does an apostrophe. A word of one letter has no prefix.
+ */
+export function wordPrefixRanges(text: Text): StaticRange[] {
+  // Most page text nodes are whitespace or non-Latin; skip them before matching words.
+  if (!HAS_LATIN.test(text.data))
+    return []
+  const ranges: StaticRange[] = []
+  for (const { 0: word, index } of text.data.matchAll(WORDS)) {
+    if (!LATIN_WORD.test(word))
+      continue
+    const letters = [...word.matchAll(LETTERS)].map(letter => letter[0])
+    if (letters.length < 2)
+      continue
+    const prefixLength = letters.slice(0, Math.ceil(letters.length / 2)).join("").length
+    ranges.push(new StaticRange({ startContainer: text, startOffset: index, endContainer: text, endOffset: index + prefixLength }))
+  }
+  return ranges
 }
 
-/** The nodes that a batch of mutation records touches. */
-interface TouchedNodes {
-  /** The nodes to emphasize again. */
-  roots: Set<Node>
-  changedTexts: Set<Node>
-  changedWrappers: Set<Element>
-  /** The emphasized texts, with their wrappers, that can need a change. */
-  candidates: Map<Text, HTMLElement>
-}
-
-/** Sorts mutation records into the nodes that they touch. It changes no node. */
-function collectTouched(records: MutationRecord[], originals: Map<Text, HTMLElement>, textOfWrapper: WeakMap<Element, Text>): TouchedNodes {
-  const touched: TouchedNodes = { roots: new Set(), changedTexts: new Set(), changedWrappers: new Set(), candidates: new Map() }
-  const addCandidate = (text: Text) => {
-    const wrapper = originals.get(text)
-    if (wrapper)
-      touched.candidates.set(text, wrapper)
-  }
-  // A removed subtree can hold emphasized texts; each one is next to its wrapper.
-  const addCandidatesIn = (node: Node) => {
-    if (isTextNode(node)) {
-      addCandidate(node)
-    }
-    else if (isElement(node)) {
-      for (const wrapper of node.matches(WORD_PREFIX_TEXT_TAG) ? [node] : node.querySelectorAll(WORD_PREFIX_TEXT_TAG)) {
-        const text = textOfWrapper.get(wrapper)
-        if (text)
-          addCandidate(text)
-      }
-    }
-  }
-  for (const record of records) {
-    const element = isElement(record.target) ? record.target : record.target.parentElement
-    const wrapper = element?.closest(WORD_PREFIX_TEXT_TAG)
-    if (wrapper) {
-      touched.changedWrappers.add(wrapper)
-      addCandidatesIn(wrapper)
-    }
-    else if (record.type === "characterData") {
-      touched.changedTexts.add(record.target)
-      addCandidatesIn(record.target)
-      touched.roots.add(record.target)
-    }
-    else {
-      record.removedNodes.forEach(addCandidatesIn)
-      // A node that the page inserts after an emphasized text separates the text from its wrapper.
-      if (record.previousSibling)
-        addCandidatesIn(record.previousSibling)
-      record.addedNodes.forEach(node => touched.roots.add(node))
-    }
-  }
-  return touched
-}
-
+/**
+ * Registers the word prefixes of the document body as the highlight that the
+ * preset styles paint with ::highlight(jiandao-word-prefix). The page DOM does
+ * not change, so page scripts, page CSS, copied text and translation see the
+ * original page. Returns the function that removes the highlight.
+ */
 export function startWordPrefixEmphasis(doc: Document): () => void {
-  // SVG and XML documents have no body to emphasize.
+  // SVG and XML documents have no body; browsers without the CSS Custom Highlight API keep the page plain.
   const body = doc.body
-  if (!body)
+  if (!body || typeof Highlight === "undefined" || !CSS.highlights)
     return () => {}
-  // Each emphasized text node keeps its place, empty, before its wrapper.
-  const originals = new Map<Text, HTMLElement>()
-  const textOfWrapper = new WeakMap<Element, Text>()
 
-  function emphasize(text: Text) {
-    // Most page text nodes are whitespace or non-Latin; skip them before building markup.
-    if (!HAS_LATIN.test(text.data))
-      return
-    const wrapper = createOwnedElement(doc, WORD_PREFIX_TEXT_TAG)
-    for (const [segment] of text.data.matchAll(TEXT_PARTS)) {
-      // Latin base letters and their combining marks stay together, including on Firefox 112.
-      const letters = LATIN_WORD.test(segment) ? [...segment.matchAll(LETTERS)].map(part => part[0]) : []
-      if (letters.length < 2) {
-        wrapper.append(segment)
-        continue
-      }
-      // Half the graphemes, rounded up, is a presentation choice, not a proven optimum.
-      const length = Math.ceil(letters.length / 2)
-      const prefix = createOwnedElement(doc, WORD_PREFIX_TAG)
-      prefix.style.setProperty("font-weight", "700", "important")
-      prefix.textContent = letters.slice(0, length).join("")
-      wrapper.append(prefix, letters.slice(length).join(""))
-    }
-    // Only prefixes are appended as elements; plain text is appended as strings.
-    if (wrapper.firstElementChild) {
-      // Keep framework-owned nodes in their original parent so updates and removals still work.
-      text.after(wrapper)
-      text.data = ""
-      originals.set(text, wrapper)
-      textOfWrapper.set(wrapper, text)
-    }
+  const registry = CSS.highlights
+  const highlight = new Highlight()
+  registry.set(WORD_PREFIX_HIGHLIGHT, highlight)
+  // Static ranges cost nothing when the page changes the DOM; the observer below replaces the ranges of changed text.
+  const rangesOfText = new Map<Text, StaticRange[]>()
+
+  function forgetText(text: Text) {
+    rangesOfText.get(text)?.forEach(range => highlight.delete(range))
+    rangesOfText.delete(text)
   }
 
-  function restore(text: Text, wrapper: HTMLElement, keepPageText: boolean) {
-    if (!keepPageText)
-      text.data = wrapper.textContent
-    wrapper.remove()
+  function emphasizeText(text: Text) {
+    forgetText(text)
+    const ranges = wordPrefixRanges(text)
+    if (ranges.length === 0)
+      return
+    ranges.forEach(range => highlight.add(range))
+    rangesOfText.set(text, ranges)
   }
 
-  function visit(root: Node) {
-    // The walker rejects skipped subtrees, so ancestors only need checking once per root.
-    const element = isElement(root) ? root : root.parentElement
-    if (!root.isConnected || !element || element.closest(SKIPPED_SELECTOR))
-      return
+  /** Calls onText for each text node under root, root included, and skips excluded subtrees when skipExcluded is set. */
+  function eachText(root: Node, skipExcluded: boolean, onText: (text: Text) => void) {
     if (isTextNode(root)) {
-      emphasize(root)
+      onText(root)
       return
     }
     const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         if (isElement(node))
-          return node.matches(SKIPPED_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP
+          return skipExcluded && node.matches(EXCLUDED_SELECTOR) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP
         return NodeFilter.FILTER_ACCEPT
       },
     })
-    const nodes: Node[] = []
     while (walker.nextNode())
-      nodes.push(walker.currentNode)
-    nodes.filter(isTextNode).forEach(emphasize)
+      onText(walker.currentNode as Text)
   }
 
-  /**
-   * Brings one emphasized text in line with the page after a change. Returns
-   * the node to emphasize again, or null when the text needs no change.
-   */
-  function reconcile(text: Text, wrapper: HTMLElement, touched: TouchedNodes): Node | null {
-    if (!text.isConnected && wrapper.isConnected && touched.changedWrappers.has(wrapper)) {
-      // normalize() removes the empty text node before the wrapper and joins the text nodes in the wrapper.
-      // Then only the wrapper holds the page text. Replace the wrapper with one text node that holds this text.
-      const merged = doc.createTextNode(wrapper.textContent)
-      wrapper.replaceWith(merged)
-      originals.delete(text)
-      return merged
-    }
-    if (touched.changedTexts.has(text) || touched.changedWrappers.has(wrapper) || !text.isConnected || text.nextSibling !== wrapper) {
-      restore(text, wrapper, touched.changedTexts.has(text))
-      originals.delete(text)
-      return text
-    }
-    return null
+  function emphasize(root: Node) {
+    // The walker rejects excluded subtrees, so only the ancestors of root need a check.
+    const element = isElement(root) ? root : root.parentElement
+    if (!root.isConnected || !element || element.closest(EXCLUDED_SELECTOR))
+      return
+    eachText(root, true, emphasizeText)
+  }
+
+  function forget(root: Node) {
+    eachText(root, false, forgetText)
   }
 
   const observer = new MutationObserver((records) => {
-    // Disconnect only for our synchronous writes; page mutations remain observable.
-    observer.disconnect()
-    // Only the emphasized texts that these records touch can need a change.
-    const touched = collectTouched(records, originals, textOfWrapper)
-    for (const [text, wrapper] of touched.candidates) {
-      const root = reconcile(text, wrapper, touched)
-      if (root)
-        touched.roots.add(root)
+    // Forget every touched node first, so that a node that moves in this batch gets its ranges again.
+    const touched: Node[] = []
+    for (const record of records) {
+      if (record.type === "childList") {
+        record.removedNodes.forEach(forget)
+        touched.push(...record.addedNodes)
+      }
+      else {
+        forget(record.target)
+        touched.push(record.target)
+      }
     }
-    touched.roots.forEach(visit)
-    observe()
+    touched.forEach(emphasize)
   })
-  function observe() {
-    observer.observe(body, { childList: true, subtree: true, characterData: true })
-  }
-  visit(body)
-  observe()
+  emphasize(body)
+  observer.observe(body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: EXCLUSION_ATTRIBUTES })
+
   return () => {
-    const pendingUpdates = new Set(observer.takeRecords().filter(record => record.type === "characterData").map(record => record.target))
     observer.disconnect()
-    originals.forEach((wrapper, text) => restore(text, wrapper, pendingUpdates.has(text)))
-    originals.clear()
-    // The page may have copied emphasized markup into nodes that are not tracked.
-    unwrapOwnedPresentation(body)
+    if (registry.get(WORD_PREFIX_HIGHLIGHT) === highlight)
+      registry.delete(WORD_PREFIX_HIGHLIGHT)
+    rangesOfText.clear()
   }
 }
 

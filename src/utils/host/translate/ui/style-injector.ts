@@ -1,6 +1,7 @@
 import customTranslationNodeCss from "@/assets/styles/custom-translation-node.css?raw"
 import hostThemeCss from "@/assets/styles/host-theme.css?raw"
 import translationNodePresetCss from "@/assets/styles/translation-node-preset.css?raw"
+import wordPrefixEmphasisCss from "@/assets/styles/word-prefix-emphasis.css?raw"
 import { logger } from "@/utils/logger"
 
 type StyleRoot = Document | ShadowRoot
@@ -76,7 +77,8 @@ function injectStyleElement(root: StyleRoot, id: string, cssText: string): void 
 // ============ Preset Styles Injection ============
 
 const BASE_PRESET_CSS = customTranslationNodeCss.replace(/@import[^;]+;/g, "") + translationNodePresetCss
-const DOCUMENT_PRESET_CSS = hostThemeCss + BASE_PRESET_CSS
+// Word-prefix emphasis covers the text of the document, not of shadow roots.
+const DOCUMENT_PRESET_CSS = hostThemeCss + BASE_PRESET_CSS + wordPrefixEmphasisCss
 const SHADOW_PRESET_CSS = hostThemeCss.replace(/:root/g, ":host") + BASE_PRESET_CSS
 
 const injectedPresetRoots = new WeakSet<StyleRoot>()

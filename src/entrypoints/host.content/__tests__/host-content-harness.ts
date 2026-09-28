@@ -77,13 +77,10 @@ export function setUpHostContentTests({ pageTranslation = true } = {}) {
   let ctx: ContentScriptContext | undefined
   /** Each page translation state that the content script sends to the background, oldest first. */
   const stateMessages: boolean[] = []
-  /** The text of each translation request to the background, oldest first. */
-  const requests: string[] = []
 
   beforeEach(() => {
     fakeBrowser.reset()
     stateMessages.length = 0
-    requests.length = 0
     vi.stubGlobal("IntersectionObserver", VisibleIntersectionObserver)
     const removers = [
       onMessage("getEnablePageTranslationFromContentScript", () => pageTranslation),
@@ -92,10 +89,7 @@ export function setUpHostContentTests({ pageTranslation = true } = {}) {
         stateMessages.push(message.data.enabled)
       }),
       onMessage("reportTranslationProgress", () => {}),
-      onMessage("enqueueTranslateRequest", (message) => {
-        requests.push(message.data.text)
-        return `translated: ${message.data.text}`
-      }),
+      onMessage("enqueueTranslateRequest", message => `translated: ${message.data.text}`),
     ]
     removeBackground = () => removers.forEach(remove => remove())
   })
@@ -110,7 +104,6 @@ export function setUpHostContentTests({ pageTranslation = true } = {}) {
 
   return {
     stateMessages,
-    requests,
     /** Starts the content script through its entry point, the same way the browser does. */
     async start() {
       ctx = new ContentScriptContext("host")
