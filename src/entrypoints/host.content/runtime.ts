@@ -8,6 +8,7 @@ import { areSamePageTranslationOrigin } from "@/utils/url"
 import { setupUrlChangeListener } from "./listen"
 import { mountHostToast } from "./mount-host-toast"
 import { bindTranslationShortcutKey } from "./translation-control/bind-translation-shortcut"
+import { watchConfigChanges } from "./translation-control/handle-config-change"
 import { PageTranslationManager } from "./translation-control/page-translation"
 
 export async function bootstrapHostContent(ctx: ContentScriptContext) {
@@ -22,6 +23,10 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
     rootMargin: `${PRELOAD_MARGIN_PX}px`,
     threshold: PRELOAD_THRESHOLD,
   })
+
+  // Translate the page again when the popup or the options page changes the translation mode.
+  // A change before this point needs no action: page translation starts later and reads the current config.
+  const unwatchConfig = watchConfigChanges(manager)
 
   const cleanupTranslationShortcut = await bindTranslationShortcutKey(manager)
 
@@ -94,6 +99,7 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
     removeHostToast()
     cleanupUrlListener()
     cleanupTranslationShortcut()
+    unwatchConfig()
     cleanupTranslationStateListener()
     cleanupFrameTranslationStateListener()
     cleanupDetectedLanguageRefreshListener()

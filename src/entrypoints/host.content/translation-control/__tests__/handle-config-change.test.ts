@@ -10,8 +10,7 @@ function createMockConfig(mode: "bilingual" | "translationOnly"): Config {
 function createMockManager(isActive: boolean): PageTranslationManager {
   return {
     isActive,
-    start: vi.fn().mockResolvedValue(undefined),
-    stop: vi.fn(),
+    restart: vi.fn().mockResolvedValue(undefined),
   } as unknown as PageTranslationManager
 }
 
@@ -25,8 +24,7 @@ describe("handleTranslationModeChange", () => {
       manager,
     )
 
-    expect(manager.stop).toHaveBeenCalled()
-    expect(manager.start).toHaveBeenCalled()
+    expect(manager.restart).toHaveBeenCalled()
   })
 
   it("should not trigger when mode stays the same", () => {
@@ -38,7 +36,7 @@ describe("handleTranslationModeChange", () => {
       manager,
     )
 
-    expect(manager.stop).not.toHaveBeenCalled()
+    expect(manager.restart).not.toHaveBeenCalled()
   })
 
   it("should not trigger when manager is not active", () => {
@@ -50,6 +48,6 @@ describe("handleTranslationModeChange", () => {
       manager,
     )
 
-    expect(manager.stop).not.toHaveBeenCalled()
+    expect(manager.restart).not.toHaveBeenCalled()
   })
 })

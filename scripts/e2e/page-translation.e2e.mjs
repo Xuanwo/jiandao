@@ -86,6 +86,23 @@ it("user translates a page with the shortcut: Given a configured service, When A
   await popup.getByText("5 paragraphs").waitFor({ timeout: 10_000 })
 })
 
+it("user changes the display mode: Given a translated article in bilingual mode, When the popup changes to Translation only, Then the article shows only the translations and sends no new request", async () => {
+  const { popup } = await setUpService()
+  const { article } = await translateArticle()
+  const requestsBefore = service.completions().length
+
+  await popup.getByRole("button", { name: "Translation only", exact: true }).click()
+  await popup.getByRole("button", { name: "Translation only", pressed: true }).waitFor()
+
+  // Each paragraph changes on its own when its translation comes back, so wait until all of them show only a translation.
+  await article.waitForFunction(() => [...document.querySelectorAll("h1, p")].every(element => element.textContent.trim().startsWith("【译】")), undefined, { timeout: 10_000 })
+    .catch(async (error) => {
+      const paragraphs = await article.locator("h1, p").allInnerTexts()
+      throw new Error(`not every paragraph shows only its translation: ${paragraphs.join(" | ")}`, { cause: error })
+    })
+  assert.equal(service.completions().length, requestsBefore, "the translations came from the cache")
+})
+
 it("user translates a copy of an article: Given page context is on and the built-in prompt, When the article is translated and then a copy with another description, Then the copy gets its translations from the cache without a new request", async () => {
   const { popup, extensionId } = await setUpService()
   await popup.goto(`chrome-extension://${extensionId}/options.html`)
