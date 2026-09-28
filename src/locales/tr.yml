@@ -1,35 +1,42 @@
 name: Plainly
-extName: Plainly - Çevir ve Öğren
-extDescription: Plainly, herhangi bir web sitesinden dilleri derinlemesine öğrenmenize yardımcı olmak için tasarlanmış açık kaynaklı bir tarayıcı uzantısıdır.
-dataTypes:
-  string: Metin
-  number: Sayı
+extName: Plainly
+extDescription: Okuduğunuz web sayfasını çevirir, başka hiçbir şey yapmaz.
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: Dil ara…
+  noLanguagesFound: Dil bulunamadı
 popup:
-  theme: Tema
-  autoLang: Otomatik
-  sourceLang: Kaynak
-  targetLang: Hedef
-  translate: Çevir
-  showOriginal: Orijinali Göster
-  options: Seçenekler
-  hover: Üzerine Gel
-  translateParagraph: paragrafı çevirmek için
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: "Geçerli mod: İki dilli"
-        action: Yalnızca çeviriye geçmek için tıklayın
-      translationOnly:
-        current: "Geçerli mod: Yalnızca çeviri"
-        action: İki dilli moda geçmek için tıklayın
-  aiSmartContext: AI Akıllı Bağlam
-  aiSmartContextDescription: Çeviri kalitesini artırmak için web sayfası bağlamını kullanır. LLM çeviri sağlayıcısı gerektirir.
+  auto: otomatik
+  autoDetected: Otomatik algılandı
+  sourceLanguage: Kaynak dil
+  targetLanguage: Hedef dil
+  translateInto: Hedef
+  displayMode: Görünüm
+  bilingual: İki dilli
+  translationOnly: Yalnızca çeviri
+  translate: Bu sayfayı çevir
+  showOriginal: Orijinali göster
+  translating: Çevriliyor
+  translated: Çevrildi
+  paragraphCount: $1 paragraf
+  failedCount: $1 başarısız
+  notTranslatable: Bu sayfa çevrilemez.
+  settings: Ayarlar
+  provider:
+    none: Henüz hizmet yok
+    missingKey: anahtar yok
+  setup:
+    title: Henüz çeviri hizmeti yok
+    description: Talimatları ajanınıza verin. Ajan anahtarınızla bir yapılandırmayı doğrular ve panoya koyar; aşağıya yapıştırın.
+    copyInstructions: Ajanınız için talimatları kopyala
+    copied: Kopyalandı
+    pasteLabel: Ajanınızdan gelen yapılandırma
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: yapılandırmada API anahtarı yok
+    apply: Uygula ve bu sayfayı çevir
+    applyOnly: Uygula
 errorRecovery:
   title: Bir sorun oluştu
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: Kurtarma modu etkin. Sayfayı yenileyin veya ayarları sıfırlayıp tekrar deneyin.
   recoveryTitle: Kurtarma seçenekleri
   refreshPage: Sayfayı yenile
   resetAction: Varsayılan ayarlara sıfırla
@@ -38,302 +45,142 @@ errorRecovery:
   errorDetails: Hata ayrıntıları
   resetDialog:
     title: Ayarlar sıfırlansın mı?
-    description: Geçerli ayarlarınız varsayılan değerlerle değiştirilecektir.
+    description: Mevcut ayarlarınız varsayılan değerlerle değiştirilecek.
     confirm: Sıfırla
     cancel: İptal
 options:
-  commandPalette:
-    placeholder: Ayarları ara...
-    noResults: Ayar bulunamadı
-  sidebar:
-    settings: Ayarlar
-  setAPIKeyWarning:
-    please: Lütfen API Anahtarını
-    page: sayfasında ayarlayın
-  apiProviders:
-    title: API Sağlayıcıları
-    description: Çeviri ve kelime analizi işlevleri için API sağlayıcılarını buradan yapılandırın. 20'den fazla yerleşik sağlayıcımız var ve OpenAI uyumlu tüm API sağlayıcılarını destekliyoruz.
-    addProvider: Sağlayıcı Ekle
-    badges:
-      featureCount: $1 özellik
-    dialog:
-      title: Yeni Sağlayıcı Ekle
-      groups:
-        builtInProviders:
-          title: Yerleşik LLM Sağlayıcıları
-          description: Yerleşik büyük dil modeli sağlayıcıları, Base URL gibi çoğu yapılandırmayı doldurmaya gerek yok
-        openaiCompatibleProviders:
-          title: OpenAI Uyumlu Özel Sağlayıcılar
-          description: İstediğiniz AI sağlayıcısını bulamıyorsanız, Zhipu AI gibi herhangi bir OpenAI uyumlu sağlayıcıyı yapılandırmak için Özel Sağlayıcı'yı seçin
-        pureTranslationProviders:
-          title: Saf Çeviri Sağlayıcıları
-          description: Büyük dil modeli yetenekleri olmadan çeviri özelliklerine odaklanan sağlayıcılar
-    form:
-      fields:
-        name: Ad
-        description: Açıklama
-        apiKey: API Anahtarı
-        baseURL: Base URL
-        optional: İsteğe Bağlı
-      duplicate: Çoğalt
-      delete: Sil
-      deleteDialog:
-        title: Sağlayıcıyı sil?
-        description: Bu işlem geri alınamaz. Bu sağlayıcıyı kullanan özellikler otomatik olarak başka bir mevcut sağlayıcıya yeniden atanacaktır.
-        confirm: Sil
-        cancel: İptal
-      atLeastOneLLMProvider: En az bir LLM çeviri sağlayıcısı gereklidir.
-      duplicateProviderName: 'Yinelenen sağlayıcı adı "$1"'
-      defaultProvider:
-        translate: Varsayılan çeviri sağlayıcısı olarak ayarla
-      models:
-        translate:
-          title: Çeviri Modeli
-          customTitle: Özel Çeviri Modeli
-          placeholder: Bir model seçin
-        fetchModels: Mevcut modelleri getir
-        fetchError: Modeller getirilemedi
-        clickToRetry: Yeniden denemek için tıklayın
-        noModels: Mevcut model yok
-        selectModel: Model seç
-        apiKeyRequired: Lütfen önce API anahtarı ekleyin
-        searchModels: Model ara...
-        noModelsFound: Model bulunamadı
-      featureProviders: Özellik Sağlayıcıları
-      advancedOptions: Gelişmiş Seçenekler
-      providerSettingLabels:
-        region: Bölge
-      temperature: Sıcaklık
-      temperatureHint: Yanıtlardaki rastgeleliği kontrol eder. Düşük değerler (0) daha belirleyici, yüksek değerler daha yaratıcıdır. Aralık sağlayıcıya göre değişir. Sağlayıcı varsayılanını kullanmak için boş bırakın.
-      headers: Başlıklar
-      headersHint: AI sağlayıcı istemcisi oluşturulurken gönderilecek özel HTTP başlıkları. Sağlayıcı varsayılanlarını kullanmak için boş bırakın; varsayılanları devre dışı bırakmak için {} kullanın.
-      providerOptions: Sağlayıcı Seçenekleri
-      providerOptionsHint: Düşünme/akıl yürütme modu gibi standart dışı API özellikleri için sağlayıcıya özel seçenekler. Ayrıntılar için Vercel AI SDK belgelerine veya sağlayıcınızın resmi belgelerine bakın.
-      providerOptionsDocsLink: Sağlayıcı Belgelerini Görüntüle
-      providerOptionsRecommendationTrigger: Önerilen sağlayıcı seçeneklerini görüntüle
-      providerOptionsRecommendationTitle: Önerilen sağlayıcı seçenekleri bulundu
-      providerOptionsRecommendationDescription: Önerilen yapılandırmayı gözden geçirip manuel olarak uygulayın.
-      providerOptionsRecommendationApply: Uygula
-      providerOptionsRecommendationApplied: Uygulandı
-      invalidJson: Geçersiz JSON formatı
-    providers:
-      description:
-        openai: GPT-4o gibi modeller sağlar
-        deepseek: Çin'de kullanım için önerilir
-        openaiCompatible: Üçüncü taraf ve OpenAI API uyumlu
-    apiKey:
-      showAPIKey: API Anahtarını Göster
-    howToConfigure: Nasıl yapılandırılır?
-    testConnection:
-      button: Bağlantıyı Test Et
-      testing: Test ediliyor...
-  general:
-    title: Genel
-    appearance:
+  title: Ayarlar
+  service:
+    title: Çeviri hizmeti
+    status:
+      none: Hizmet yok
+      unconfigured: Anahtar yok
+      configured: Test edilmedi
+      testing: Test ediliyor…
+      ok: Bağlandı
+      failed: Bağlantı başarısız
+    testConnection: Bağlantıyı test et
+    sendsTo: Sayfa metni $1 hizmetine gider
+    copyInstructions: Ajanınız için talimatları kopyala
+    copied: Kopyalandı
+    paste:
+      open: Yapılandırmayı yapıştır
+      label: Ajanınızdan gelen yapılandırma
+      keyMissing: Yapılandırmada API anahtarı yok.
+      cancel: İptal
+      apply: Uygula
+      applying: Onaylanıyor…
+  reading:
+    title: Okuma
+    mode:
       title: Görünüm
-      theme: Tema
-      system: Sistem
-      light: Açık
-      dark: Koyu
-    featureProviders:
-      title: Özellik Sağlayıcıları
-      description: Her özellik için kullanılacak sağlayıcıyı seçin
-      features:
-        translate: Sayfa Çevirisi
-    translationConfig:
-      model:
-        title: Model
-        enterCustomModel: Özel model adını girin
-    clearCache:
-      title: Önbelleği Temizle
-      description: Tarayıcınızdaki tüm çeviri önbelleğini temizleyin
-      clearing: Temizleniyor...
-      dialog:
-        title: Önbelleği Temizle
-        trigger: Önbelleği Temizle
-        confirm: Onayla
-        cancel: İptal
-        description: Bu işlem tüm çeviri önbelleğini temizleyecektir. Bu işlem geri alınamaz.
-  translation:
-    title: Çeviri
-    requestQueueConfig:
-      title: Çeviri Hızı
-      firstOnDescription: Çeviri isteklerinin işleme hızını
-      lastOnDescription: algoritmasıyla ayarlayın
-      capacity:
-        title: Maksimum Ani İstek Sayısı
-        description: İzin verilen geçici ani istek sayısı, kısa bir süre içinde eşzamanlı olarak işlenebilecek maksimum istek sayısını belirler
-      rate:
-        title: Saniyedeki Ortalama İstek
-        description: Saniyedeki ortalama istek, ancak geçici olarak fazla istek göndermek için maksimum ani sayısını yapılandırmaya izin verir
-    batchQueueConfig:
-      title: Toplu Çeviri
-      description: Toplu çeviri için karakter limitleri ve maksimum paragraf sayısını yapılandırın (yalnızca LLM çevirisi için geçerlidir)
-      maxCharactersPerBatch:
-        title: Maksimum Karakter
-        description: Her çevirinin içerik hacmini kontrol etmek için toplu istek başına izin verilen maksimum karakter sayısı
-      maxItemsPerBatch:
-        title: Maksimum Paragraf Sayısı
-        description: Her çevirinin içerik hacmini kontrol etmek için her toplu çeviri için maksimum paragraf sayısı
-    personalizedPrompts:
-      title: Kişiselleştirilmiş Promptlar
-      description: Farklı türde Promptları özelleştirmek, çeviri sırasında Prompt türünü kendiniz ayarlamanıza olanak tanır. Prompt, kullanıcının LLM'ye gönderdiği metni temsil eder.
-      addPrompt: Prompt Ekle
-      default: Varsayılan
-      importSuccess: İçe Aktarma Başarılı
-      import: İçe Aktar
-      export: Dışa Aktar
-      current: kullanımda
-      editPrompt:
-        title: Promptu Düzenle
-        name: Ad
-        systemPrompt: Sistem Promptu
-        prompt: Prompt
-        promptCellInput:
-          input: Çevrilecek metin içeriği
-          targetLanguage: Hedef dil
-          webTitle: Web sayfası başlığı
-          webDescription: Sayfa meta verilerinden web sayfası açıklaması
-          webContent: Web sayfası içeriği (ilk 2000 karaktere kısaltılır)
-          webSummary: Web sayfası özeti (AI Akıllı Bağlam gerektirir)
-        save: Değişiklikleri Kaydet
-        close: İptal
-      deletePrompt:
-        title: Promptu Sil
-        description: Promptu silmeyi onayla
-        confirm: Onayla
-        cancel: İptal
-      exportPrompt:
-        exportSelected: Seçilenleri Dışa Aktar
-        cancel: İptal
-    translationStyle:
-      title: Çeviri Görüntüleme Stili
-      description: Çeviri sonuçlarını orijinal metinden ayırt etmek için istediğiniz herhangi bir stili ayarlayın
-      useCustomStyle: Özel CSS Stili Kullan
-      useCustomStyleDescription: Yazı tipleri, animasyonlar ve dile özgü stiller dahil herhangi bir CSS'yi destekler
-      presetStyle: Hazır Stil
-      cssEditor: CSS Editörü
-      preview: Önizleme
-      stylePreviewLanguage: Dil
-      stylePreviewDirection: Yön
-      stylePreviewTranslatedText: Çevrilmiş Metin
-      style:
+      bilingual: İki dilli
+      translationOnly: Yalnızca çeviri
+    style:
+      title: Çeviri stili
+      custom: Özel CSS
+      presets:
+        line: İnce çizgi
         default: Yok
-        blur: Bulanıklık Efekti
-        blockquote: Alıntı
-        weakened: Zayıflatılmış
-        dashedLine: Kesikli Çizgi
-        border: Kenarlık
-        textColor: Metin Rengi
-        background: Arka Plan
-      customCSS:
-        editor:
-          placeholder: |
-            /* Örnek: Renk ve arka planlı özel stil */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: Kaydet
-          savedButton: Kaydedildi
-          validation:
-            validating: Doğrulanıyor...
-            valid: CSS geçerli
-            syntaxError: CSS sözdizimi hataları içeriyor
-            tooLong: CSS çok uzun
-            saved: Tüm değişiklikler kaydedildi
-    translationMode:
-      title: Çeviri Modu
-      description: "Çevrilmiş metnin nasıl görüntüleneceğini seçin: iki dilli veya yalnızca çeviri."
-      mode:
-        bilingual: İki Dilli
-        translationOnly: Yalnızca Çeviri
-    translateRange:
-      title: Çeviri Kapsamı
-      description: Sayfadaki yalnızca ana içeriğin mi yoksa tüm içeriğin mi çevrileceğini seçin.
-      range:
-        main: Ana İçerik
-        all: Tüm İçerik
-    pageTranslationShortcut:
-      title: Sayfa Çeviri Kısayolu
-      description: Tüm web sayfalarını çevirmek için kısayol tuşunu özelleştirin
-    preloadConfig:
-      title: Ön Çeviri Aralığı
-      description: API maliyetlerinden tasarruf etmek için görünüm alanının altındaki ne kadar içeriğin önceden çevrileceğini kontrol edin
-      margin:
-        title: Ön Yükleme Mesafesi (piksel)
-        description: İçeriği çevirmeye başlamak için görünüm alanının ne kadar altı. Daha düşük değerler API maliyetlerinden tasarruf sağlar ancak kaydırma sırasında gecikmelere neden olabilir.
-      threshold:
-        title: Görünürlük Eşiği
-        description: Çeviriyi tetiklemek için gereken öğe görünürlük yüzdesi (0-1). Daha yüksek değerler, öğenin daha fazlası görünür olana kadar çeviriyi geciktirir.
-    smallParagraphFilter:
-      title: Kısa Metin Filtresi
-      description: Eşik değerinden az karakterli veya kelimeli metin düğümlerinin çevirisini atla (0 = devre dışı)
-      minCharacters:
-        title: Minimum Karakter
-        description: Bu değerden az karakterli metin düğümleri çevrilmeyecektir. Karakter sayısı boşlukları içerir.
-      minWords:
-        title: Minimum Kelime
-        description: Bu değerden az kelimeli metin düğümleri çevrilmeyecektir. Tüm dillerde doğru kelime sayımı için Intl.Segmenter kullanılır.
-      error: Değer $1 ile $2 arasında olmalıdır
-    nodeTranslationHotkey:
-      title: Üzerine Gelme veya Uzun Basma Çeviri Kısayolu
-      description: Üzerine gelme için değiştirici tuşu özelleştirin veya paragrafları çevirmek için uzun basın
-      enable: Etkinleştir
-    llmProviderConfigured: $1 için LLM sağlayıcısı seçildi
-    llmProviderNotConfigured: $1 için LLM sağlayıcısı seçilmedi
-    aiContentAware:
-      title: AI Akıllı Bağlam Çevirisi
-      description: AI'ya web sayfası bağlamı sağlayarak çeviri kalitesini artırın
-      enable: AI Akıllı Bağlam Çevirisini Etkinleştir
-      enableDescription: AI, çeviri doğruluğunu artırmak için web sayfası özetini kullanır. LLM sağlayıcısı gerektirir. Bir sayfayı çevirmeye başlarken gecikme ekler ve API maliyetlerini artırır.
-  config:
-    title: Yapılandırma
-    about:
-      title: Hakkında
-      description: Plainly Nisan 2025'te doğdu
-      mission: Plainly, yapay zeka çağında yüksek kaliteli eğitime daha eşit erişimi genişletmek için, dil öğrenimi, tıp ve bilgi yoğun diğer alanlarda gerçek bir öğretmene daha yakın hissettiren öğrenme deneyimlerini daha ulaşılabilir maliyetlerle sunmayı hedefler.
-    resetConfig:
-      title: Yapılandırmayı Sıfırla
-      description: Tüm yapılandırmayı varsayılan değere sıfırla
+        weakened: Soluk
+        textColor: Renkli
+        dashedLine: Kesikli alt çizgi
+        background: Vurgu
+        blockquote: Alıntı çubuğu
+        border: Çerçeve
+        blur: Üzerine gelince göster
+      cssPlaceholder: |
+        /* Örnek: çeviriyi renklendirip vurgulayın */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: Kaydet
+        saved: Kaydedildi
+        validating: Denetleniyor…
+        valid: CSS geçerli
+        syntaxError: CSS sözdizimi hataları içeriyor
+        tooLong: CSS çok uzun
+        allSaved: Tüm değişiklikler kaydedildi
+    range:
+      title: Çevir
+      main: Ana içerik
+      all: Tüm sayfa
+    shortcut:
+      title: Kısayol
+  quality:
+    title: Çeviri kalitesi
+    context:
+      title: Sayfa bağlamını kullan
+    prompt:
+      title: Prompt
+      default: Varsayılan
+  advanced:
+    title: Gelişmiş
+    rate: Saniye başına istek
+    capacity: Aynı anda gönderilen istek
+    maxCharactersPerBatch: İstek başına karakter
+    maxItemsPerBatch: İstek başına paragraf
+    preloadMargin: Görünür alanın ötesini önceden çevir (px)
+    preloadThreshold: Çeviriden önce görünür oran
+    minCharacters: N karakterden kısa paragrafları atla
+    minWords: N kelimeden kısa paragrafları atla
+    minError: Değer en az $1 olmalıdır
+    rangeError: Değer $1 ile $2 arasında olmalıdır
+    cache:
+      title: Çeviri önbelleği
+      clear: Temizle
+      clearing: Temizleniyor…
       dialog:
-        title: Yapılandırmayı Sıfırla
-        trigger: Yapılandırmayı Sıfırla
-        confirm: Onayla
+        title: Çeviri önbelleği temizlensin mi?
+        description: Önbellekteki tüm çeviriler ve sayfa özetleri silinir. Sayfalar gerektiğinde yeniden çevrilir.
+        confirm: Temizle
         cancel: İptal
-        description: Bu işlem tüm özel yapılandırmalarınızı temizleyecek ve varsayılan değerlere sıfırlayacaktır. Lütfen onaylayın.
-translateService:
-  title: Çeviri Servisi
-  description: Yalnızca web sayfası çevirisi için
-  normalTranslator: Normal Çevirmen
-  aiTranslator: AI Çevirmen
-  selectServices: Hizmet seçin
-  translationProviders: Çeviri Hizmetleri
-  configureAPI: API Yapılandır
-translatePrompt:
-  title: AI Çeviri Stili
-  description: Çeviri sırasında kullanılacak bir Prompt seçin. Seçenekler sayfasında özel Promptlar ekleyin veya değiştirin.
-noAPIKeyConfig:
-  warning: AI modelleri kullanmak istiyorsanız, lütfen önce seçenekler sayfasında API anahtarını ayarlayın
-  warningWithLink:
-    youMust: Önce
-    setTheAPIKey: API anahtarını ayarlamalısınız
-    firstOnThe: ""
-    optionsPage: seçenekler
-    page: sayfasında
+  appearance:
+    title: Görünüm
+    system: Sistem
+    light: Açık
+    dark: Koyu
+  reset:
+    title: Tüm ayarlar
+    dialog:
+      title: Tüm ayarlar sıfırlansın mı?
+      description: API anahtarları ve promptlar dahil tüm ayarlar varsayılan değerlerine döner.
+      confirm: Sıfırla
+      cancel: İptal
 translation:
   sameLanguage: Kaynak ve hedef diller farklı olmalıdır
-  autoModeSameLanguage: Algılanan dil '$1' hedef dille aynı
+  noApiKey: Önce bir API anahtarı ekleyin. Ayarlamak için araç çubuğundaki Plainly simgesine tıklayın.
+  failed: Çeviri başarısız oldu
+  retry: Yeniden dene
+  unknownError: Bir sorun oluştu
+setupPreview:
+  provider: Çeviri hizmeti
+  model: Model
+  apiKey: API Anahtarı
+  keyNew: yeni anahtar
+  keyReused: kayıtlı anahtar korunuyor
+  keyMissing: eksik
+  host: Sayfa metninin gittiği yer
+  thinking: Düşünme kapalı
+  yes: Evet
+  no: Hayır
+  unset: Ayarlanmadı
+  languages: Hedef dil · görünüm
+  unchanged: Değişmedi
+agentInstructions:
+  noConfiguration: (henüz yok)
+  text: |
+    Web sayfalarını çevirmek için Plainly (素读) tarayıcı uzantısını kullanıyorum. Lütfen çeviri hizmetini benim için ayarla.
+    Önce kılavuzu oku: $1
+    Kılavuzu izle: hangi hizmeti istediğimi, API anahtarımın nerede olduğunu ve hangi dilde okuduğumu bana sor. Kılavuzdaki istek şablonuyla anahtarımı kullanarak bir istek başarılı olana kadar doğrula. Yapılandırma JSON'unu panoma yaz. Sonra bana bunu Plainly açılır penceresine yapıştırıp uygulamamı söyle.
+    Anahtarı gizlenmiş geçerli yapılandırmam:
+    $2
 shortcutKeySelector:
-  placeholder: Lütfen kısayolu girin
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: Ters tırnak
-  clickAndHold: Tıkla ve basılı tut
+  placeholder: Bir kısayola basın
 languages:
   eng: İngilizce
   cmn: Basitleştirilmiş Çince

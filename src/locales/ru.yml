@@ -1,35 +1,42 @@
 name: Plainly
-extName: Plainly - Переводи и учись
-extDescription: Plainly — расширение браузера с открытым исходным кодом, которое поможет вам глубоко изучать языки на любом веб-сайте.
-dataTypes:
-  string: Текст
-  number: Число
+extName: Plainly
+extDescription: Переводит веб-страницу, которую вы читаете, и больше ничего не делает.
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: Поиск языков…
+  noLanguagesFound: Языки не найдены
 popup:
-  theme: Тема
-  autoLang: Авто
-  sourceLang: Исходный
-  targetLang: Целевой
-  translate: Перевести
+  auto: авто
+  autoDetected: Определён автоматически
+  sourceLanguage: Исходный язык
+  targetLanguage: Целевой язык
+  translateInto: Перевести на
+  displayMode: Отображение
+  bilingual: Двуязычный
+  translationOnly: Только перевод
+  translate: Перевести страницу
   showOriginal: Показать оригинал
-  options: Настройки
-  hover: Наведение
-  translateParagraph: для перевода абзаца
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: "Текущий режим: двуязычный"
-        action: Нажмите, чтобы переключиться на только перевод
-      translationOnly:
-        current: "Текущий режим: только перевод"
-        action: Нажмите, чтобы переключиться на двуязычный
-  aiSmartContext: Умный контекст ИИ
-  aiSmartContextDescription: Использует контекст веб-страницы для улучшения качества перевода. Требуется LLM-провайдер перевода.
+  translating: Переводится
+  translated: Переведено
+  paragraphCount: "Абзацев: $1"
+  failedCount: "Ошибок: $1"
+  notTranslatable: Эту страницу нельзя перевести.
+  settings: Настройки
+  provider:
+    none: Сервиса пока нет
+    missingKey: нет ключа
+  setup:
+    title: Сервис перевода ещё не настроен
+    description: Передайте инструкции своему агенту. Он проверит конфигурацию с вашим ключом и поместит её в буфер обмена; вставьте её ниже.
+    copyInstructions: Скопировать инструкции для агента
+    copied: Скопировано
+    pasteLabel: Конфигурация от агента
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: в конфигурации нет API-ключа
+    apply: Применить и перевести страницу
+    applyOnly: Применить
 errorRecovery:
   title: Что-то пошло не так
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: Включён режим восстановления. Обновите страницу или сбросьте настройки и попробуйте снова.
   recoveryTitle: Варианты восстановления
   refreshPage: Обновить страницу
   resetAction: Сбросить к настройкам по умолчанию
@@ -42,298 +49,138 @@ errorRecovery:
     confirm: Сбросить
     cancel: Отмена
 options:
-  commandPalette:
-    placeholder: Поиск настроек...
-    noResults: Настройки не найдены
-  sidebar:
-    settings: Настройки
-  setAPIKeyWarning:
-    please: Пожалуйста, установите API-ключ на странице
-    page: настроек
-  apiProviders:
-    title: API-провайдеры
-    description: Настройте API-провайдеров для функций перевода и анализа слов. У нас более 20 встроенных провайдеров и поддержка любых OpenAI-совместимых API.
-    addProvider: Добавить провайдера
-    badges:
-      featureCount: $1 функций
-    dialog:
-      title: Добавить нового провайдера
-      groups:
-        builtInProviders:
-          title: Встроенные LLM-провайдеры
-          description: Встроенные провайдеры больших языковых моделей, не требуют заполнения большинства настроек, таких как Base URL
-        openaiCompatibleProviders:
-          title: OpenAI-совместимые провайдеры
-          description: Если вы не нашли нужного ИИ-провайдера, выберите Custom Provider для настройки любого OpenAI-совместимого провайдера, например Zhipu AI
-        pureTranslationProviders:
-          title: Чистые провайдеры перевода
-          description: Провайдеры, ориентированные на функции перевода без возможностей больших языковых моделей
-    form:
-      fields:
-        name: Название
-        description: Описание
-        apiKey: API-ключ
-        baseURL: Base URL
-        optional: Необязательно
-      duplicate: Дублировать
-      delete: Удалить
-      deleteDialog:
-        title: Удалить провайдера?
-        description: Это действие нельзя отменить. Функции, использующие этого провайдера, будут автоматически переназначены другому доступному провайдеру.
-        confirm: Удалить
-        cancel: Отмена
-      atLeastOneLLMProvider: Требуется как минимум один LLM-провайдер перевода.
-      duplicateProviderName: 'Дублирующееся имя провайдера "$1"'
-      defaultProvider:
-        translate: Установить как провайдер перевода по умолчанию
-      models:
-        translate:
-          title: Модель перевода
-          customTitle: Пользовательская модель перевода
-          placeholder: Выберите модель
-        fetchModels: Получить доступные модели
-        fetchError: Не удалось получить модели
-        clickToRetry: Нажмите для повтора
-        noModels: Нет доступных моделей
-        selectModel: Выбрать модель
-        apiKeyRequired: Сначала добавьте API ключ
-        searchModels: Поиск моделей...
-        noModelsFound: Модели не найдены
-      featureProviders: Поставщики функций
-      advancedOptions: Расширенные настройки
-      providerSettingLabels:
-        region: Регион
-      temperature: Температура
-      temperatureHint: Контролирует случайность ответов. Низкие значения (0) более детерминированы, высокие — более креативны. Диапазон зависит от провайдера. Оставьте пустым для использования значения по умолчанию.
-      headers: Заголовки
-      headersHint: Пользовательские HTTP-заголовки для создания клиента AI-провайдера. Оставьте пустым для значений провайдера по умолчанию; используйте {}, чтобы отключить их.
-      providerOptions: Параметры провайдера
-      providerOptionsHint: Специфические параметры провайдера для нестандартных функций API, таких как режим размышления/рассуждения. Подробнее см. документацию Vercel AI SDK или официальную документацию вашего провайдера.
-      providerOptionsDocsLink: Документация провайдера
-      providerOptionsRecommendationTrigger: Показать рекомендуемые параметры провайдера
-      providerOptionsRecommendationTitle: Обнаружены рекомендуемые параметры провайдера
-      providerOptionsRecommendationDescription: Проверьте рекомендованную конфигурацию и примените её вручную.
-      providerOptionsRecommendationApply: Применить
-      providerOptionsRecommendationApplied: Применено
-      invalidJson: Неверный формат JSON
-    providers:
-      description:
-        openai: Предоставляет модели, такие как GPT-4o
-        deepseek: Рекомендуется для использования в Китае
-        openaiCompatible: Сторонние и OpenAI API-совместимые
-    apiKey:
-      showAPIKey: Показать API-ключ
-    howToConfigure: Как настроить?
-    testConnection:
-      button: Проверить соединение
-      testing: Тестирование...
-  general:
-    title: Общие
-    appearance:
-      title: Внешний вид
-      theme: Тема
-      system: Системная
-      light: Светлая
-      dark: Тёмная
-    featureProviders:
-      title: Провайдеры функций
-      description: Выберите провайдера для каждой функции
-      features:
-        translate: Перевод страницы
-    translationConfig:
-      model:
-        title: Модель
-        enterCustomModel: Введите название пользовательской модели
-    clearCache:
-      title: Очистить кэш
-      description: Очистить весь кэш перевода в вашем браузере
-      clearing: Очистка...
-      dialog:
-        title: Очистить кэш
-        trigger: Очистить кэш
-        confirm: Подтвердить
-        cancel: Отмена
-        description: Эта операция очистит весь кэш перевода. Это действие нельзя отменить.
-  translation:
-    title: Перевод
-    requestQueueConfig:
-      title: Скорость перевода
-      firstOnDescription: Настройте скорость обработки запросов перевода с помощью
-      lastOnDescription: алгоритма
-      capacity:
-        title: Максимальное количество пакетных запросов
-        description: Допустимое временное количество пакетных запросов определяет максимальное количество запросов, которые могут обрабатываться одновременно в течение короткого периода
-      rate:
-        title: Среднее количество запросов в секунду
-        description: Среднее количество запросов в секунду, но позволяет настроить максимальное количество пакетов для временной отправки избыточных запросов
-    batchQueueConfig:
-      title: Пакетный перевод
-      description: Настройте лимиты символов и максимальное количество абзацев для пакетного перевода (действует только для LLM-перевода)
-      maxCharactersPerBatch:
-        title: Максимум символов
-        description: Максимальное количество символов, разрешённое на один пакетный запрос, для контроля объёма содержимого каждого перевода
-      maxItemsPerBatch:
-        title: Максимум абзацев
-        description: Максимальное количество абзацев для каждого пакетного перевода для контроля объёма содержимого каждого перевода
-    personalizedPrompts:
-      title: Персонализированные промпты
-      description: Настройка различных типов промптов позволяет вам самостоятельно изменять тип промпта во время перевода. Промпт — это текст, который пользователь отправляет LLM.
-      addPrompt: Добавить промпт
-      default: По умолчанию
-      importSuccess: Импорт успешен
-      import: Импорт
-      export: Экспорт
-      current: используется
-      editPrompt:
-        title: Редактировать промпт
-        name: Название
-        systemPrompt: Системный промпт
-        prompt: Промпт
-        promptCellInput:
-          input: Текстовое содержимое для перевода
-          targetLanguage: Целевой язык
-          webTitle: Заголовок веб-страницы
-          webDescription: Описание веб-страницы из метаданных
-          webContent: Содержимое веб-страницы (обрезается до первых 2000 символов)
-          webSummary: Резюме веб-страницы (требуется умный контекст ИИ)
-        save: Сохранить изменения
-        close: Отмена
-      deletePrompt:
-        title: Удалить промпт
-        description: Подтвердить удаление промпта
-        confirm: Подтвердить
-        cancel: Отмена
-      exportPrompt:
-        exportSelected: Экспортировать выбранные
-        cancel: Отмена
-    translationStyle:
-      title: Стиль отображения перевода
-      description: Установите любой стиль для отличия результатов перевода от оригинального текста
-      useCustomStyle: Использовать пользовательский CSS-стиль
-      useCustomStyleDescription: Поддерживает любой CSS, включая шрифты, анимации и стили для конкретных языков
-      presetStyle: Предустановленный стиль
-      cssEditor: CSS-редактор
-      preview: Предпросмотр
-      stylePreviewLanguage: Язык
-      stylePreviewDirection: Направление
-      stylePreviewTranslatedText: Переведённый текст
-      style:
+  title: Настройки
+  service:
+    title: Сервис перевода
+    status:
+      none: Нет сервиса
+      unconfigured: Нет ключа
+      configured: Не проверено
+      testing: Проверка…
+      ok: Подключено
+      failed: Не удалось подключиться
+    testConnection: Проверить соединение
+    sendsTo: Текст страницы отправляется в $1
+    copyInstructions: Скопировать инструкции для агента
+    copied: Скопировано
+    paste:
+      open: Вставить конфигурацию
+      label: Конфигурация от агента
+      keyMissing: В конфигурации нет API-ключа.
+      cancel: Отмена
+      apply: Применить
+      applying: Подтверждение…
+  reading:
+    title: Чтение
+    mode:
+      title: Отображение
+      bilingual: Двуязычный
+      translationOnly: Только перевод
+    style:
+      title: Стиль перевода
+      custom: Свой CSS
+      presets:
+        line: Тонкая линия
         default: Нет
-        blur: Эффект размытия
-        blockquote: Цитата
-        weakened: Ослабленный
-        dashedLine: Пунктирная линия
-        border: Граница
-        textColor: Цвет текста
-        background: Фон
-      customCSS:
-        editor:
-          placeholder: |
-            /* Пример: Пользовательский стиль с цветом и фоном */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: Сохранить
-          savedButton: Сохранено
-          validation:
-            validating: Проверка...
-            valid: CSS корректен
-            syntaxError: CSS содержит синтаксические ошибки
-            tooLong: CSS слишком длинный
-            saved: Все изменения сохранены
-    translationMode:
-      title: Режим перевода
-      description: "Выберите способ отображения переведённого текста: двуязычный или только перевод."
-      mode:
-        bilingual: Двуязычный
-        translationOnly: Только перевод
-    translateRange:
-      title: Диапазон перевода
-      description: Выберите, переводить только основное содержимое или всё содержимое на странице.
-      range:
-        main: Основное содержимое
-        all: Всё содержимое
-    pageTranslationShortcut:
-      title: Горячая клавиша перевода страницы
-      description: Настройте горячую клавишу для перевода всей веб-страницы
-    preloadConfig:
-      title: Диапазон предварительного перевода
-      description: Управляйте количеством контента ниже области просмотра, который будет предварительно переведён для экономии затрат на API
-      margin:
-        title: Расстояние предзагрузки (в пикселях)
-        description: Насколько ниже области просмотра начинать перевод контента. Меньшие значения экономят затраты на API, но могут вызвать задержки при прокрутке.
-      threshold:
-        title: Порог видимости
-        description: Процент видимости элемента, необходимый для запуска перевода (0-1). Более высокие значения откладывают перевод до тех пор, пока больше элемента не станет видимым.
-    smallParagraphFilter:
-      title: Фильтр коротких текстов
-      description: Пропускать перевод текстовых узлов с меньшим количеством символов или слов, чем порог (0 = отключено)
-      minCharacters:
-        title: Минимальное количество символов
-        description: Текстовые узлы с меньшим количеством символов не будут переведены. Количество символов включает пробелы.
-      minWords:
-        title: Минимальное количество слов
-        description: Текстовые узлы с меньшим количеством слов не будут переведены. Используется Intl.Segmenter для точного подсчёта слов на всех языках.
-      error: Значение должно быть от $1 до $2
-    nodeTranslationHotkey:
-      title: Горячая клавиша перевода при наведении или долгом нажатии
-      description: Настройте клавишу-модификатор для перевода при наведении или используйте долгое нажатие для перевода абзацев
-      enable: Включить
-    llmProviderConfigured: LLM-провайдер выбран для $1
-    llmProviderNotConfigured: LLM-провайдер не выбран для $1
-    aiContentAware:
-      title: Умный контекстный перевод ИИ
-      description: Улучшайте качество перевода, предоставляя ИИ контекст веб-страницы
-      enable: Включить умный контекстный перевод ИИ
-      enableDescription: ИИ использует резюме веб-страницы для повышения точности перевода. Требуется LLM-провайдер. Добавляет задержку при начале перевода страницы и увеличивает затраты на API.
-  config:
-    title: Конфигурация
-    about:
-      title: О приложении
-      description: Plainly появился в апреле 2025 года
-      mission: Plainly стремится расширить равный доступ к качественному образованию в эпоху ИИ, делая обучение, максимально похожее на занятия с настоящим преподавателем, доступным по цене в языках, медицине и других знанияемких областях.
-    resetConfig:
-      title: Сбросить конфигурацию
-      description: Сбросить все настройки до значений по умолчанию
+        weakened: Приглушённый
+        textColor: Цветной
+        dashedLine: Пунктирное подчёркивание
+        background: Выделение
+        blockquote: Полоса цитаты
+        border: Рамка
+        blur: Показ при наведении
+      cssPlaceholder: |
+        /* Пример: цвет и выделение перевода */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: Сохранить
+        saved: Сохранено
+        validating: Проверка…
+        valid: CSS корректен
+        syntaxError: CSS содержит синтаксические ошибки
+        tooLong: CSS слишком длинный
+        allSaved: Все изменения сохранены
+    range:
+      title: Переводить
+      main: Основное содержимое
+      all: Всю страницу
+    shortcut:
+      title: Горячая клавиша
+  quality:
+    title: Качество перевода
+    context:
+      title: Учитывать контекст страницы
+    prompt:
+      title: Промпт
+      default: По умолчанию
+  advanced:
+    title: Дополнительно
+    rate: Запросов в секунду
+    capacity: Одновременных запросов
+    maxCharactersPerBatch: Символов в запросе
+    maxItemsPerBatch: Абзацев в запросе
+    preloadMargin: Переводить заранее за пределами экрана (px)
+    preloadThreshold: Видимая доля перед переводом
+    minCharacters: Пропускать абзацы короче N символов
+    minWords: Пропускать абзацы короче N слов
+    minError: Значение должно быть не меньше $1
+    rangeError: Значение должно быть от $1 до $2
+    cache:
+      title: Кэш переводов
+      clear: Очистить
+      clearing: Очистка…
       dialog:
-        title: Сбросить конфигурацию
-        trigger: Сбросить конфигурацию
-        confirm: Подтвердить
+        title: Очистить кэш переводов?
+        description: Все сохранённые переводы и краткие содержания страниц будут удалены. Страницы будут переведены заново по запросу.
+        confirm: Очистить
         cancel: Отмена
-        description: Эта операция очистит все ваши пользовательские конфигурации и сбросит их до значений по умолчанию. Пожалуйста, подтвердите.
-translateService:
-  title: Сервис перевода
-  description: Только для перевода веб-страницы
-  normalTranslator: Обычный переводчик
-  aiTranslator: ИИ-переводчик
-  selectServices: Выберите сервисы
-  translationProviders: Сервисы перевода
-  configureAPI: Настроить API
-translatePrompt:
-  title: Стиль ИИ-перевода
-  description: Выберите промпт для использования во время перевода. Добавляйте или изменяйте пользовательские промпты на странице настроек.
-noAPIKeyConfig:
-  warning: Если вы хотите использовать ИИ-модели, сначала установите API-ключ на странице настроек
-  warningWithLink:
-    youMust: Вы должны
-    setTheAPIKey: установить API-ключ
-    firstOnThe: сначала на странице
-    optionsPage: настроек
-    page: ""
+  appearance:
+    title: Внешний вид
+    system: Системная
+    light: Светлая
+    dark: Тёмная
+  reset:
+    title: Все настройки
+    dialog:
+      title: Сбросить все настройки?
+      description: Все настройки, включая API-ключи и промпты, вернутся к значениям по умолчанию.
+      confirm: Сбросить
+      cancel: Отмена
 translation:
   sameLanguage: Исходный и целевой языки должны различаться
-  autoModeSameLanguage: Обнаруженный язык '$1' совпадает с целевым языком
+  noApiKey: Сначала добавьте API-ключ. Нажмите на значок Plainly на панели инструментов, чтобы настроить его.
+  failed: Не удалось перевести
+  retry: Повторить
+  unknownError: Что-то пошло не так
+setupPreview:
+  provider: Сервис перевода
+  model: Модель
+  apiKey: API-ключ
+  keyNew: новый ключ
+  keyReused: сохранённый ключ остаётся
+  keyMissing: отсутствует
+  host: Текст страницы отправляется в
+  thinking: Режим размышления выключен
+  yes: Да
+  no: Нет
+  unset: Не задано
+  languages: Целевой язык · отображение
+  unchanged: Без изменений
+agentInstructions:
+  noConfiguration: (пока нет)
+  text: |
+    Я перевожу веб-страницы с помощью расширения браузера Plainly (素读). Пожалуйста, настрой для меня его сервис перевода.
+    Сначала прочитай руководство: $1
+    Действуй по нему: спроси, какой сервис я хочу, где мой API-ключ и на каком языке я читаю. Проверь запрос с моим ключом по шаблону из руководства, пока запрос не пройдёт успешно. Запиши JSON конфигурации в мой буфер обмена. Затем скажи мне вставить его во всплывающее окно Plainly и применить.
+    Моя текущая конфигурация, ключ скрыт:
+    $2
 shortcutKeySelector:
-  placeholder: Пожалуйста, введите горячую клавишу
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: Обратный апостроф
-  clickAndHold: Нажмите и удерживайте
+  placeholder: Нажмите сочетание клавиш
 languages:
   eng: Английский
   cmn: Упрощённый китайский

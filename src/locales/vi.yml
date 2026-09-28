@@ -1,35 +1,42 @@
 name: Plainly
-extName: Plainly - Dịch và học
-extDescription: Plainly là tiện ích mở rộng trình duyệt mã nguồn mở được thiết kế để giúp bạn học ngôn ngữ sâu từ bất kỳ trang web nào.
-dataTypes:
-  string: Văn bản
-  number: Số
+extName: Plainly
+extDescription: Dịch trang web bạn đang đọc, và không làm gì khác.
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: Tìm ngôn ngữ…
+  noLanguagesFound: Không tìm thấy ngôn ngữ
 popup:
-  theme: Chủ đề
-  autoLang: Tự động
-  sourceLang: Nguồn
-  targetLang: Đích
-  translate: Dịch
+  auto: tự động
+  autoDetected: Tự động phát hiện
+  sourceLanguage: Ngôn ngữ nguồn
+  targetLanguage: Ngôn ngữ đích
+  translateInto: Dịch sang
+  displayMode: Hiển thị
+  bilingual: Song ngữ
+  translationOnly: Chỉ bản dịch
+  translate: Dịch trang này
   showOriginal: Hiển thị bản gốc
-  options: Tùy chọn
-  hover: Di chuột
-  translateParagraph: để dịch đoạn văn
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: Hiện tại là song ngữ
-        action: Nhấp để chuyển sang chỉ bản dịch
-      translationOnly:
-        current: Hiện tại chỉ bản dịch
-        action: Nhấp để chuyển sang song ngữ
-  aiSmartContext: Ngữ cảnh thông minh AI
-  aiSmartContextDescription: Sử dụng ngữ cảnh trang web để cải thiện chất lượng dịch. Yêu cầu nhà cung cấp dịch LLM.
+  translating: Đang dịch
+  translated: Đã dịch
+  paragraphCount: $1 đoạn
+  failedCount: $1 lỗi
+  notTranslatable: Không thể dịch trang này.
+  settings: Cài đặt
+  provider:
+    none: Chưa có dịch vụ
+    missingKey: chưa có khóa
+  setup:
+    title: Chưa có dịch vụ dịch
+    description: Đưa hướng dẫn cho agent của bạn. Agent sẽ xác minh một cấu hình bằng khóa của bạn và đặt nó vào bộ nhớ tạm; hãy dán vào bên dưới.
+    copyInstructions: Sao chép hướng dẫn cho agent
+    copied: Đã sao chép
+    pasteLabel: Cấu hình từ agent của bạn
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: cấu hình không có API Key
+    apply: Áp dụng và dịch trang này
+    applyOnly: Áp dụng
 errorRecovery:
   title: Đã xảy ra sự cố
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: Chế độ khôi phục đang bật. Hãy tải lại trang hoặc đặt lại cài đặt rồi thử lại.
   recoveryTitle: Tùy chọn khôi phục
   refreshPage: Tải lại trang
   resetAction: Đặt lại về cài đặt mặc định
@@ -38,302 +45,142 @@ errorRecovery:
   errorDetails: Chi tiết lỗi
   resetDialog:
     title: Đặt lại cài đặt?
-    description: Cài đặt hiện tại sẽ bị thay thế bằng giá trị mặc định.
+    description: Cài đặt hiện tại sẽ được thay bằng giá trị mặc định.
     confirm: Đặt lại
     cancel: Hủy
 options:
-  commandPalette:
-    placeholder: Tìm kiếm cài đặt...
-    noResults: Không tìm thấy cài đặt
-  sidebar:
-    settings: Cài đặt
-  setAPIKeyWarning:
-    please: Vui lòng đặt API Key trên trang
-    page: cài đặt
-  apiProviders:
-    title: Nhà cung cấp API
-    description: Cấu hình các nhà cung cấp API cho chức năng dịch và phân tích từ vựng tại đây. Chúng tôi có hơn 20 nhà cung cấp tích hợp sẵn và hỗ trợ mọi API tương thích OpenAI.
-    addProvider: Thêm nhà cung cấp
-    badges:
-      featureCount: $1 tính năng
-    dialog:
-      title: Thêm nhà cung cấp mới
-      groups:
-        builtInProviders:
-          title: Nhà cung cấp LLM tích hợp sẵn
-          description: Các nhà cung cấp mô hình ngôn ngữ lớn tích hợp sẵn, không cần điền hầu hết các cấu hình như Base URL
-        openaiCompatibleProviders:
-          title: Nhà cung cấp tùy chỉnh tương thích OpenAI
-          description: Nếu bạn không tìm thấy nhà cung cấp AI mong muốn, chọn Nhà cung cấp tùy chỉnh để cấu hình bất kỳ nhà cung cấp tương thích OpenAI nào, như Zhipu AI
-        pureTranslationProviders:
-          title: Nhà cung cấp dịch thuật thuần túy
-          description: Các nhà cung cấp tập trung vào tính năng dịch thuật mà không có khả năng mô hình ngôn ngữ lớn
-    form:
-      fields:
-        name: Tên
-        description: Mô tả
-        apiKey: API Key
-        baseURL: Base URL
-        optional: Tùy chọn
-      duplicate: Sao chép
-      delete: Xóa
-      deleteDialog:
-        title: Xóa nhà cung cấp?
-        description: Hành động này không thể hoàn tác. Các tính năng sử dụng nhà cung cấp này sẽ được tự động chuyển sang nhà cung cấp khả dụng khác.
+  title: Cài đặt
+  service:
+    title: Dịch vụ dịch
+    status:
+      none: Không có dịch vụ
+      unconfigured: Chưa có khóa
+      configured: Chưa kiểm tra
+      testing: Đang kiểm tra…
+      ok: Đã kết nối
+      failed: Kết nối thất bại
+    testConnection: Kiểm tra kết nối
+    sendsTo: Văn bản trang được gửi đến $1
+    copyInstructions: Sao chép hướng dẫn cho agent
+    copied: Đã sao chép
+    paste:
+      open: Dán cấu hình
+      label: Cấu hình từ agent của bạn
+      keyMissing: Cấu hình không có API Key.
+      cancel: Hủy
+      apply: Áp dụng
+      applying: Đang xác nhận…
+  reading:
+    title: Đọc
+    mode:
+      title: Hiển thị
+      bilingual: Song ngữ
+      translationOnly: Chỉ bản dịch
+    style:
+      title: Kiểu bản dịch
+      custom: CSS tùy chỉnh
+      presets:
+        line: Đường mảnh
+        default: Không
+        weakened: Nhạt
+        textColor: Tô màu
+        dashedLine: Gạch chân nét đứt
+        background: Tô nền
+        blockquote: Thanh trích dẫn
+        border: Viền
+        blur: Hiện khi di chuột
+      cssPlaceholder: |
+        /* Ví dụ: tô màu và tô nền cho bản dịch */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: Lưu
+        saved: Đã lưu
+        validating: Đang kiểm tra…
+        valid: CSS hợp lệ
+        syntaxError: CSS có lỗi cú pháp
+        tooLong: CSS quá dài
+        allSaved: Đã lưu mọi thay đổi
+    range:
+      title: Phạm vi dịch
+      main: Nội dung chính
+      all: Toàn bộ trang
+    shortcut:
+      title: Phím tắt
+  quality:
+    title: Chất lượng bản dịch
+    context:
+      title: Dùng ngữ cảnh trang
+    prompt:
+      title: Prompt
+      default: Mặc định
+  advanced:
+    title: Nâng cao
+    rate: Số yêu cầu mỗi giây
+    capacity: Số yêu cầu chạy cùng lúc
+    maxCharactersPerBatch: Số ký tự mỗi yêu cầu
+    maxItemsPerBatch: Số đoạn mỗi yêu cầu
+    preloadMargin: Dịch trước phần ngoài vùng nhìn thấy (px)
+    preloadThreshold: Tỷ lệ hiển thị trước khi dịch
+    minCharacters: Bỏ qua đoạn ngắn hơn N ký tự
+    minWords: Bỏ qua đoạn ngắn hơn N từ
+    minError: Giá trị phải ít nhất là $1
+    rangeError: Giá trị phải từ $1 đến $2
+    cache:
+      title: Bộ nhớ đệm bản dịch
+      clear: Xóa
+      clearing: Đang xóa…
+      dialog:
+        title: Xóa bộ nhớ đệm bản dịch?
+        description: Mọi bản dịch và bản tóm tắt trang đã lưu sẽ bị xóa. Các trang sẽ được dịch lại khi cần.
         confirm: Xóa
         cancel: Hủy
-      atLeastOneLLMProvider: Cần ít nhất một nhà cung cấp dịch LLM.
-      duplicateProviderName: 'Tên nhà cung cấp trùng lặp "$1"'
-      defaultProvider:
-        translate: Đặt làm nhà cung cấp dịch mặc định
-      models:
-        translate:
-          title: Mô hình dịch
-          customTitle: Mô hình dịch tùy chỉnh
-          placeholder: Chọn mô hình
-        fetchModels: Lấy các mô hình có sẵn
-        fetchError: Không thể lấy mô hình
-        clickToRetry: Nhấp để thử lại
-        noModels: Không có mô hình nào
-        selectModel: Chọn mô hình
-        apiKeyRequired: Vui lòng thêm khóa API trước
-        searchModels: Tìm kiếm mô hình...
-        noModelsFound: Không tìm thấy mô hình
-      featureProviders: Nhà cung cấp tính năng
-      advancedOptions: Tùy chọn nâng cao
-      providerSettingLabels:
-        region: Khu vực
-      temperature: Nhiệt độ
-      temperatureHint: Kiểm soát tính ngẫu nhiên trong phản hồi. Giá trị thấp (0) mang tính xác định hơn, giá trị cao mang tính sáng tạo hơn. Phạm vi thay đổi theo nhà cung cấp. Để trống để sử dụng giá trị mặc định của nhà cung cấp.
-      headers: Header
-      headersHint: Header HTTP tùy chỉnh được gửi khi tạo client nhà cung cấp AI. Để trống để dùng mặc định của nhà cung cấp; dùng {} để tắt mặc định.
-      providerOptions: Tùy chọn nhà cung cấp
-      providerOptionsHint: Các tùy chọn dành riêng cho nhà cung cấp cho các tính năng API không chuẩn như chế độ suy nghĩ/lập luận. Xem tài liệu Vercel AI SDK hoặc tài liệu chính thức của nhà cung cấp để biết chi tiết cấu hình.
-      providerOptionsDocsLink: Xem Tài liệu Nhà cung cấp
-      providerOptionsRecommendationTrigger: Xem tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationTitle: Đã phát hiện tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationDescription: Hãy xem lại và tự áp dụng cấu hình được đề xuất.
-      providerOptionsRecommendationApply: Áp dụng
-      providerOptionsRecommendationApplied: Đã áp dụng
-      invalidJson: Định dạng JSON không hợp lệ
-    providers:
-      description:
-        openai: Cung cấp các mô hình như GPT-4o
-        deepseek: Khuyến nghị sử dụng ở Trung Quốc
-        openaiCompatible: Bên thứ ba và tương thích API OpenAI
-    apiKey:
-      showAPIKey: Hiển thị API Key
-    howToConfigure: Cấu hình như thế nào?
-    testConnection:
-      button: Kiểm tra kết nối
-      testing: Đang kiểm tra...
-  general:
-    title: Chung
-    appearance:
-      title: Giao diện
-      theme: Chủ đề
-      system: Hệ thống
-      light: Sáng
-      dark: Tối
-    featureProviders:
-      title: Nhà cung cấp tính năng
-      description: Chọn nhà cung cấp sử dụng cho mỗi tính năng
-      features:
-        translate: Dịch trang
-    translationConfig:
-      model:
-        title: Mô hình
-        enterCustomModel: Nhập tên mô hình tùy chỉnh
-    clearCache:
-      title: Xóa bộ nhớ đệm
-      description: Xóa tất cả bộ nhớ đệm dịch trong trình duyệt của bạn
-      clearing: Đang xóa...
-      dialog:
-        title: Xóa bộ nhớ đệm
-        trigger: Xóa bộ nhớ đệm
-        confirm: Xác nhận
-        cancel: Hủy
-        description: Thao tác này sẽ xóa tất cả bộ nhớ đệm dịch. Hành động này không thể hoàn tác.
-  translation:
-    title: Dịch thuật
-    requestQueueConfig:
-      title: Tốc độ dịch
-      firstOnDescription: Điều chỉnh tốc độ xử lý yêu cầu dịch bằng
-      lastOnDescription: thuật toán
-      capacity:
-        title: Số lượng yêu cầu burst tối đa
-        description: Số lượng yêu cầu burst tạm thời được phép xác định số lượng yêu cầu tối đa có thể được xử lý đồng thời trong một khoảng thời gian ngắn
-      rate:
-        title: Số yêu cầu trung bình mỗi giây
-        description: Số yêu cầu trung bình mỗi giây, nhưng cho phép cấu hình số lượng burst tối đa để gửi tạm thời các yêu cầu vượt quá
-    batchQueueConfig:
-      title: Dịch theo lô
-      description: Cấu hình giới hạn ký tự và số đoạn văn tối đa cho dịch theo lô (chỉ có hiệu lực với dịch LLM)
-      maxCharactersPerBatch:
-        title: Số ký tự tối đa
-        description: Số ký tự tối đa được phép cho mỗi yêu cầu lô để kiểm soát khối lượng nội dung của mỗi bản dịch
-      maxItemsPerBatch:
-        title: Số đoạn văn tối đa
-        description: Số đoạn văn tối đa cho mỗi bản dịch lô để kiểm soát khối lượng nội dung của mỗi bản dịch
-    personalizedPrompts:
-      title: Prompt cá nhân hóa
-      description: Tùy chỉnh các loại Prompt khác nhau cho phép bạn tự điều chỉnh loại Prompt trong quá trình dịch. Prompt là văn bản mà người dùng gửi cho LLM.
-      addPrompt: Thêm Prompt
-      default: Mặc định
-      importSuccess: Nhập thành công
-      import: Nhập
-      export: Xuất
-      current: đang sử dụng
-      editPrompt:
-        title: Chỉnh sửa Prompt
-        name: Tên
-        systemPrompt: System Prompt
-        prompt: Prompt
-        promptCellInput:
-          input: Nội dung văn bản để dịch
-          targetLanguage: Ngôn ngữ đích
-          webTitle: Tiêu đề trang web
-          webDescription: Mô tả trang web từ siêu dữ liệu trang
-          webContent: Nội dung trang web (bị cắt còn 2000 ký tự đầu)
-          webSummary: Tóm tắt trang web (yêu cầu Ngữ cảnh thông minh AI)
-        save: Lưu thay đổi
-        close: Hủy
-      deletePrompt:
-        title: Xóa Prompt
-        description: Xác nhận xóa prompt
-        confirm: Xác nhận
-        cancel: Hủy
-      exportPrompt:
-        exportSelected: Xuất đã chọn
-        cancel: Hủy
-    translationStyle:
-      title: Kiểu hiển thị bản dịch
-      description: Đặt bất kỳ kiểu nào bạn muốn để phân biệt kết quả dịch với văn bản gốc
-      useCustomStyle: Sử dụng kiểu CSS tùy chỉnh
-      useCustomStyleDescription: Hỗ trợ bất kỳ CSS nào, bao gồm phông chữ, hoạt ảnh và kiểu dành riêng cho ngôn ngữ
-      presetStyle: Kiểu có sẵn
-      cssEditor: Trình chỉnh sửa CSS
-      preview: Xem trước
-      stylePreviewLanguage: Ngôn ngữ
-      stylePreviewDirection: Hướng
-      stylePreviewTranslatedText: Văn bản đã dịch
-      style:
-        default: Không
-        blur: Hiệu ứng mờ
-        blockquote: Trích dẫn
-        weakened: Làm mờ
-        dashedLine: Đường nét đứt
-        border: Viền
-        textColor: Màu chữ
-        background: Nền
-      customCSS:
-        editor:
-          placeholder: |
-            /* Ví dụ: Kiểu tùy chỉnh với màu sắc và nền */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: Lưu
-          savedButton: Đã lưu
-          validation:
-            validating: Đang xác thực...
-            valid: CSS hợp lệ
-            syntaxError: CSS có lỗi cú pháp
-            tooLong: CSS quá dài
-            saved: Tất cả thay đổi đã được lưu
-    translationMode:
-      title: Chế độ dịch
-      description: "Chọn cách hiển thị văn bản đã dịch: song ngữ hoặc chỉ bản dịch."
-      mode:
-        bilingual: Song ngữ
-        translationOnly: Chỉ bản dịch
-    translateRange:
-      title: Phạm vi dịch
-      description: Chọn chỉ dịch nội dung chính hay tất cả nội dung trên trang.
-      range:
-        main: Nội dung chính
-        all: Tất cả nội dung
-    pageTranslationShortcut:
-      title: Phím tắt dịch trang
-      description: Tùy chỉnh phím tắt để dịch toàn bộ trang web
-    preloadConfig:
-      title: Phạm vi dịch trước
-      description: Kiểm soát lượng nội dung bên dưới vùng nhìn được dịch trước để tiết kiệm chi phí API
-      margin:
-        title: Khoảng cách tải trước (pixel)
-        description: Khoảng cách bên dưới vùng nhìn để bắt đầu dịch nội dung. Giá trị thấp hơn tiết kiệm chi phí API nhưng có thể gây chậm trễ khi cuộn.
-      threshold:
-        title: Ngưỡng hiển thị
-        description: Tỷ lệ phần trăm hiển thị của phần tử cần thiết để kích hoạt dịch (0-1). Giá trị cao hơn sẽ trì hoãn dịch cho đến khi nhiều phần tử hơn được hiển thị.
-    smallParagraphFilter:
-      title: Bộ lọc văn bản ngắn
-      description: Bỏ qua dịch các nút văn bản có ít ký tự hoặc từ hơn ngưỡng (0 = tắt)
-      minCharacters:
-        title: Số ký tự tối thiểu
-        description: Các nút văn bản có ít ký tự hơn giá trị này sẽ không được dịch. Số ký tự bao gồm khoảng trắng.
-      minWords:
-        title: Số từ tối thiểu
-        description: Các nút văn bản có ít từ hơn giá trị này sẽ không được dịch. Sử dụng Intl.Segmenter để đếm từ chính xác trên tất cả các ngôn ngữ.
-      error: Giá trị phải từ $1 đến $2
-    nodeTranslationHotkey:
-      title: Phím tắt dịch khi di chuột hoặc nhấn giữ
-      description: Tùy chỉnh phím bổ trợ khi di chuột hoặc dùng nhấn giữ để dịch đoạn văn
-      enable: Bật
-    llmProviderConfigured: Đã chọn nhà cung cấp LLM cho $1
-    llmProviderNotConfigured: Chưa chọn nhà cung cấp LLM cho $1
-    aiContentAware:
-      title: Dịch ngữ cảnh thông minh AI
-      description: Nâng cao chất lượng dịch bằng cách cung cấp ngữ cảnh trang web cho AI
-      enable: Bật dịch ngữ cảnh thông minh AI
-      enableDescription: AI sử dụng tóm tắt trang web để cải thiện độ chính xác dịch. Yêu cầu nhà cung cấp LLM. Thêm độ trễ khi bắt đầu dịch trang và tăng chi phí API.
-  config:
-    title: Cấu hình
-    about:
-      title: Giới thiệu
-      description: Plainly ra đời vào tháng 4 năm 2025
-      mission: Plainly hướng tới việc mở rộng cơ hội tiếp cận bình đẳng với giáo dục chất lượng cao trong thời đại AI bằng cách mang lại trải nghiệm học tập gần với cảm giác được giáo viên thật hướng dẫn, nhưng với chi phí hợp lý hơn trong học ngôn ngữ, y học và các lĩnh vực giàu tri thức khác.
-    resetConfig:
-      title: Đặt lại cấu hình
-      description: Đặt lại tất cả cấu hình về giá trị mặc định
-      dialog:
-        title: Đặt lại cấu hình
-        trigger: Đặt lại cấu hình
-        confirm: Xác nhận
-        cancel: Hủy
-        description: Thao tác này sẽ xóa tất cả cấu hình tùy chỉnh của bạn và đặt lại về giá trị mặc định. Vui lòng xác nhận.
-translateService:
-  title: Dịch vụ dịch thuật
-  description: Chỉ để dịch trang web
-  normalTranslator: Trình dịch thông thường
-  aiTranslator: Trình dịch AI
-  selectServices: Chọn dịch vụ
-  translationProviders: Dịch vụ dịch thuật
-  configureAPI: Cấu hình API
-translatePrompt:
-  title: Kiểu dịch AI
-  description: Chọn một Prompt để sử dụng trong quá trình dịch. Thêm hoặc sửa đổi Prompt tùy chỉnh trên trang tùy chọn.
-noAPIKeyConfig:
-  warning: Nếu bạn muốn sử dụng mô hình AI, vui lòng đặt API key trên trang tùy chọn trước
-  warningWithLink:
-    youMust: Bạn phải
-    setTheAPIKey: đặt API key
-    firstOnThe: trước trên trang
-    optionsPage: tùy chọn
-    page: ""
+  appearance:
+    title: Giao diện
+    system: Hệ thống
+    light: Sáng
+    dark: Tối
+  reset:
+    title: Mọi cài đặt
+    dialog:
+      title: Đặt lại mọi cài đặt?
+      description: Mọi cài đặt, kể cả API Key và prompt, sẽ trở về giá trị mặc định.
+      confirm: Đặt lại
+      cancel: Hủy
 translation:
   sameLanguage: Ngôn ngữ nguồn và đích phải khác nhau
-  autoModeSameLanguage: Ngôn ngữ phát hiện '$1' giống với ngôn ngữ đích
+  noApiKey: Hãy thêm API Key trước. Nhấp vào biểu tượng Plainly trên thanh công cụ để cài đặt.
+  failed: Dịch thất bại
+  retry: Thử lại
+  unknownError: Đã xảy ra sự cố
+setupPreview:
+  provider: Dịch vụ dịch
+  model: Mô hình
+  apiKey: API Key
+  keyNew: khóa mới
+  keyReused: giữ khóa đã lưu
+  keyMissing: thiếu
+  host: Văn bản trang được gửi đến
+  thinking: Tắt chế độ suy nghĩ
+  yes: Có
+  no: Không
+  unset: Chưa đặt
+  languages: Ngôn ngữ đích · hiển thị
+  unchanged: Không đổi
+agentInstructions:
+  noConfiguration: (chưa có)
+  text: |
+    Tôi dùng tiện ích trình duyệt Plainly (素读) để dịch trang web. Hãy thiết lập dịch vụ dịch của nó cho tôi.
+    Trước hết hãy đọc hướng dẫn: $1
+    Làm theo hướng dẫn: hỏi tôi muốn dùng dịch vụ nào, API Key của tôi ở đâu và tôi đọc bằng ngôn ngữ nào. Xác minh bằng khóa của tôi với mẫu yêu cầu trong hướng dẫn cho đến khi một yêu cầu thành công. Ghi JSON cấu hình vào bộ nhớ tạm của tôi. Sau đó bảo tôi dán nó vào cửa sổ bật lên của Plainly và áp dụng.
+    Cấu hình hiện tại của tôi, khóa đã được che:
+    $2
 shortcutKeySelector:
-  placeholder: Vui lòng nhập phím tắt
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: Dấu huyền
-  clickAndHold: Nhấn và giữ
+  placeholder: Nhấn một phím tắt
 languages:
   eng: Tiếng Anh
   cmn: Tiếng Trung giản thể
