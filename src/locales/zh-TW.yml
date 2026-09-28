@@ -157,20 +157,6 @@ translation:
   failed: 翻譯失敗
   retry: 重試
   unknownError: 發生錯誤
-setupPreview:
-  provider: 翻譯服務
-  model: 模型
-  apiKey: API 金鑰
-  keyNew: 新金鑰
-  keyReused: 沿用已儲存的金鑰
-  keyMissing: 缺少
-  host: 網頁文字會傳送到
-  thinking: 關閉思考模式
-  yes: 是
-  no: 否
-  unset: 未設定
-  languages: 目標語言 · 顯示方式
-  unchanged: 不變
 agentInstructions:
   noConfiguration: （尚未設定）
   text: |

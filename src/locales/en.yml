@@ -157,20 +157,6 @@ translation:
   failed: Translation failed
   retry: Retry
   unknownError: Something went wrong
-setupPreview:
-  provider: Translation service
-  model: Model
-  apiKey: API Key
-  keyNew: new key
-  keyReused: stored key kept
-  keyMissing: missing
-  host: Page text goes to
-  thinking: Thinking off
-  yes: Yes
-  no: No
-  unset: Not set
-  languages: Target language · display
-  unchanged: Unchanged
 agentInstructions:
   noConfiguration: (none yet)
   text: |

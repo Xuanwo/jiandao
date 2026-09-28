@@ -157,20 +157,6 @@ translation:
   failed: 翻訳に失敗しました
   retry: 再試行
   unknownError: 問題が発生しました
-setupPreview:
-  provider: 翻訳サービス
-  model: モデル
-  apiKey: API キー
-  keyNew: 新しいキー
-  keyReused: 保存済みのキーを使用
-  keyMissing: なし
-  host: ページのテキストの送信先
-  thinking: 思考モードをオフ
-  yes: はい
-  no: いいえ
-  unset: 未設定
-  languages: ターゲット言語 · 表示
-  unchanged: 変更なし
 agentInstructions:
   noConfiguration: （まだありません）
   text: |

@@ -157,20 +157,6 @@ translation:
   failed: Dịch thất bại
   retry: Thử lại
   unknownError: Đã xảy ra sự cố
-setupPreview:
-  provider: Dịch vụ dịch
-  model: Mô hình
-  apiKey: API Key
-  keyNew: khóa mới
-  keyReused: giữ khóa đã lưu
-  keyMissing: thiếu
-  host: Văn bản trang được gửi đến
-  thinking: Tắt chế độ suy nghĩ
-  yes: Có
-  no: Không
-  unset: Chưa đặt
-  languages: Ngôn ngữ đích · hiển thị
-  unchanged: Không đổi
 agentInstructions:
   noConfiguration: (chưa có)
   text: |

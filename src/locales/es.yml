@@ -157,20 +157,6 @@ translation:
   failed: Error de traducción
   retry: Reintentar
   unknownError: Algo salió mal
-setupPreview:
-  provider: Servicio de traducción
-  model: Modelo
-  apiKey: Clave API
-  keyNew: clave nueva
-  keyReused: se mantiene la clave guardada
-  keyMissing: falta
-  host: El texto de la página va a
-  thinking: Razonamiento desactivado
-  yes: Sí
-  no: No
-  unset: Sin definir
-  languages: Idioma de destino · visualización
-  unchanged: Sin cambios
 agentInstructions:
   noConfiguration: (aún ninguna)
   text: |

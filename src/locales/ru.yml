@@ -157,20 +157,6 @@ translation:
   failed: Не удалось перевести
   retry: Повторить
   unknownError: Что-то пошло не так
-setupPreview:
-  provider: Сервис перевода
-  model: Модель
-  apiKey: API-ключ
-  keyNew: новый ключ
-  keyReused: сохранённый ключ остаётся
-  keyMissing: отсутствует
-  host: Текст страницы отправляется в
-  thinking: Режим размышления выключен
-  yes: Да
-  no: Нет
-  unset: Не задано
-  languages: Целевой язык · отображение
-  unchanged: Без изменений
 agentInstructions:
   noConfiguration: (пока нет)
   text: |

@@ -157,20 +157,6 @@ translation:
   failed: Çeviri başarısız oldu
   retry: Yeniden dene
   unknownError: Bir sorun oluştu
-setupPreview:
-  provider: Çeviri hizmeti
-  model: Model
-  apiKey: API Anahtarı
-  keyNew: yeni anahtar
-  keyReused: kayıtlı anahtar korunuyor
-  keyMissing: eksik
-  host: Sayfa metninin gittiği yer
-  thinking: Düşünme kapalı
-  yes: Evet
-  no: Hayır
-  unset: Ayarlanmadı
-  languages: Hedef dil · görünüm
-  unchanged: Değişmedi
 agentInstructions:
   noConfiguration: (henüz yok)
   text: |

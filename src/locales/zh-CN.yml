@@ -157,20 +157,6 @@ translation:
   failed: 翻译失败
   retry: 重试
   unknownError: 出了点问题
-setupPreview:
-  provider: 翻译服务
-  model: 模型
-  apiKey: API Key
-  keyNew: 新密钥
-  keyReused: 沿用已存密钥
-  keyMissing: 缺少
-  host: 网页文本会发往
-  thinking: 关闭思考模式
-  yes: 是
-  no: 否
-  unset: 未设置
-  languages: 目标语言 · 显示
-  unchanged: 不变
 agentInstructions:
   noConfiguration: （尚未配置）
   text: |

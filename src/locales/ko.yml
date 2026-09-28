@@ -157,20 +157,6 @@ translation:
   failed: 번역 실패
   retry: 다시 시도
   unknownError: 문제가 발생했습니다
-setupPreview:
-  provider: 번역 서비스
-  model: 모델
-  apiKey: API 키
-  keyNew: 새 키
-  keyReused: 저장된 키 유지
-  keyMissing: 없음
-  host: 페이지 텍스트 전송 대상
-  thinking: 사고 모드 끄기
-  yes: 예
-  no: 아니요
-  unset: 설정 안 됨
-  languages: 대상 언어 · 표시
-  unchanged: 변경 없음
 agentInstructions:
   noConfiguration: (아직 없음)
   text: |
