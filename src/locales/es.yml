@@ -1,35 +1,42 @@
 name: Plainly
-extName: Plainly - Traduce y aprende
-extDescription: Plainly es una extensión de navegador de código abierto diseñada para ayudarte a aprender idiomas en profundidad desde cualquier sitio web.
-dataTypes:
-  string: Texto
-  number: Número
+extName: Plainly
+extDescription: Traduce la página web que estás leyendo y nada más.
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: Buscar idiomas…
+  noLanguagesFound: No se encontraron idiomas
 popup:
-  theme: Tema
-  autoLang: Auto
-  sourceLang: Origen
-  targetLang: Destino
-  translate: Traducir
+  auto: automático
+  autoDetected: Detectado automáticamente
+  sourceLanguage: Idioma de origen
+  targetLanguage: Idioma de destino
+  translateInto: Traducir a
+  displayMode: Visualización
+  bilingual: Bilingüe
+  translationOnly: Solo traducción
+  translate: Traducir esta página
   showOriginal: Mostrar original
-  options: Opciones
-  hover: Pasar el cursor
-  translateParagraph: para traducir el párrafo
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: Modo bilingüe actual
-        action: Haz clic para cambiar a solo traducción
-      translationOnly:
-        current: Modo solo traducción actual
-        action: Haz clic para cambiar a bilingüe
-  aiSmartContext: Contexto inteligente de IA
-  aiSmartContextDescription: Usa el contexto de la página web para mejorar la calidad de la traducción. Requiere un proveedor de traducción LLM.
+  translating: Traduciendo
+  translated: Traducida
+  paragraphCount: $1 párrafos
+  failedCount: $1 con error
+  notTranslatable: Esta página no se puede traducir.
+  settings: Configuración
+  provider:
+    none: Aún no hay servicio
+    missingKey: sin clave
+  setup:
+    title: Aún no hay servicio de traducción
+    description: Pasa las instrucciones a tu agente. Verifica una configuración con tu clave y la copia al portapapeles; pégala abajo.
+    copyInstructions: Copiar instrucciones para tu agente
+    copied: Copiado
+    pasteLabel: Configuración de tu agente
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: la configuración no tiene clave API
+    apply: Aplicar y traducir esta página
+    applyOnly: Aplicar
 errorRecovery:
   title: Algo salió mal
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: El modo de recuperación está activo. Actualiza la página o restablece la configuración y vuelve a intentarlo.
   recoveryTitle: Opciones de recuperación
   refreshPage: Actualizar la página
   resetAction: Restablecer configuración predeterminada
@@ -38,303 +45,142 @@ errorRecovery:
   errorDetails: Detalles del error
   resetDialog:
     title: ¿Restablecer configuración?
-    description: Esto reemplazará tu configuración actual por los valores predeterminados.
+    description: Esto reemplazará tu configuración actual con los valores predeterminados.
     confirm: Restablecer
     cancel: Cancelar
 options:
-  commandPalette:
-    placeholder: Buscar configuración...
-    noResults: No se encontró configuración
-  sidebar:
-    settings: Configuración
-  setAPIKeyWarning:
-    please: Configura la clave API en
-    page: página
-  apiProviders:
-    title: Proveedores de API
-    description: Configura proveedores de API para traducción e información de vocabulario. Tenemos más de 20 proveedores integrados y admitimos cualquier proveedor de API compatible con OpenAI.
-    addProvider: Añadir proveedor
-    badges:
-      featureCount: $1 funciones
-    dialog:
-      title: Añadir nuevo proveedor
-      groups:
-        builtInProviders:
-          title: Proveedores LLM integrados
-          description: Proveedores integrados de modelos de lenguaje grandes; no hace falta completar la mayoría de configuraciones, como Base URL
-        openaiCompatibleProviders:
-          title: Proveedores personalizados compatibles con OpenAI
-          description: Si no encuentras el proveedor de AI que deseas, selecciona Proveedor personalizado para configurar cualquier proveedor compatible con OpenAI, como Zhipu AI
-        pureTranslationProviders:
-          title: Proveedores de traducción pura
-          description: Proveedores centrados en funciones de traducción sin capacidades de modelos de lenguaje grandes
-    form:
-      fields:
-        name: Nombre
-        description: Descripción
-        apiKey: Clave API
-        baseURL: Base URL
-        optional: Opcional
-      duplicate: Duplicar
-      delete: Eliminar
-      deleteDialog:
-        title: ¿Eliminar proveedor?
-        description: Esta acción no se puede deshacer. Las funciones que usan este proveedor se reasignarán automáticamente a otro proveedor disponible.
-        confirm: Eliminar
-        cancel: Cancelar
-      atLeastOneLLMProvider: Se requiere al menos un proveedor de traducción LLM.
-      providerInUseCannotDisable: 'No se puede desactivar "$1" porque actualmente lo usan $2 función(es).'
-      duplicateProviderName: 'Nombre de proveedor duplicado "$1"'
-      defaultProvider:
-        translate: Establecer como proveedor de traducción predeterminado
-      models:
-        translate:
-          title: Modelo de traducción
-          customTitle: Modelo de traducción personalizado
-          placeholder: Selecciona un modelo
-        fetchModels: Obtener modelos disponibles
-        fetchError: No se pudieron obtener los modelos
-        clickToRetry: Haz clic para reintentar
-        noModels: No hay modelos disponibles
-        selectModel: Selecciona un modelo
-        apiKeyRequired: Añade primero una clave API
-        searchModels: Buscar modelos...
-        noModelsFound: No se encontraron modelos
-      featureProviders: Proveedores de funciones
-      advancedOptions: Opciones avanzadas
-      providerSettingLabels:
-        region: Región
-      temperature: Temperatura
-      temperatureHint: Controla la aleatoriedad en las respuestas. Los valores más bajos (0) son más deterministas; los más altos son más creativos. El rango varía según el proveedor. Déjalo vacío para usar el valor predeterminado del proveedor.
-      headers: Encabezados
-      headersHint: Encabezados HTTP personalizados enviados al crear el cliente del proveedor de IA. Déjalo vacío para usar los valores predeterminados; usa {} para desactivarlos.
-      providerOptions: Opciones del proveedor
-      providerOptionsHint: Opciones específicas del proveedor para funciones API no estándar, como el modo thinking/reasoning. Consulta la documentación de Vercel AI SDK o la documentación oficial de tu proveedor para ver detalles de configuración.
-      providerOptionsDocsLink: Ver documentación del proveedor
-      providerOptionsRecommendationTrigger: Ver opciones recomendadas del proveedor
-      providerOptionsRecommendationTitle: Opciones recomendadas del proveedor detectadas
-      providerOptionsRecommendationDescription: Revisa y aplica manualmente la configuración recomendada.
-      providerOptionsRecommendationApply: Aplicar
-      providerOptionsRecommendationApplied: Aplicado
-      invalidJson: Formato JSON no válido
-    providers:
-      description:
-        openai: Proporciona modelos como GPT-4o
-        deepseek: Recomendado para usar en China
-        openaiCompatible: Compatible con API de terceros y OpenAI
-    apiKey:
-      showAPIKey: Mostrar clave API
-    howToConfigure: ¿Cómo configurar?
-    testConnection:
-      button: Probar conexión
-      testing: Probando...
-  general:
-    title: General
-    appearance:
-      title: Apariencia
-      theme: Tema
-      system: Sistema
-      light: Claro
-      dark: Oscuro
-    featureProviders:
-      title: Proveedores de funciones
-      description: Elige qué proveedor usar para cada función
-      features:
-        translate: Traducción de página
-    translationConfig:
-      model:
-        title: Modelo
-        enterCustomModel: Introduce el nombre del modelo personalizado
-    clearCache:
-      title: Borrar caché
-      description: Borra toda la caché de traducción en tu navegador
-      clearing: Borrando...
-      dialog:
-        title: Borrar caché
-        trigger: Borrar caché
-        confirm: Confirmar
-        cancel: Cancelar
-        description: Esta operación borrará toda la caché de traducción. Esta acción no se puede deshacer.
-  translation:
-    title: Traducción
-    requestQueueConfig:
-      title: Tasa de traducción
-      firstOnDescription: Ajusta la velocidad de procesamiento de las solicitudes de traducción usando el
-      lastOnDescription: algoritmo
-      capacity:
-        title: Recuento máximo de solicitudes en ráfaga
-        description: El recuento de solicitudes temporales en ráfaga permitido determina el número máximo de solicitudes que se pueden procesar de forma concurrente durante un periodo corto
-      rate:
-        title: Solicitudes promedio por segundo
-        description: Solicitudes promedio por segundo, pero permite configurar un recuento máximo en ráfaga para enviar temporalmente solicitudes excedentes
-    batchQueueConfig:
-      title: Traducción por lotes
-      description: Configura límites de caracteres y recuento máximo de párrafos para la traducción por lotes (solo efectivo para traducción LLM)
-      maxCharactersPerBatch:
-        title: Caracteres máximos
-        description: Número máximo de caracteres permitido por solicitud por lote para controlar el volumen de contenido de cada traducción
-      maxItemsPerBatch:
-        title: Recuento máximo de párrafos
-        description: Número máximo de párrafos para cada traducción por lote para controlar el volumen de contenido de cada traducción
-    personalizedPrompts:
-      title: Prompts personalizados
-      description: Personalizar distintos tipos de Prompts te permite ajustar tú mismo el tipo de Prompt durante la traducción. Un Prompt representa el texto que el usuario envía al LLM.
-      addPrompt: Añadir Prompt
-      default: Predeterminado
-      importSuccess: Importación correcta
-      import: Importar
-      export: Exportar
-      current: en uso
-      editPrompt:
-        title: Editar Prompt
-        name: Nombre
-        systemPrompt: Prompt del sistema
-        prompt: Prompt
-        promptCellInput:
-          input: Contenido de texto a traducir
-          targetLanguage: Idioma de destino
-          webTitle: Título de la página web
-          webDescription: Descripción de la página web desde los metadatos
-          webContent: Contenido de la página web (truncado a los primeros 2000 caracteres)
-          webSummary: Resumen de la página web (requiere contexto inteligente de IA)
-        save: Guardar cambios
-        close: Cancelar
-      deletePrompt:
-        title: Eliminar Prompt
-        description: Confirmar eliminación del prompt
-        confirm: Confirmar
-        cancel: Cancelar
-      exportPrompt:
-        exportSelected: Exportar seleccionados
-        cancel: Cancelar
-    translationStyle:
-      title: Estilo de visualización de traducción
-      description: Define cualquier estilo que quieras para distinguir los resultados de traducción del texto original
-      useCustomStyle: Usar estilo CSS personalizado
-      useCustomStyleDescription: Admite cualquier CSS, incluidas fuentes, animaciones y estilos específicos de idioma
-      presetStyle: Estilo preestablecido
-      cssEditor: Editor CSS
-      preview: Vista previa
-      stylePreviewLanguage: Idioma
-      stylePreviewDirection: Dirección
-      stylePreviewTranslatedText: Texto traducido
-      style:
+  title: Configuración
+  service:
+    title: Servicio de traducción
+    status:
+      none: Sin servicio
+      unconfigured: Sin clave
+      configured: Sin probar
+      testing: Probando…
+      ok: Conectado
+      failed: Error de conexión
+    testConnection: Probar conexión
+    sendsTo: El texto de la página va a $1
+    copyInstructions: Copiar instrucciones para tu agente
+    copied: Copiado
+    paste:
+      open: Pegar configuración
+      label: Configuración de tu agente
+      keyMissing: La configuración no tiene clave API.
+      cancel: Cancelar
+      apply: Aplicar
+      applying: Confirmando…
+  reading:
+    title: Lectura
+    mode:
+      title: Visualización
+      bilingual: Bilingüe
+      translationOnly: Solo traducción
+    style:
+      title: Estilo de la traducción
+      custom: CSS personalizado
+      presets:
+        line: Línea fina
         default: Ninguno
-        blur: Efecto de desenfoque
-        blockquote: Cita en bloque
         weakened: Atenuado
-        dashedLine: Línea discontinua
-        border: Borde
-        textColor: Color del texto
-        background: Fondo
-      customCSS:
-        editor:
-          placeholder: |
-            /* Example: Custom style with color and background */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: Guardar
-          savedButton: Guardado
-          validation:
-            validating: Validando...
-            valid: CSS válido
-            syntaxError: CSS tiene errores de sintaxis
-            tooLong: CSS es demasiado largo
-            saved: Todos los cambios guardados
-    translationMode:
-      title: Modo de traducción
-      description: "Elige cómo se muestra el texto traducido: bilingüe o solo traducción."
-      mode:
-        bilingual: Bilingüe
-        translationOnly: Solo traducción
-    translateRange:
-      title: Rango de traducción
-      description: Selecciona si traducir solo el contenido principal o todo el contenido de la página.
-      range:
-        main: Contenido principal
-        all: Todo el contenido
-    pageTranslationShortcut:
-      title: Atajo de traducción de página
-      description: Personaliza la tecla de atajo para traducir páginas web completas
-    preloadConfig:
-      title: Rango de pretraducción
-      description: Controla cuánto contenido por debajo de la ventana visible se pretraduce para ahorrar costes de API
-      margin:
-        title: Distancia de precarga (píxeles)
-        description: Qué tan lejos por debajo de la ventana visible empezar a traducir contenido. Los valores más bajos ahorran costes de API, pero pueden causar retrasos al desplazarse.
-      threshold:
-        title: Umbral de visibilidad
-        description: Porcentaje de visibilidad del elemento requerido para activar la traducción (0-1). Los valores más altos retrasan la traducción hasta que sea visible una mayor parte del elemento.
-    smallParagraphFilter:
-      title: Filtro de párrafos pequeños
-      description: Omitir la traducción de nodos de texto con menos caracteres o palabras que el umbral (0 = desactivado)
-      minCharacters:
-        title: Caracteres mínimos
-        description: Los nodos de texto con menos caracteres que este valor no se traducirán. El recuento de caracteres incluye espacios en blanco.
-      minWords:
-        title: Palabras mínimas
-        description: Los nodos de texto con menos palabras que este valor no se traducirán. Usa Intl.Segmenter para un recuento preciso de palabras en todos los idiomas.
-      error: El valor debe estar entre $1 y $2
-    nodeTranslationHotkey:
-      title: Atajo de traducción al pasar el cursor o mantener pulsado
-      description: Personaliza la tecla modificadora al pasar el cursor o usa pulsación larga para traducir párrafos
-      enable: Activar
-    llmProviderConfigured: Proveedor LLM seleccionado para $1
-    llmProviderNotConfigured: No se seleccionó ningún proveedor LLM para $1
-    aiContentAware:
-      title: Traducción con contexto inteligente de IA
-      description: Mejora la calidad de la traducción proporcionando contexto de la página web a la AI
-      enable: Activar traducción con contexto inteligente de IA
-      enableDescription: La AI usa el resumen de la página web para mejorar la precisión de traducción. Requiere proveedor LLM. Añade latencia al empezar a traducir una página y aumenta los costes de API.
-  config:
-    title: Configuración
-    about:
-      title: Acerca de
-      description: Plainly nació en abril de 2025
-      mission: Plainly busca ampliar el acceso igualitario a educación de alta calidad en la era de la AI haciendo asequibles experiencias de aprendizaje que se sientan más cercanas a un profesor real, en el aprendizaje de idiomas, medicina y otros campos intensivos en conocimiento.
-    resetConfig:
-      title: Restablecer configuración
-      description: Restablecer toda la configuración al valor predeterminado
+        textColor: Coloreado
+        dashedLine: Subrayado discontinuo
+        background: Resaltado
+        blockquote: Barra de cita
+        border: Contorno
+        blur: Mostrar al pasar el cursor
+      cssPlaceholder: |
+        /* Ejemplo: colorear y resaltar la traducción */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: Guardar
+        saved: Guardado
+        validating: Comprobando…
+        valid: CSS válido
+        syntaxError: El CSS tiene errores de sintaxis
+        tooLong: El CSS es demasiado largo
+        allSaved: Todos los cambios guardados
+    range:
+      title: Traducir
+      main: Contenido principal
+      all: Toda la página
+    shortcut:
+      title: Atajo
+  quality:
+    title: Calidad de la traducción
+    context:
+      title: Usar el contexto de la página
+    prompt:
+      title: Prompt
+      default: Predeterminado
+  advanced:
+    title: Avanzado
+    rate: Solicitudes por segundo
+    capacity: Solicitudes simultáneas
+    maxCharactersPerBatch: Caracteres por solicitud
+    maxItemsPerBatch: Párrafos por solicitud
+    preloadMargin: Traducir por delante del área visible (px)
+    preloadThreshold: Fracción visible antes de traducir
+    minCharacters: Omitir párrafos de menos de N caracteres
+    minWords: Omitir párrafos de menos de N palabras
+    minError: El valor debe ser al menos $1
+    rangeError: El valor debe estar entre $1 y $2
+    cache:
+      title: Caché de traducciones
+      clear: Borrar
+      clearing: Borrando…
       dialog:
-        title: Restablecer configuración
-        trigger: Restablecer configuración
-        confirm: Confirmar
+        title: ¿Borrar la caché de traducciones?
+        description: Se eliminan todas las traducciones y los resúmenes de página guardados. Las páginas se volverán a traducir cuando sea necesario.
+        confirm: Borrar
         cancel: Cancelar
-        description: Esta operación borrará todas tus configuraciones personalizadas y las restablecerá a los valores predeterminados. Confirma para continuar.
-translateService:
-  title: Servicio de traducción
-  description: Solo para traducir la página web
-  normalTranslator: Traductor normal
-  aiTranslator: Traductor AI
-  selectServices: Seleccionar servicios
-  translationProviders: Proveedores de traducción
-  configureAPI: Configurar API
-translatePrompt:
-  title: Estilo de traducción AI
-  description: Selecciona un Prompt para usar durante la traducción. Añade o modifica Prompts personalizados en la página de opciones.
-noAPIKeyConfig:
-  warning: Si quieres usar modelos AI, primero configura la clave API en la página de opciones
-  warningWithLink:
-    youMust: Debes
-    setTheAPIKey: configurar la clave API
-    firstOnThe: primero en la
-    optionsPage: opciones
-    page: página
+  appearance:
+    title: Apariencia
+    system: Sistema
+    light: Claro
+    dark: Oscuro
+  reset:
+    title: Toda la configuración
+    dialog:
+      title: ¿Restablecer toda la configuración?
+      description: Toda la configuración, incluidas las claves API y los prompts, vuelve a sus valores predeterminados.
+      confirm: Restablecer
+      cancel: Cancelar
 translation:
   sameLanguage: Los idiomas de origen y destino deben ser diferentes
-  autoModeSameLanguage: El idioma detectado '$1' es el mismo que el idioma de destino
+  noApiKey: Primero añade una clave API. Haz clic en el icono de Plainly en la barra de herramientas para configurarla.
+  failed: Error de traducción
+  retry: Reintentar
+  unknownError: Algo salió mal
+setupPreview:
+  provider: Servicio de traducción
+  model: Modelo
+  apiKey: Clave API
+  keyNew: clave nueva
+  keyReused: se mantiene la clave guardada
+  keyMissing: falta
+  host: El texto de la página va a
+  thinking: Razonamiento desactivado
+  yes: Sí
+  no: No
+  unset: Sin definir
+  languages: Idioma de destino · visualización
+  unchanged: Sin cambios
+agentInstructions:
+  noConfiguration: (aún ninguna)
+  text: |
+    Uso la extensión de navegador Plainly (素读) para traducir páginas web. Configura su servicio de traducción, por favor.
+    Lee primero la guía: $1
+    Síguela: pregúntame qué servicio quiero, dónde está mi clave API y en qué idioma leo. Verifica la configuración con mi clave y la plantilla de solicitud de la guía hasta que una solicitud funcione. Escribe el JSON de configuración en mi portapapeles. Después dime que lo pegue en la ventana emergente de Plainly y lo aplique.
+    Mi configuración actual, con la clave oculta:
+    $2
 shortcutKeySelector:
-  placeholder: Introduce el atajo
-hotkey:
-  control: Ctrl
-  alt: Opción
-  shift: Mayús
-  backtick: Acento grave
-  clickAndHold: Hacer clic y mantener
+  placeholder: Pulsa un atajo
 languages:
   eng: Inglés
   cmn: Chino simplificado

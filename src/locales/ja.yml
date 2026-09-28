@@ -1,35 +1,42 @@
 name: 素読
-extName: 素読 - 翻訳して学ぶ
-extDescription: 素読は、あらゆるウェブサイトから言語を深く学ぶために設計されたオープンソースのブラウザ拡張機能です。
-dataTypes:
-  string: テキスト
-  number: 数値
+extName: 素読
+extDescription: 読んでいるウェブページを翻訳します。それ以外のことはしません。
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: 言語を検索…
+  noLanguagesFound: 言語が見つかりません
 popup:
-  theme: テーマ
-  autoLang: 自動検出
-  sourceLang: ソース言語
-  targetLang: 翻訳言語
-  translate: 翻訳
+  auto: 自動
+  autoDetected: 自動検出
+  sourceLanguage: ソース言語
+  targetLanguage: ターゲット言語
+  translateInto: 翻訳先
+  displayMode: 表示
+  bilingual: バイリンガル
+  translationOnly: 翻訳のみ
+  translate: このページを翻訳
   showOriginal: 原文を表示
-  options: オプション
-  hover: ホバー
-  translateParagraph: 段落を翻訳
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: 現在はバイリンガル
-        action: クリックして翻訳のみへ切り替え
-      translationOnly:
-        current: 現在は翻訳のみ
-        action: クリックしてバイリンガルへ切り替え
-  aiSmartContext: AI スマートコンテキスト
-  aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
+  translating: 翻訳中
+  translated: 翻訳済み
+  paragraphCount: $1 段落
+  failedCount: $1 件失敗
+  notTranslatable: このページは翻訳できません。
+  settings: 設定
+  provider:
+    none: サービスがまだありません
+    missingKey: キー未設定
+  setup:
+    title: 翻訳サービスがまだありません
+    description: 手順をエージェントに渡してください。エージェントがあなたのキーで構成を検証し、クリップボードにコピーします。下に貼り付けてください。
+    copyInstructions: エージェント向けの手順をコピー
+    copied: コピーしました
+    pasteLabel: エージェントが作成した構成
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: 構成に API キーがありません
+    apply: 適用してこのページを翻訳
+    applyOnly: 適用
 errorRecovery:
   title: 問題が発生しました
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: 復旧モードになっています。ページを再読み込みするか、設定をリセットしてからもう一度お試しください。
   recoveryTitle: 復旧オプション
   refreshPage: ページを再読み込み
   resetAction: 設定をデフォルトにリセット
@@ -42,298 +49,138 @@ errorRecovery:
     confirm: リセット
     cancel: キャンセル
 options:
-  commandPalette:
-    placeholder: 設定を検索...
-    noResults: 設定が見つかりません
-  sidebar:
-    settings: 設定
-  setAPIKeyWarning:
-    please: 設定ページで
-    page: APIキーを設定してください
-  apiProviders:
-    title: APIプロバイダー
-    description: 翻訳および語彙分析機能用のAPIプロバイダーを設定。20以上の内蔵プロバイダーに加え、OpenAI互換APIもサポートしています。
-    addProvider: プロバイダーを追加
-    badges:
-      featureCount: $1 件の機能
-    dialog:
-      title: 新しいプロバイダーを追加
-      groups:
-        builtInProviders:
-          title: 組み込みLLMプロバイダー
-          description: 組み込みの大規模言語モデルプロバイダー、Base URLなどの設定が不要
-        openaiCompatibleProviders:
-          title: OpenAI互換カスタムプロバイダー
-          description: 希望するAIプロバイダーが見つからない場合は、Custom Providerを選択してZhipu AIなどのOpenAI互換プロバイダーを設定できます
-        pureTranslationProviders:
-          title: 純粋翻訳プロバイダー
-          description: 大規模言語モデル機能を持たない翻訳専門のプロバイダー
-    form:
-      fields:
-        name: 名前
-        description: 説明
-        apiKey: APIキー
-        baseURL: ベースURL
-        optional: オプション
-      duplicate: 複製
-      delete: 削除
-      deleteDialog:
-        title: プロバイダーを削除しますか？
-        description: この操作は元に戻せません。このプロバイダーを使用している機能は、他の利用可能なプロバイダーに自動的に再割り当てされます。
-        confirm: 削除
-        cancel: キャンセル
-      atLeastOneLLMProvider: 最低1つのLLM翻訳プロバイダーが必要です。
-      duplicateProviderName: '重複するプロバイダー名 "$1"'
-      defaultProvider:
-        translate: デフォルト翻訳プロバイダーに設定
-      models:
-        translate:
-          title: 翻訳モデル
-          customTitle: カスタム翻訳モデル
-          placeholder: モデルを選択してください
-        fetchModels: 利用可能なモデルを取得
-        fetchError: モデルの取得に失敗しました
-        clickToRetry: クリックして再試行
-        noModels: 利用可能なモデルがありません
-        selectModel: モデルを選択
-        apiKeyRequired: 先にAPIキーを追加してください
-        searchModels: モデルを検索...
-        noModelsFound: モデルが見つかりません
-      featureProviders: 機能プロバイダー
-      advancedOptions: 詳細オプション
-      providerSettingLabels:
-        region: リージョン
-      temperature: 温度
-      temperatureHint: 応答のランダム性を制御します。低い値（0）はより決定的で、高い値はより創造的です。範囲はプロバイダーによって異なります。空欄の場合はプロバイダーのデフォルト値を使用します。
-      headers: ヘッダー
-      headersHint: AIプロバイダークライアント作成時に送信するカスタムHTTPヘッダー。空欄の場合はプロバイダーのデフォルトを使用し、{} でデフォルトを無効化します。
-      providerOptions: プロバイダーオプション
-      providerOptionsHint: 思考/推論モードなどの非標準API機能のためのプロバイダー固有オプション。詳細はVercel AI SDKドキュメントまたはプロバイダーの公式ドキュメントをご覧ください。
-      providerOptionsDocsLink: プロバイダードキュメントを見る
-      providerOptionsRecommendationTrigger: 推奨プロバイダーオプションを表示
-      providerOptionsRecommendationTitle: 推奨プロバイダーオプションが見つかりました
-      providerOptionsRecommendationDescription: 推奨設定を確認し、手動で適用してください。
-      providerOptionsRecommendationApply: 適用
-      providerOptionsRecommendationApplied: 適用済み
-      invalidJson: 無効なJSON形式
-    providers:
-      description:
-        openai: GPT-4oなどのモデルを提供
-        deepseek: 中国国内での使用を推奨
-        openaiCompatible: OpenAI API互換のサードパーティー
-    apiKey:
-      showAPIKey: APIキーを表示
-    howToConfigure: 設定方法は?
-    testConnection:
-      button: 接続テスト
-      testing: テスト中...
-  general:
-    title: 一般
-    appearance:
-      title: 外観
-      theme: テーマ
-      system: システム
-      light: ライト
-      dark: ダーク
-    featureProviders:
-      title: 機能プロバイダー
-      description: 各機能に使用するプロバイダーを選択
-      features:
-        translate: ページ翻訳
-    translationConfig:
-      model:
-        title: モデル
-        enterCustomModel: カスタムモデル名を入力
-    clearCache:
-      title: キャッシュクリア
-      description: ブラウザのすべての翻訳キャッシュをクリアします
-      clearing: クリア中...
-      dialog:
-        title: キャッシュクリア
-        trigger: キャッシュクリア
-        confirm: 確認
-        cancel: キャンセル
-        description: この操作により、すべての翻訳キャッシュがクリアされます。この操作は元に戻せません。
-  translation:
-    title: 翻訳
-    requestQueueConfig:
-      title: 翻訳速度
-      firstOnDescription: 翻訳リクエストの処理速度を調整し、
-      lastOnDescription: を利用して実装する
-      capacity:
-        title: 最大バーストリクエスト数
-        description: 許容される一時的バーストリクエスト数は、短期間内に同時処理可能な最大リクエスト数を決定する
-      rate:
-        title: 秒間平均リクエスト数
-        description: 平均秒間リクエスト数（ただし、最大バーストリクエスト数を設定し一時的な超過リクエスト送信を許可）
-    batchQueueConfig:
-      title: バッチ翻訳
-      description: バッチ翻訳時の文字数制限と最大段落数を設定（大規模言語モデル翻訳でのみ有効）
-      maxCharactersPerBatch:
-        title: 最大文字数
-        description: バッチリクエストあたりの最大文字数で、各翻訳のコンテンツ量を制御します
-      maxItemsPerBatch:
-        title: 最大段落数
-        description: 各バッチ翻訳の最大段落数、各翻訳のコンテンツ量を制御します
-    personalizedPrompts:
-      title: 個人化プロンプト
-      description: 異なるタイプのプロンプトをカスタマイズすることで、翻訳時にプロンプトタイプを自ら調整できます。プロンプトとは、ユーザーがLLMに送信するテキストを指します。
-      addPrompt: プロンプトを追加
-      default: デフォルト
-      importSuccess: インポート成功
-      import: インポート
-      export: エクスポート
-      current: 使用中
-      editPrompt:
-        title: プロンプトを編集
-        name: 名前
-        systemPrompt: システムプロンプト
-        prompt: プロンプト
-        promptCellInput:
-          input: 翻訳するテキスト内容
-          targetLanguage: 目標言語
-          webTitle: ウェブページタイトル
-          webDescription: ページメタデータのウェブページ説明
-          webContent: ウェブページ本文（先頭 2000 文字に切り詰め）
-          webSummary: ウェブページ要約（AI スマートコンテキストが必要）
-        save: 保存
-        close: キャンセル
-      deletePrompt:
-        title: プロンプトを削除
-        description: このプロンプトを削除しますか
-        confirm: 確認
-        cancel: キャンセル
-      exportPrompt:
-        exportSelected: 選択したものをエクスポート
-        cancel: キャンセル
-    translationStyle:
-      title: 翻訳表示スタイル
-      description: 翻訳結果と原文を区別するために好みのスタイルを設定
-      useCustomStyle: カスタム CSS スタイルを使用
-      useCustomStyleDescription: 任意の CSS に対応、フォント、アニメーション、言語別スタイルなど
-      presetStyle: プリセットスタイル
-      cssEditor: CSSエディター
-      preview: プレビュー
-      stylePreviewLanguage: 言語
-      stylePreviewDirection: 方向
-      stylePreviewTranslatedText: 翻訳済みテキスト
-      style:
+  title: 設定
+  service:
+    title: 翻訳サービス
+    status:
+      none: サービスなし
+      unconfigured: キー未設定
+      configured: 未テスト
+      testing: テスト中…
+      ok: 接続済み
+      failed: 接続に失敗しました
+    testConnection: 接続テスト
+    sendsTo: "ページのテキストの送信先: $1"
+    copyInstructions: エージェント向けの手順をコピー
+    copied: コピーしました
+    paste:
+      open: 構成を貼り付け
+      label: エージェントが作成した構成
+      keyMissing: 構成に API キーがありません。
+      cancel: キャンセル
+      apply: 適用
+      applying: 確認中…
+  reading:
+    title: 閲覧
+    mode:
+      title: 表示
+      bilingual: バイリンガル
+      translationOnly: 翻訳のみ
+    style:
+      title: 翻訳のスタイル
+      custom: カスタム CSS
+      presets:
+        line: 細線
         default: なし
-        blur: ぼかし効果
-        blockquote: 引用
-        weakened: 弱化
-        dashedLine: 破線
+        weakened: 淡色
+        textColor: 色付き
+        dashedLine: 破線の下線
+        background: ハイライト
+        blockquote: 引用線
         border: 枠線
-        textColor: テキストカラー
-        background: 背景
-      customCSS:
-        editor:
-          placeholder: |
-            /* 例：カスタムカラーと背景のスタイル */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: 保存
-          savedButton: 保存済み
-          validation:
-            validating: 検証中...
-            valid: CSSは有効です
-            syntaxError: CSSに構文エラーがあります
-            tooLong: CSSが長すぎます
-            saved: すべての変更が保存されました
-    translationMode:
-      title: 翻訳モード
-      description: 翻訳テキストの表示方法を選択：バイリンガルまたは翻訳のみ
-      mode:
-        bilingual: バイリンガル
-        translationOnly: 翻訳のみ
-    translateRange:
+        blur: ホバーで表示
+      cssPlaceholder: |
+        /* 例：翻訳に色とハイライトを付ける */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: 保存
+        saved: 保存済み
+        validating: 確認中…
+        valid: CSS は有効です
+        syntaxError: CSS に構文エラーがあります
+        tooLong: CSS が長すぎます
+        allSaved: すべての変更が保存されました
+    range:
       title: 翻訳範囲
-      description: ページのメインコンテンツのみを翻訳するか、すべてのコンテンツを翻訳するかを選択します。
-      range:
-        main: メインコンテンツ
-        all: すべてのコンテンツ
-    pageTranslationShortcut:
-      title: ページ翻訳ショートカットキー
-      description: ウェブページ全体を翻訳するショートカットキーをカスタマイズします
-    preloadConfig:
-      title: 事前翻訳範囲
-      description: ビューポート下のコンテンツをどれだけ事前翻訳するかを制御し、API コストを節約します
-      margin:
-        title: プリロード距離（ピクセル）
-        description: ビューポートからどれくらい離れた位置でコンテンツの翻訳を開始するか。小さい値は API コストを節約しますが、スクロール時に遅延が発生する可能性があります。
-      threshold:
-        title: 可視性しきい値
-        description: 翻訳をトリガーするために必要な要素の可視性の割合（0-1）。高い値は、要素がより多く表示されるまで翻訳を遅らせます。
-    smallParagraphFilter:
-      title: 短いテキストフィルター
-      description: 指定した文字数または単語数より少ないテキストノードの翻訳をスキップします（0 = 無効）
-      minCharacters:
-        title: 最小文字数
-        description: この値より少ない文字数のテキストノードは翻訳されません。文字数には空白が含まれます。
-      minWords:
-        title: 最小単語数
-        description: この値より少ない単語数のテキストノードは翻訳されません。すべての言語で正確な単語カウントのために Intl.Segmenter を使用します。
-      error: 値は $1 から $2 の間である必要があります
-    nodeTranslationHotkey:
-      title: ホバーまたは長押し翻訳ショートカットキー
-      description: ホバー翻訳の修飾キーをカスタマイズするか、長押しで段落を翻訳します
-      enable: 有効化
-    llmProviderConfigured: $1の LLM プロバイダー選択済み
-    llmProviderNotConfigured: $1の LLM プロバイダー未選択
-    aiContentAware:
-      title: AI スマートコンテキスト翻訳
-      description: ウェブページのコンテキストを AI に提供して翻訳品質を向上させます
-      enable: AI スマートコンテキスト翻訳を有効にする
-      enableDescription: AI はウェブページの要約を使用して翻訳精度を向上させます。LLM プロバイダーが必要です。翻訳開始時に遅延が発生し、API コストが増加します。
-  config:
-    title: 設定
-    about:
-      title: 素読 について
-      description: 素読 は 2025 年 4 月に生まれました
-      mission: 素読 は、AI 時代における質の高い教育機会への平等なアクセスを広げるため、語学学習、医学、その他の知識集約型分野で、実際の教師に近い学習体験を手頃な価格で提供することを目指しています。
-    resetConfig:
-      title: 設定をリセット
-      description: すべての設定をデフォルト値にリセットします。
+      main: メインコンテンツ
+      all: ページ全体
+    shortcut:
+      title: ショートカット
+  quality:
+    title: 翻訳の品質
+    context:
+      title: ページのコンテキストを使う
+    prompt:
+      title: プロンプト
+      default: デフォルト
+  advanced:
+    title: 詳細設定
+    rate: 1 秒あたりのリクエスト数
+    capacity: 同時に送るリクエスト数
+    maxCharactersPerBatch: 1 リクエストあたりの文字数
+    maxItemsPerBatch: 1 リクエストあたりの段落数
+    preloadMargin: 表示領域より先に翻訳する距離（px）
+    preloadThreshold: 翻訳を始める表示割合
+    minCharacters: N 文字未満の段落をスキップ
+    minWords: N 語未満の段落をスキップ
+    minError: 値は $1 以上にしてください
+    rangeError: 値は $1 から $2 の間である必要があります
+    cache:
+      title: 翻訳キャッシュ
+      clear: クリア
+      clearing: クリア中…
       dialog:
-        title: 設定をリセット
-        trigger: 設定をリセット
-        confirm: 確認
+        title: 翻訳キャッシュをクリアしますか？
+        description: キャッシュされた翻訳とページの要約はすべて削除されます。ページは必要なときに再度翻訳されます。
+        confirm: クリア
         cancel: キャンセル
-        description: この操作は、すべての設定をデフォルト値にリセットします。ご確認ください。
-translateService:
-  title: 翻訳サービス
-  description: ウェブページの翻訳にのみ使用
-  normalTranslator: 通常翻訳
-  aiTranslator: AI翻訳
-  selectServices: サービスを選択
-  translationProviders: 翻訳サービス
-  configureAPI: API設定
-translatePrompt:
-  title: AI翻訳スタイル
-  description: 翻訳時に使用するプロンプトを選択できます。オプションページでカスタムプロンプトを追加または変更できます
-noAPIKeyConfig:
-  warning: AIモデルを使用するには、まずオプションページでAPIキーを設定してください
-  warningWithLink:
-    youMust: まず
-    setTheAPIKey: APIキーを設定
-    firstOnThe: する必要があります（
-    optionsPage: オプションページ
-    page: ）
+  appearance:
+    title: 外観
+    system: システム
+    light: ライト
+    dark: ダーク
+  reset:
+    title: すべての設定
+    dialog:
+      title: すべての設定をリセットしますか？
+      description: API キーとプロンプトを含むすべての設定がデフォルト値に戻ります。
+      confirm: リセット
+      cancel: キャンセル
 translation:
   sameLanguage: ソース言語とターゲット言語は異なる必要があります
-  autoModeSameLanguage: 検出された言語 '$1' はターゲット言語と同じです
+  noApiKey: まず API キーを追加してください。ツールバーの素読アイコンをクリックすると設定できます。
+  failed: 翻訳に失敗しました
+  retry: 再試行
+  unknownError: 問題が発生しました
+setupPreview:
+  provider: 翻訳サービス
+  model: モデル
+  apiKey: API キー
+  keyNew: 新しいキー
+  keyReused: 保存済みのキーを使用
+  keyMissing: なし
+  host: ページのテキストの送信先
+  thinking: 思考モードをオフ
+  yes: はい
+  no: いいえ
+  unset: 未設定
+  languages: ターゲット言語 · 表示
+  unchanged: 変更なし
+agentInstructions:
+  noConfiguration: （まだありません）
+  text: |
+    ブラウザー拡張機能 Plainly（素读）でウェブページを翻訳しています。翻訳サービスを設定してください。
+    まずガイドを読んでください：$1
+    ガイドに従ってください：使いたいサービス、API キーの場所、私が読む言語を私に聞いてください。ガイドのリクエストテンプレートを使って私のキーで検証し、リクエストが成功するまで続けてください。構成の JSON を私のクリップボードに書き込んでください。最後に、Plainly のポップアップに貼り付けて適用するよう私に伝えてください。
+    現在の構成（キーは伏せてあります）：
+    $2
 shortcutKeySelector:
-  placeholder: ショートカットを入力してください
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: バッククォート
-  clickAndHold: クリックして長押し
+  placeholder: ショートカットキーを押してください
 languages:
   eng: 英語
   cmn: 簡体字中国語

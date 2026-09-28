@@ -1,35 +1,42 @@
 name: Plainly
-extName: Plainly - 번역하고 배우기
-extDescription: Plainly는 모든 웹사이트에서 언어를 깊이 있게 학습할 수 있도록 도와주는 오픈 소스 브라우저 확장 프로그램입니다.
-dataTypes:
-  string: 텍스트
-  number: 숫자
+extName: Plainly
+extDescription: 지금 읽고 있는 웹 페이지를 번역합니다. 그 외에는 아무것도 하지 않습니다.
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: 언어 검색…
+  noLanguagesFound: 언어를 찾을 수 없습니다
 popup:
-  theme: 테마
-  autoLang: 자동
-  sourceLang: 원본
-  targetLang: 대상
-  translate: 번역
+  auto: 자동
+  autoDetected: 자동 감지
+  sourceLanguage: 원본 언어
+  targetLanguage: 대상 언어
+  translateInto: 번역할 언어
+  displayMode: 표시
+  bilingual: 이중 언어
+  translationOnly: 번역만
+  translate: 이 페이지 번역
   showOriginal: 원문 보기
-  options: 옵션
-  hover: 마우스 오버
-  translateParagraph: 단락 번역
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: 현재 이중 언어 모드
-        action: 클릭하여 번역만으로 전환
-      translationOnly:
-        current: 현재 번역만 모드
-        action: 클릭하여 이중 언어로 전환
-  aiSmartContext: AI 스마트 컨텍스트
-  aiSmartContextDescription: 웹페이지 컨텍스트를 사용하여 번역 품질을 향상시킵니다. LLM 번역 제공자가 필요합니다.
+  translating: 번역 중
+  translated: 번역됨
+  paragraphCount: $1개 단락
+  failedCount: $1개 실패
+  notTranslatable: 이 페이지는 번역할 수 없습니다.
+  settings: 설정
+  provider:
+    none: 아직 서비스 없음
+    missingKey: 키 없음
+  setup:
+    title: 아직 번역 서비스가 없습니다
+    description: 안내를 에이전트에게 전달하세요. 에이전트가 키로 구성을 검증하고 클립보드에 넣어 줍니다. 아래에 붙여 넣으세요.
+    copyInstructions: 에이전트용 안내 복사
+    copied: 복사됨
+    pasteLabel: 에이전트가 만든 구성
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: 구성에 API 키가 없습니다
+    apply: 적용하고 이 페이지 번역
+    applyOnly: 적용
 errorRecovery:
   title: 문제가 발생했습니다
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: 복구 모드가 활성화되었습니다. 페이지를 새로고침하거나 설정을 초기화한 뒤 다시 시도하세요.
   recoveryTitle: 복구 옵션
   refreshPage: 페이지 새로고침
   resetAction: 기본 설정으로 초기화
@@ -38,302 +45,142 @@ errorRecovery:
   errorDetails: 오류 세부 정보
   resetDialog:
     title: 설정을 초기화할까요?
-    description: 현재 설정이 기본값으로 덮어써집니다.
+    description: 현재 설정이 기본값으로 바뀝니다.
     confirm: 초기화
     cancel: 취소
 options:
-  commandPalette:
-    placeholder: 설정 검색...
-    noResults: 설정을 찾을 수 없습니다
-  sidebar:
-    settings: 설정
-  setAPIKeyWarning:
-    please: API Key를 설정해 주세요
-    page: 페이지에서
-  apiProviders:
-    title: API 제공업체
-    description: 번역 및 어휘 분석 기능을 위한 API 제공업체를 구성합니다. 20개 이상의 내장 제공업체와 모든 OpenAI 호환 API를 지원합니다.
-    addProvider: 제공업체 추가
-    badges:
-      featureCount: $1 개 기능
-    dialog:
-      title: 새 제공업체 추가
-      groups:
-        builtInProviders:
-          title: 내장 LLM 제공업체
-          description: 내장된 대규모 언어 모델 제공업체, Base URL과 같은 대부분의 설정이 필요 없음
-        openaiCompatibleProviders:
-          title: OpenAI 호환 사용자 정의 제공업체
-          description: 원하는 AI 제공업체를 찾을 수 없는 경우 Custom Provider를 선택하여 Zhipu AI와 같은 OpenAI 호환 제공업체를 구성할 수 있습니다
-        pureTranslationProviders:
-          title: 순수 번역 제공업체
-          description: 대규모 언어 모델 기능이 없는 번역 전문 제공업체
-    form:
-      fields:
-        name: 이름
-        description: 설명
-        apiKey: API Key
-        baseURL: Base URL
-        optional: 선택사항
-      duplicate: 복제
-      delete: 삭제
-      deleteDialog:
-        title: 제공업체를 삭제하시겠습니까?
-        description: 이 작업은 취소할 수 없습니다. 이 제공업체를 사용하는 기능은 다른 사용 가능한 제공업체로 자동 재할당됩니다.
-        confirm: 삭제
-        cancel: 취소
-      atLeastOneLLMProvider: 최소 하나의 LLM 번역 제공업체가 필요합니다.
-      duplicateProviderName: '중복된 제공업체 이름 "$1"'
-      defaultProvider:
-        translate: 기본 번역 제공업체로 설정
-      models:
-        translate:
-          title: 번역 모델
-          customTitle: 사용자 정의 번역 모델
-          placeholder: 모델을 선택하세요
-        fetchModels: 사용 가능한 모델 가져오기
-        fetchError: 모델을 가져오지 못했습니다
-        clickToRetry: 다시 시도하려면 클릭
-        noModels: 사용 가능한 모델이 없습니다
-        selectModel: 모델 선택
-        apiKeyRequired: 먼저 API 키를 추가하세요
-        searchModels: 모델 검색...
-        noModelsFound: 모델을 찾을 수 없습니다
-      featureProviders: 기능 제공업체
-      advancedOptions: 고급 옵션
-      providerSettingLabels:
-        region: 리전
-      temperature: 온도
-      temperatureHint: 응답의 무작위성을 제어합니다. 낮은 값(0)은 더 결정적이고, 높은 값은 더 창의적입니다. 범위는 제공자에 따라 다릅니다. 비워두면 제공자 기본값을 사용합니다.
-      headers: 헤더
-      headersHint: AI 제공자 클라이언트를 만들 때 전송할 사용자 지정 HTTP 헤더입니다. 비워두면 제공자 기본값을 사용하고, {}를 입력하면 기본값을 비활성화합니다.
-      providerOptions: 제공자 옵션
-      providerOptionsHint: 사고/추론 모드와 같은 비표준 API 기능을 위한 공급자별 옵션입니다. 자세한 내용은 Vercel AI SDK 문서 또는 공급자의 공식 문서를 참조하세요.
-      providerOptionsDocsLink: 공급자 문서 보기
-      providerOptionsRecommendationTrigger: 추천 제공자 옵션 보기
-      providerOptionsRecommendationTitle: 추천 제공자 옵션이 감지되었습니다
-      providerOptionsRecommendationDescription: 추천 구성을 검토한 뒤 수동으로 적용하세요.
-      providerOptionsRecommendationApply: 적용
-      providerOptionsRecommendationApplied: 적용됨
-      invalidJson: 잘못된 JSON 형식
-    providers:
-      description:
-        openai: GPT-4o 같은 모델을 제공합니다
-        deepseek: 중국에서 사용을 권장합니다
-        openaiCompatible: OpenAI API 호환 서드파티
-    apiKey:
-      showAPIKey: API Key 표시
-    howToConfigure: 구성 방법은?
-    testConnection:
-      button: 연결 테스트
-      testing: 테스트 중...
-  general:
-    title: 일반
-    appearance:
-      title: 외관
-      theme: 테마
-      system: 시스템
-      light: 라이트
-      dark: 다크
-    featureProviders:
-      title: 기능 제공업체
-      description: 각 기능에 사용할 제공업체를 선택
-      features:
-        translate: 페이지 번역
-    translationConfig:
-      model:
-        title: 모델
-        enterCustomModel: 사용자 정의 모델 이름 입력
-    clearCache:
-      title: 캐시 지우기
-      description: 브라우저의 모든 번역 캐시를 지웁니다
-      clearing: 지우는 중...
-      dialog:
-        title: 캐시 지우기
-        trigger: 캐시 지우기
-        confirm: 확인
-        cancel: 취소
-        description: 이 작업은 모든 번역 캐시를 지웁니다. 이 작업은 되돌릴 수 없습니다.
-  translation:
-    title: 번역
-    requestQueueConfig:
-      title: 번역 속도
-      firstOnDescription: 번역 요청 처리 속도 조정 및
-      lastOnDescription: 구현
-      capacity:
-        title: 최대 버스트 요청 수
-        description: 허용되는 임시 버스트 요청 수는 짧은 시간 내 동시 처리 가능한 최대 요청 수를 결정함
-      rate:
-        title: 초당 평균 요청 수
-        description: 초당 평균 요청 수 (단, 최대 버스트 요청 수 설정을 통한 일시적 초과 요청 전송 허용)
-    batchQueueConfig:
-      title: 배치 번역
-      description: 배치 번역 시 문자 수 제한 및 최대 단락 수 구성 (대규모 언어 모델 번역에서만 유효)
-      maxCharactersPerBatch:
-        title: 최대 문자 수
-        description: 배치 요청당 허용되는 최대 문자 수로 각 번역의 콘텐츠 양을 제어합니다
-      maxItemsPerBatch:
-        title: 최대 단락 수
-        description: 각 배치 번역의 최대 단락 수로 각 번역의 콘텐츠 양을 제어합니다
-    personalizedPrompts:
-      title: 개인화된 프롬프트
-      description: 다양한 유형의 프롬프트를 사용자 정의하여, 번역 시 프롬프트 유형을 직접 조정할 수 있습니다. 프롬프트는 사용자가 LLM에게 보내는 텍스트를 나타내며.
-      addPrompt: 프롬프트 추가
-      default: 기본
-      importSuccess: 가져오기 성공
-      import: 가져오기
-      export: 내보내기
-      current: 사용 중
-      editPrompt:
-        title: 프롬프트 편집
-        name: 이름
-        systemPrompt: 시스템 프롬프트
-        prompt: 프롬프트
-        promptCellInput:
-          input: 번역할 텍스트 내용
-          targetLanguage: 목표 언어
-          webTitle: 웹페이지 제목
-          webDescription: 페이지 메타데이터의 웹페이지 설명
-          webContent: 웹페이지 본문(앞의 2000자로 잘림)
-          webSummary: 웹페이지 요약 (AI 스마트 컨텍스트 필요)
-        save: 저장
-        close: 취소
-      deletePrompt:
-        title: 프롬프트 삭제
-        description: 이 프롬프트를 삭제하시겠습니까
-        confirm: 확인
-        cancel: 취소
-      exportPrompt:
-        exportSelected: 선택 항목 내보내기
-        cancel: 취소
-    translationStyle:
-      title: 번역 표시 스타일
-      description: 번역 결과와 원문을 구분하기 위해 원하는 스타일을 설정하세요
-      useCustomStyle: 커스텀 CSS 스타일 사용
-      useCustomStyleDescription: 모든 CSS 지원, 글꼴, 애니메이션, 언어별 스타일 등
-      presetStyle: 프리셋 스타일
-      cssEditor: CSS 편집기
-      preview: 미리보기
-      stylePreviewLanguage: 언어
-      stylePreviewDirection: 방향
-      stylePreviewTranslatedText: 번역된 텍스트
-      style:
+  title: 설정
+  service:
+    title: 번역 서비스
+    status:
+      none: 서비스 없음
+      unconfigured: 키 없음
+      configured: 테스트 안 됨
+      testing: 테스트 중…
+      ok: 연결됨
+      failed: 연결 실패
+    testConnection: 연결 테스트
+    sendsTo: "페이지 텍스트 전송 대상: $1"
+    copyInstructions: 에이전트용 안내 복사
+    copied: 복사됨
+    paste:
+      open: 구성 붙여 넣기
+      label: 에이전트가 만든 구성
+      keyMissing: 구성에 API 키가 없습니다.
+      cancel: 취소
+      apply: 적용
+      applying: 확인 중…
+  reading:
+    title: 읽기
+    mode:
+      title: 표시
+      bilingual: 이중 언어
+      translationOnly: 번역만
+    style:
+      title: 번역 스타일
+      custom: 사용자 지정 CSS
+      presets:
+        line: 가는 선
         default: 없음
-        blur: 흐림 효과
-        blockquote: 인용
-        weakened: 약화
-        dashedLine: 점선
+        weakened: 흐리게
+        textColor: 색상
+        dashedLine: 점선 밑줄
+        background: 강조
+        blockquote: 인용 막대
         border: 테두리
-        textColor: 텍스트 색상
-        background: 배경
-      customCSS:
-        editor:
-          placeholder: |
-            /* 예제: 사용자 정의 색상 및 배경 스타일 */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: 저장
-          savedButton: 저장됨
-          validation:
-            validating: 검증 중...
-            valid: CSS가 유효합니다
-            syntaxError: CSS에 구문 오류가 있습니다
-            tooLong: CSS가 너무 깁니다
-            saved: 모든 변경사항이 저장되었습니다
-    translationMode:
-      title: 번역 모드
-      description: "번역된 텍스트 표시 방법 선택: 이중 언어 또는 번역만"
-      mode:
-        bilingual: 이중 언어
-        translationOnly: 번역만
-    translateRange:
+        blur: 마우스를 올리면 표시
+      cssPlaceholder: |
+        /* 예: 번역에 색을 입히고 강조하기 */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: 저장
+        saved: 저장됨
+        validating: 확인 중…
+        valid: CSS가 유효합니다
+        syntaxError: CSS에 구문 오류가 있습니다
+        tooLong: CSS가 너무 깁니다
+        allSaved: 모든 변경사항이 저장되었습니다
+    range:
       title: 번역 범위
-      description: 페이지의 주요 내용만 번역할지 모든 내용을 번역할지 선택합니다.
-      range:
-        main: 주요 내용
-        all: 전체 내용
-    pageTranslationShortcut:
-      title: 페이지 번역 단축키
-      description: 전체 웹페이지를 번역하는 단축키를 사용자 지정합니다
-    preloadConfig:
-      title: 사전 번역 범위
-      description: API 비용을 절약하기 위해 뷰포트 아래 콘텐츠를 얼마나 사전 번역할지 제어합니다
-      margin:
-        title: 미리 로드 거리 (픽셀)
-        description: 뷰포트에서 얼마나 떨어진 곳에서 콘텐츠 번역을 시작할지. 작은 값은 API 비용을 절약하지만 스크롤 시 지연이 발생할 수 있습니다.
-      threshold:
-        title: 가시성 임계값
-        description: 번역을 트리거하는 데 필요한 요소 가시성 비율 (0-1). 높은 값은 요소가 더 많이 보일 때까지 번역을 지연시킵니다.
-    smallParagraphFilter:
-      title: 짧은 텍스트 필터
-      description: 지정한 문자 수 또는 단어 수보다 적은 텍스트 노드의 번역을 건너뜁니다 (0 = 비활성화)
-      minCharacters:
-        title: 최소 문자 수
-        description: 이 값보다 적은 문자 수의 텍스트 노드는 번역되지 않습니다. 문자 수에는 공백이 포함됩니다.
-      minWords:
-        title: 최소 단어 수
-        description: 이 값보다 적은 단어 수의 텍스트 노드는 번역되지 않습니다. 모든 언어에서 정확한 단어 카운트를 위해 Intl.Segmenter를 사용합니다.
-      error: 값은 $1에서 $2 사이여야 합니다
-    nodeTranslationHotkey:
-      title: 호버 또는 길게 누르기 번역 단축키
-      description: 호버 번역 수정 키를 사용자 지정하거나 마우스 길게 누르기로 단락을 번역합니다
-      enable: 활성화
-    llmProviderConfigured: $1에 LLM 제공업체 선택됨
-    llmProviderNotConfigured: $1에 LLM 제공업체 미선택
-    aiContentAware:
-      title: AI 스마트 컨텍스트 번역
-      description: AI에 웹페이지 컨텍스트를 제공하여 번역 품질을 향상시킵니다
-      enable: AI 스마트 컨텍스트 번역 활성화
-      enableDescription: AI가 웹페이지 요약을 사용하여 번역 정확도를 향상시킵니다. LLM 제공업체가 필요합니다. 번역 시작 시 지연이 발생하고 API 비용이 증가합니다.
-  config:
-    title: 설정
-    about:
-      title: 소개
-      description: Plainly는 2025년 4월에 태어났습니다
-      mission: Plainly는 언어 학습, 의학 등 지식 집약적 분야에서 AI 시대의 고품질 교육 기회에 더 평등하게 접근할 수 있도록, 실제 교사에 가까운 학습 경험을 더 낮은 비용으로 제공하는 것을 목표로 합니다.
-    resetConfig:
-      title: 기본 설정 복원
-      description: 모든 설정을 기본값으로 재설정
+      main: 본문
+      all: 페이지 전체
+    shortcut:
+      title: 단축키
+  quality:
+    title: 번역 품질
+    context:
+      title: 페이지 컨텍스트 사용
+    prompt:
+      title: 프롬프트
+      default: 기본
+  advanced:
+    title: 고급
+    rate: 초당 요청 수
+    capacity: 동시에 처리할 요청 수
+    maxCharactersPerBatch: 요청당 문자 수
+    maxItemsPerBatch: 요청당 단락 수
+    preloadMargin: 화면보다 앞서 번역할 거리(px)
+    preloadThreshold: 번역 전에 보여야 하는 비율
+    minCharacters: N자보다 짧은 단락 건너뛰기
+    minWords: N단어보다 짧은 단락 건너뛰기
+    minError: 값은 $1 이상이어야 합니다
+    rangeError: 값은 $1에서 $2 사이여야 합니다
+    cache:
+      title: 번역 캐시
+      clear: 지우기
+      clearing: 지우는 중…
       dialog:
-        title: 기본 설정 복원
-        trigger: 설정 초기화
-        confirm: 확인
+        title: 번역 캐시를 지울까요?
+        description: 캐시된 모든 번역과 페이지 요약이 삭제됩니다. 페이지는 필요할 때 다시 번역됩니다.
+        confirm: 지우기
         cancel: 취소
-        description: 이 작업은 모든 사용자 지정 설정을 지우고 기본값으로 재설정합니다. 삭제하시겠습니까?
-translateService:
-  title: 번역 서비스
-  description: 웹페이지 번역 전용
-  normalTranslator: 일반 번역기
-  aiTranslator: AI 번역기
-  selectServices: 서비스 선택
-  translationProviders: 번역 서비스
-  configureAPI: API 설정
-translatePrompt:
-  title: AI 번역 스타일
-  description: 번역 시 사용할 프롬프트를 선택할 수 있습니다. 설정 페이지에서 사용자 정의 프롬프트를 추가하거나 수정할 수 있습니다
-noAPIKeyConfig:
-  warning: AI 모델을 사용하려면 먼저 옵션 페이지에서 API 키를 설정해 주세요
-  warningWithLink:
-    youMust: 반드시
-    setTheAPIKey: API 키를 설정해야 합니다
-    firstOnThe: 먼저
-    optionsPage: 옵션
-    page: 페이지에서
+  appearance:
+    title: 외관
+    system: 시스템
+    light: 라이트
+    dark: 다크
+  reset:
+    title: 모든 설정
+    dialog:
+      title: 모든 설정을 초기화할까요?
+      description: API 키와 프롬프트를 포함한 모든 설정이 기본값으로 돌아갑니다.
+      confirm: 초기화
+      cancel: 취소
 translation:
   sameLanguage: 원본 언어와 대상 언어는 달라야 합니다
-  autoModeSameLanguage: 감지된 언어 '$1'은(는) 대상 언어와 같습니다
+  noApiKey: 먼저 API 키를 추가하세요. 툴바의 Plainly 아이콘을 클릭하면 설정할 수 있습니다.
+  failed: 번역 실패
+  retry: 다시 시도
+  unknownError: 문제가 발생했습니다
+setupPreview:
+  provider: 번역 서비스
+  model: 모델
+  apiKey: API 키
+  keyNew: 새 키
+  keyReused: 저장된 키 유지
+  keyMissing: 없음
+  host: 페이지 텍스트 전송 대상
+  thinking: 사고 모드 끄기
+  yes: 예
+  no: 아니요
+  unset: 설정 안 됨
+  languages: 대상 언어 · 표시
+  unchanged: 변경 없음
+agentInstructions:
+  noConfiguration: (아직 없음)
+  text: |
+    브라우저 확장 프로그램 Plainly(素读)로 웹 페이지를 번역하고 있습니다. 번역 서비스를 설정해 주세요.
+    먼저 가이드를 읽어 주세요: $1
+    가이드를 따라 주세요: 제가 원하는 서비스, API 키의 위치, 제가 읽는 언어를 물어봐 주세요. 가이드의 요청 템플릿으로 제 키를 사용해 요청이 성공할 때까지 검증해 주세요. 구성 JSON을 제 클립보드에 써 주세요. 그런 다음 Plainly 팝업에 붙여 넣고 적용하라고 알려 주세요.
+    현재 구성(키는 가려져 있습니다):
+    $2
 shortcutKeySelector:
-  placeholder: 단축키를 입력해 주세요
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: 백틱
-  clickAndHold: 클릭하고 길게 누르기
+  placeholder: 단축키를 누르세요
 languages:
   eng: 영어
   cmn: 중국어 간체

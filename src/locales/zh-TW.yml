@@ -1,35 +1,42 @@
 name: 素讀
-extName: 素讀 - 翻譯與學習
-extDescription: 素讀是一款開放原始碼的瀏覽器擴充功能，幫助你在任何網站上深入學習語言。
-dataTypes:
-  string: 文字
-  number: 數字
+extName: 素讀
+extDescription: 翻譯你正在讀的網頁，其他什麼都不做。
 languageCombobox:
-  searchLanguages: Search languages...
-  noLanguagesFound: No languages found
+  searchLanguages: 搜尋語言…
+  noLanguagesFound: 找不到語言
 popup:
-  theme: 主題
-  autoLang: 自動偵測
-  sourceLang: 來源語言
-  targetLang: 目標語言
-  translate: 翻譯
+  auto: 自動
+  autoDetected: 自動偵測
+  sourceLanguage: 來源語言
+  targetLanguage: 目標語言
+  translateInto: 翻譯成
+  displayMode: 顯示方式
+  bilingual: 雙語對照
+  translationOnly: 僅顯示譯文
+  translate: 翻譯此頁
   showOriginal: 顯示原文
-  options: 選項
-  hover: 滑鼠停留
-  translateParagraph: 翻譯段落
-  translationModeToggle:
-    tooltip:
-      bilingual:
-        current: 當前為雙語對照
-        action: 點擊切換為僅譯文
-      translationOnly:
-        current: 當前為僅譯文
-        action: 點擊切換為雙語對照
-  aiSmartContext: AI 智慧上下文
-  aiSmartContextDescription: 結合網頁上下文提升翻譯效果。需要設定 LLM 翻譯服務提供者。
+  translating: 翻譯中
+  translated: 已翻譯
+  paragraphCount: $1 段
+  failedCount: $1 段失敗
+  notTranslatable: 這個頁面無法翻譯。
+  settings: 設定
+  provider:
+    none: 尚無服務
+    missingKey: 尚未設定金鑰
+  setup:
+    title: 尚未設定翻譯服務
+    description: 把說明交給你的 agent，它會用你的金鑰驗證一份設定並放進剪貼簿，貼到下面就行。
+    copyInstructions: 複製給 agent 的說明
+    copied: 已複製
+    pasteLabel: agent 產生的設定
+    placeholder: '{ "plainly": 1, "provider": { … } }'
+    keyMissing: 設定裡沒有 API 金鑰
+    apply: 套用並翻譯此頁
+    applyOnly: 套用
 errorRecovery:
   title: 應用程式發生異常
-  description: Recovery mode is active. Refresh the page or reset settings and try again.
+  description: 已進入復原模式。請重新整理頁面或重設設定後再試一次。
   recoveryTitle: 復原選項
   refreshPage: 重新整理頁面
   resetAction: 重設為預設設定
@@ -42,298 +49,138 @@ errorRecovery:
     confirm: 重設
     cancel: 取消
 options:
-  commandPalette:
-    placeholder: 搜尋設定…
-    noResults: 找不到設定
-  sidebar:
-    settings: 設定
-  setAPIKeyWarning:
-    please: 請在
-    page: 頁面設定 API 金鑰
-  apiProviders:
-    title: API 提供者
-    description: 設定用於翻譯和詞彙解析功能的 API 提供者。我們內建了 20 多個提供者，並支援任何 OpenAI 相容 API 提供者。
-    addProvider: 新增提供者
-    badges:
-      featureCount: $1 個功能
-    dialog:
-      title: 新增提供者
-      groups:
-        builtInProviders:
-          title: 內建 LLM 提供者
-          description: 內建的大型語言模型提供者，大多數設定不需要填寫，例如 Base URL
-        openaiCompatibleProviders:
-          title: OpenAI 相容自訂提供者
-          description: 如果找不到你想要的 AI 提供者，請選擇 Custom Provider 來設定任何 OpenAI API 相容的提供者，例如智譜
-        pureTranslationProviders:
-          title: 純翻譯提供者
-          description: 專注於翻譯功能的提供者，沒有大型語言模型能力
-    form:
-      fields:
-        name: 名稱
-        description: 描述
-        apiKey: API 金鑰
-        baseURL: Base URL
-        optional: 可選
-      duplicate: 複製
-      delete: 刪除
-      deleteDialog:
-        title: 刪除提供者？
-        description: 此操作無法撤銷。使用此提供者的功能將自動重新分配到其他可用提供者。
-        confirm: 刪除
-        cancel: 取消
-      atLeastOneLLMProvider: 至少需要一個 LLM 翻譯提供者。
-      duplicateProviderName: '重複的提供者名稱 "$1"'
-      defaultProvider:
-        translate: 設為預設翻譯提供者
-      models:
-        translate:
-          title: 翻譯模型
-          customTitle: 自訂翻譯模型
-          placeholder: 選擇一個模型
-        fetchModels: 取得可用模型
-        fetchError: 取得模型失敗
-        clickToRetry: 點選重試
-        noModels: 沒有可用的模型
-        selectModel: 選擇模型
-        apiKeyRequired: 請先新增 API 金鑰
-        searchModels: 搜尋模型…
-        noModelsFound: 找不到模型
-      featureProviders: 功能提供者
-      advancedOptions: 進階選項
-      providerSettingLabels:
-        region: 區域
-      temperature: 溫度
-      temperatureHint: 控制回應的隨機性。數值越低（如 0）越穩定，數值越高越有創造性。可用範圍依提供者而異。留空則使用提供者預設值。
-      headers: 請求標頭
-      headersHint: 建立 AI 提供者用戶端時送出的自訂 HTTP 請求標頭。留空則使用提供者預設值；填入 {} 可停用預設值。
-      providerOptions: 提供者選項
-      providerOptionsHint: 用於非標準 API 功能（例如思考／推理模式）的提供者專屬選項。詳細資訊請參閱 Vercel AI SDK 文件或你的提供者官方文件。
-      providerOptionsDocsLink: 查看提供者文件
-      providerOptionsRecommendationTrigger: 查看推薦的提供者選項
-      providerOptionsRecommendationTitle: 偵測到推薦的提供者選項
-      providerOptionsRecommendationDescription: 請先檢查，再手動套用推薦設定。
-      providerOptionsRecommendationApply: 套用
-      providerOptionsRecommendationApplied: 已套用
-      invalidJson: JSON 格式無效
-    providers:
-      description:
-        openai: 提供 GPT-4o 等模型
-        deepseek: 推薦在中國使用
-        openaiCompatible: OpenAI API 相容的第三方
-    apiKey:
-      showAPIKey: 顯示 API 金鑰
-    howToConfigure: 如何設定？
-    testConnection:
-      button: 測試連接
+  title: 設定
+  service:
+    title: 翻譯服務
+    status:
+      none: 無服務
+      unconfigured: 尚未設定金鑰
+      configured: 尚未測試
       testing: 測試中…
-  general:
-    title: 通用
-    appearance:
-      title: 外觀
-      theme: 主題
-      system: 跟隨系統設定
-      light: 淺色
-      dark: 深色
-    featureProviders:
-      title: 功能提供者
-      description: 為每個功能選擇使用的提供者
-      features:
-        translate: 網頁翻譯
-    translationConfig:
-      model:
-        title: 模型
-        enterCustomModel: 輸入自訂模型名稱
-    clearCache:
-      title: 清除快取
-      description: 清理瀏覽器中的所有翻譯快取
+      ok: 已連線
+      failed: 連線失敗
+    testConnection: 測試連線
+    sendsTo: 網頁文字會傳送到 $1
+    copyInstructions: 複製給 agent 的說明
+    copied: 已複製
+    paste:
+      open: 貼上設定
+      label: agent 產生的設定
+      keyMissing: 設定裡沒有 API 金鑰。
+      cancel: 取消
+      apply: 套用
+      applying: 確認中…
+  reading:
+    title: 閱讀
+    mode:
+      title: 顯示方式
+      bilingual: 雙語對照
+      translationOnly: 僅顯示譯文
+    style:
+      title: 譯文樣式
+      custom: 自訂 CSS
+      presets:
+        line: 左側細線
+        default: 無
+        weakened: 淡化
+        textColor: 著色
+        dashedLine: 虛線底線
+        background: 底色
+        blockquote: 引用線
+        border: 邊框
+        blur: 游標停留時顯示
+      cssPlaceholder: |
+        /* 範例：為譯文著色並加上底色 */
+        [data-plainly-custom-translation-style='custom'] {
+          color: #414535;
+          background-color: light-dark(#F2E3BC, #C19875);
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
+      css:
+        save: 儲存
+        saved: 已儲存
+        validating: 檢查中…
+        valid: CSS 有效
+        syntaxError: CSS 存在語法錯誤
+        tooLong: CSS 過長
+        allSaved: 所有變更已儲存
+    range:
+      title: 翻譯範圍
+      main: 主要內容
+      all: 整個頁面
+    shortcut:
+      title: 快速鍵
+  quality:
+    title: 譯文品質
+    context:
+      title: 參考整頁上下文
+    prompt:
+      title: 提示詞
+      default: 預設
+  advanced:
+    title: 進階
+    rate: 每秒請求數
+    capacity: 同時進行的請求數上限
+    maxCharactersPerBatch: 每次請求的字元數上限
+    maxItemsPerBatch: 每次請求的段落數上限
+    preloadMargin: 提前翻譯可視範圍以下的內容（px）
+    preloadThreshold: 可見比例達到多少才翻譯
+    minCharacters: 略過少於 N 個字元的段落
+    minWords: 略過少於 N 個字詞的段落
+    minError: 數值不得小於 $1
+    rangeError: 數值必須在 $1 到 $2 之間
+    cache:
+      title: 譯文快取
+      clear: 清除
       clearing: 清除中…
       dialog:
-        title: 清除快取
-        trigger: 清除快取
-        confirm: 確認
+        title: 要清除翻譯快取嗎？
+        description: 所有快取的譯文和頁面摘要都會被刪除，頁面會在需要時重新翻譯。
+        confirm: 清除
         cancel: 取消
-        description: 此操作將清理所有翻譯快取。此操作無法撤銷。
-  translation:
-    title: 翻譯
-    requestQueueConfig:
-      title: 翻譯速率
-      firstOnDescription: 調整翻譯請求的處理速度，使用
-      lastOnDescription: 實現
-      capacity:
-        title: 最大突發請求數
-        description: 允許的暫時突發請求數量，決定了在短時間內最多能同時處理多少個請求
-      rate:
-        title: 每秒平均請求數量
-        description: 平均每秒的請求數量，但允許設定最大突發請求數來短暫發送超量請求
-    batchQueueConfig:
-      title: 批次翻譯
-      description: 設定批次翻譯時的字元數限制和最大段落數量（僅對大語言模型翻譯有效）
-      maxCharactersPerBatch:
-        title: 最大字元數
-        description: 每個批次請求允許的最大字元數，用於控制單次翻譯的內容量
-      maxItemsPerBatch:
-        title: 最大段落數
-        description: 每個批次翻譯的最大段落數，用於控制單次翻譯的內容量
-    personalizedPrompts:
-      title: 個人化提示詞
-      description: 自訂不同類型的提示詞，可以在翻譯時自行調整提示詞類型。提示詞表示以使用者身份發送給 LLM 的文字。
-      addPrompt: 新增提示詞
-      default: 通用
-      importSuccess: 匯入成功
-      import: 匯入
-      export: 匯出
-      current: 正在使用
-      editPrompt:
-        title: 編輯提示詞
-        name: 標題
-        systemPrompt: 系統提示詞
-        prompt: 提示詞
-        promptCellInput:
-          input: 需要翻譯的文字內容
-          targetLanguage: 目標語言
-          webTitle: 網頁標題
-          webDescription: 頁面中繼資料的網頁描述
-          webContent: 網頁內文（截斷到前 2000 個字元）
-          webSummary: 網頁摘要（需啟用 AI 智慧上下文）
-        save: 儲存
-        close: 取消
-      deletePrompt:
-        title: 刪除提示詞
-        description: 確定要刪除提示詞嗎
-        confirm: 確定
-        cancel: 取消
-      exportPrompt:
-        exportSelected: 匯出所選
-        cancel: 取消
-    translationStyle:
-      title: 翻譯顯示樣式
-      description: 設定任何你想要的樣式，用來區分翻譯結果與原文
-      useCustomStyle: 使用自訂 CSS 樣式
-      useCustomStyleDescription: 支援任意 CSS，包括修改字體、動畫、多語言差異化樣式
-      presetStyle: 預設樣式
-      cssEditor: CSS 編輯器
-      preview: 預覽
-      stylePreviewLanguage: 語言
-      stylePreviewDirection: 方向
-      stylePreviewTranslatedText: 翻譯的文字
-      style:
-        default: 無
-        blur: 模糊效果
-        blockquote: 引用
-        weakened: 弱化
-        dashedLine: 虛線
-        border: 邊框
-        textColor: 文字顏色
-        background: 背景
-      customCSS:
-        editor:
-          placeholder: |
-            /* 範例：自訂顏色和背景樣式 */
-            [data-plainly-custom-translation-style='custom'] {
-              color: #414535;
-              background-color: light-dark(#F2E3BC, #C19875);
-              padding: 2px 4px;
-              border-radius: 4px;
-            }
-          saveButton: 儲存
-          savedButton: 已儲存
-          validation:
-            validating: 驗證中...
-            valid: CSS 有效
-            syntaxError: CSS 存在語法錯誤
-            tooLong: CSS 過長
-            saved: 所有變更已儲存
-    translationMode:
-      title: 翻譯模式
-      description: 選擇翻譯文字的顯示方式：雙語對照或僅顯示翻譯
-      mode:
-        bilingual: 雙語對照
-        translationOnly: 僅顯示翻譯
-    translateRange:
-      title: 翻譯範圍
-      description: 選擇是僅翻譯主要內容還是翻譯頁面上的所有內容。
-      range:
-        main: 主要內容
-        all: 全部內容
-    pageTranslationShortcut:
-      title: 網頁翻譯快速鍵
-      description: 自訂翻譯整個網頁的快速鍵
-    preloadConfig:
-      title: 預翻譯範圍
-      description: 控制視窗下方多少內容會被預先翻譯，以節省 API 費用
-      margin:
-        title: 預載距離（像素）
-        description: 距離視窗多遠時開始翻譯內容。較小的值可節省 API 費用，但捲動時可能會有延遲。
-      threshold:
-        title: 可見度門檻值
-        description: 觸發翻譯所需的元素可見度百分比（0-1）。較高的值會延遲翻譯，直到更多元素可見。
-    smallParagraphFilter:
-      title: 小段落過濾
-      description: 跳過翻譯少於指定字元數或詞數的文字節點（0 = 停用）
-      minCharacters:
-        title: 最小字元數
-        description: 少於此字元數的文字節點將不會被翻譯。字元計數包含空格。
-      minWords:
-        title: 最小詞數
-        description: 少於此詞數的文字節點將不會被翻譯。使用 Intl.Segmenter 進行跨語言準確分詞。
-      error: 數值必須在 $1 到 $2 之間
-    nodeTranslationHotkey:
-      title: 懸停或長按翻譯快速鍵
-      description: 自訂懸停翻譯的修飾鍵，或使用滑鼠長按翻譯段落
-      enable: 啟用
-    llmProviderConfigured: 已為$1選擇 LLM 提供者
-    llmProviderNotConfigured: 沒有為$1選擇 LLM 提供者
-    aiContentAware:
-      title: AI 智慧上下文翻譯
-      description: 透過向 AI 提供網頁上下文來提高翻譯品質
-      enable: 啟用 AI 智慧上下文翻譯
-      enableDescription: AI 使用網頁摘要來提高翻譯準確性。需要 LLM 翻譯提供者。剛開始翻譯頁面時會有延遲，並增加 API 費用。
-  config:
-    title: 設定
-    about:
-      title: 關於
-      description: 素讀 於 2025 年 4 月誕生
-      mission: 素讀 致力於在 AI 時代擴大高品質教育機會的平等可及性，透過更低成本地提供盡可能接近真人教師的學習體驗，涵蓋語言學習、醫學以及其他知識密集型領域。
-    resetConfig:
-      title: 重設設定
-      description: 重設所有設定為預設值
-      dialog:
-        title: 重設設定
-        trigger: 重設設定
-        confirm: 確認
-        cancel: 取消
-        description: 此操作將清空你的所有自訂設定，並將其重設為預設值，請確認是否清除。
-translateService:
-  title: 翻譯服務
-  description: 僅用於翻譯網頁內容
-  normalTranslator: 一般翻譯
-  aiTranslator: AI 翻譯
-  selectServices: 選擇服務
-  translationProviders: 翻譯服務
-  configureAPI: 設定 API
-translatePrompt:
-  title: AI 翻譯風格
-  description: 選擇在翻譯時使用的提示詞。可在選項頁面新增或修改自訂提示詞
-noAPIKeyConfig:
-  warning: 如果想要使用 AI 模型，請先在選項頁面設定 API 金鑰
-  warningWithLink:
-    youMust: 你必須先
-    setTheAPIKey: 設定 API 金鑰
-    firstOnThe: 在
-    optionsPage: 選項
-    page: 頁
+  appearance:
+    title: 外觀
+    system: 跟隨系統設定
+    light: 淺色
+    dark: 深色
+  reset:
+    title: 所有設定
+    dialog:
+      title: 要重設所有設定嗎？
+      description: 包括 API 金鑰和提示詞在內的所有設定都會恢復為預設值。
+      confirm: 重設
+      cancel: 取消
 translation:
   sameLanguage: 來源語言和目標語言必須不同
-  autoModeSameLanguage: 偵測到的語言「$1」與目標語言相同
+  noApiKey: 尚未填入 API 金鑰。請點一下工具列上的素讀圖示進行設定。
+  failed: 翻譯失敗
+  retry: 重試
+  unknownError: 發生錯誤
+setupPreview:
+  provider: 翻譯服務
+  model: 模型
+  apiKey: API 金鑰
+  keyNew: 新金鑰
+  keyReused: 沿用已儲存的金鑰
+  keyMissing: 缺少
+  host: 網頁文字會傳送到
+  thinking: 關閉思考模式
+  yes: 是
+  no: 否
+  unset: 未設定
+  languages: 目標語言 · 顯示方式
+  unchanged: 不變
+agentInstructions:
+  noConfiguration: （尚未設定）
+  text: |
+    我在用瀏覽器擴充功能 Plainly（素讀）翻譯網頁，請幫我設定它的翻譯服務。
+    先閱讀說明：$1
+    依照說明操作：問清楚我要用哪家服務、API 金鑰在哪裡、我讀什麼語言；用我的金鑰依照說明裡的請求範本驗證，直到請求成功；把設定 JSON 寫入我的剪貼簿；最後告訴我在 Plainly 彈出視窗裡貼上並套用。
+    我目前的設定（金鑰已遮蔽）：
+    $2
 shortcutKeySelector:
-  placeholder: 請輸入快速鍵
-hotkey:
-  control: Ctrl
-  alt: Option
-  shift: Shift
-  backtick: 反引號
-  clickAndHold: 點選並按住
+  placeholder: 請按下快速鍵
 languages:
   eng: 英語
   cmn: 簡體中文
