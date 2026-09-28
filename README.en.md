@@ -1,10 +1,14 @@
-# Jiandao
+<p align="center"><img src=".github/assets/logo.png" alt="Jiandao icon" width="128"></p>
 
-简道翻译 · [中文](./README.md)
+<h1 align="center">Jiandao</h1>
+
+<p align="center">简道翻译 · <a href="./README.md">中文</a></p>
 
 Jiandao is a browser extension that does one thing: it translates the web page you are reading into your language.
 
 Click "Translate this page" and a translation appears under each paragraph, set apart from the original by a thin line on its left. Nothing else is added to the page: no floating buttons, no selection bubbles, no sidebar. Click again and the page is back to how it was.
+
+![A passage of Thoreau's Walden in English, each paragraph followed by Jiandao's Chinese translation with a thin vermilion line on its left](.github/assets/translation.png)
 
 The translation comes from a model you choose, such as OpenAI, Anthropic, Gemini, DeepSeek, or a model running on your own computer. Page text goes from your browser straight to that service. There is no Jiandao server in between.
 
@@ -34,12 +38,12 @@ To try unreleased code in Chrome, build it the same way: run `pnpm build`, open 
 
 ## First Setup
 
-1. Click the Jiandao icon in the browser toolbar. The popup says there is no translation service yet.
-2. Click "Copy instructions for your agent" and paste them into your coding agent.
-3. The agent asks which service you want, where your API key is, and which language you read. It sends a real translation request with your key, and once that works it puts a configuration on your clipboard.
-4. Back in the popup, paste the configuration and click "Apply and translate this page".
+1. Click the Jiandao icon in the browser toolbar. The popup says there is no translation service yet; click "Set up in settings".
+2. In the "Translation service" section, click "Copy instructions for your agent" and paste them into your coding agent.
+3. The agent asks which service you want and where your API key is. It sends a real translation request with your key, and once that works it puts the service configuration on your clipboard.
+4. Back on the settings page, paste the configuration into the "Translation service" box and click "Apply". Jiandao tests the connection first and saves only if it works.
 
-Changing the service, the model or the prompt later works the same way: click "Copy instructions for your agent" on the settings page, tell the agent what you want to change, and paste the new configuration back.
+To change the service or the model later, click "Edit" in "Translation service": change a field in place, or click "Copy instructions for your agent", tell the agent what you want, and paste the new configuration back.
 
 Setup goes through an agent because service addresses, model names and parameters change often and are easy to get wrong by hand. The agent checks each one against the guide and makes a real request with your key, so the configuration you receive has already worked once. The full guide for agents is [docs/agent-setup.md](./docs/agent-setup.md). If your agent supports skills, you can install [skills/jiandao-setup](./skills/jiandao-setup/SKILL.md) instead.
 
@@ -56,10 +60,12 @@ Open a page, click the toolbar icon, check the source and target languages, and 
 
 Open settings from the popup. The options you are most likely to use:
 
-- **Translation style**: Hairline, Muted, Tinted, Dashed underline, Highlight, Quote bar, Outline, or Reveal on hover. You can also write your own CSS.
-- **Translation range**: Main content or Whole page.
+- **Translation service**: the service in use, where page text goes, and the result of the last connection check. "Test connection" checks again.
+- **Translation style**: Hairline, None, Muted, Tinted or Highlight. You can also write your own CSS.
 - **Use page context**: the model reads a summary of the page before translating paragraphs. Terms and references come out more accurate, at the cost of one extra request per page.
-- **Advanced**: request rate, concurrency, paragraphs and characters per request, and clearing the translation cache.
+- **Prompt**: "Edit" opens the system prompt and the template in place; you can restore the default at any time.
+
+Request rate, batch size and translation range are not settings: Jiandao adjusts them to how the service actually responds, and translates only the main content when a page marks it up.
 
 ## Privacy
 
