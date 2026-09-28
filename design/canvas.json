@@ -3,7 +3,7 @@
   "attachments": {},
   "boards": {
     "Main.dc.html": {
-      "h": 300,
+      "h": 344,
       "title": "弹窗 · 就绪",
       "w": 320,
       "x": 400,
@@ -17,28 +17,28 @@
       "y": 780
     },
     "Popup-Dark.dc.html": {
-      "h": 300,
+      "h": 344,
       "title": "弹窗 · 深色（跟随系统）",
       "w": 320,
       "x": 1200,
       "y": 0
     },
     "Popup-Translating.dc.html": {
-      "h": 300,
+      "h": 344,
       "title": "弹窗 · 翻译中",
       "w": 320,
       "x": 800,
       "y": 0
     },
     "Settings.dc.html": {
-      "h": 980,
+      "h": 1180,
       "title": "设置 · 单页（翻译服务、阅读、译文质量；无高级、无外观）",
       "w": 1120,
       "x": 0,
       "y": 1760
     },
     "Popup-Setup-Agent.dc.html": {
-      "h": 300,
+      "h": 344,
       "title": "弹窗 · 未配置（引导去设置页）",
       "w": 320,
       "x": 0,
@@ -130,17 +130,24 @@
     },
     "Page-Emphasis.dc.html": {
       "h": 600,
-      "title": "页面内 · 词首强调（未翻译）：拉丁词的前一半加粗，标题不变",
+      "title": "页面内 · 英文词首加粗（未翻译）：每个英文单词的前一半加粗，标题不变",
       "w": 880,
       "x": 3280,
       "y": 780
     },
     "Page-Emphasis-Translated.dc.html": {
       "h": 680,
-      "title": "页面内 · 词首强调（双语对照）：原文拉丁词的前一半加粗，译文按同一规则，中文和标题不变",
+      "title": "页面内 · 英文词首加粗（双语对照）：原文按同一规则加粗，中文译文和标题不变",
       "w": 880,
       "x": 4240,
       "y": 780
+    },
+    "Settings-Emphasis.dc.html": {
+      "h": 620,
+      "title": "阅读 · 英文词首加粗已打开：两段示例都加粗，中文不变",
+      "w": 720,
+      "x": 2320,
+      "y": 1760
     }
   },
   "createdOnFiles": {
@@ -212,6 +219,7 @@
     "Page-Emphasis.dc.html",
     "Page-Emphasis-Translated.dc.html",
     "Settings.dc.html",
+    "Settings-Emphasis.dc.html",
     "Adaptive.dc.html",
     "Service-States.dc.html",
     "Agent-Flow.dc.html",

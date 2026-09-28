@@ -14,7 +14,7 @@ a{color:#2B45B8}a:hover{color:#1B2455}
 button{font-family:inherit;cursor:pointer}
 </style>
 </helmet>
-<div style="width: 320px; height: 300px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="width: 320px; height: 344px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between;">
   <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
     <div style="display: flex; align-items: center; gap: 8px;">
       <button type="button" aria-label="源语言" style="flex-grow: 1; min-width: 0; text-align: left; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 10px; padding: 9px 12px; display: flex; flex-direction: column; gap: 2px; color: #151A2D;">
@@ -36,6 +36,11 @@ button{font-family:inherit;cursor:pointer}
       <span style="font-size: 11px; color: rgba(255, 255, 255, 0.7); letter-spacing: 0.04em;">⌥E</span>
     </button>
   </div>
+  <div>
+  <div style="border-top: 1px solid #E3E6EC; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+    <label for="emphasis" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #151A2D;"><span aria-hidden="true" style="font-family: Georgia, serif; font-size: 14px;"><b style="font-weight: inherit; text-shadow: 0.06em 0 0 currentColor;">Re</b>ad</span>英文词首加粗</label>
+    <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="英文词首加粗" style="width: 34px; height: 20px; border-radius: 10px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF;"></span></button>
+  </div>
   <div style="border-top: 1px solid #E3E6EC; padding: 8px 10px 8px 16px; display: flex; align-items: center; justify-content: space-between;">
     <span style="display: flex; align-items: center; gap: 6px; color: #626978; font-size: 12px;">
       <span style="width: 6px; height: 6px; border-radius: 50%; background: #3F8F5A; display: inline-block;"></span>
@@ -45,9 +50,10 @@ button{font-family:inherit;cursor:pointer}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
     </button>
   </div>
+  </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":320,"height":300}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":320,"height":344}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }

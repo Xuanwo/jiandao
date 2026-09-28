@@ -15,7 +15,7 @@ button,input{font-family:inherit}
 button{cursor:pointer}
 </style>
 </helmet>
-<div style="width: 1120px; height: 980px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
+<div style="width: 1120px; height: 1180px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
   <main style="width: 640px; display: flex; flex-direction: column; gap: 40px;">
 
     <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em;">设置</h1>
@@ -27,6 +27,7 @@ button{cursor:pointer}
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
+      <div style="font-size: 12px; color: #626978;">翻译</div>
       <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
           <div style="font-size: 13px; font-weight: 500;">显示方式</div>
@@ -50,13 +51,20 @@ button{cursor:pointer}
             <div style="border-left: 2px solid rgba(242, 74, 44, 0.75); padding-left: 10px; font-size: 13px;">阅读和经历训练的是你对世界的模型。</div>
           </div>
         </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
-          <label for="emphasis" style="font-size: 13px; font-weight: 500;">词首强调</label>
-          <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="词首强调" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button>
-        </div>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
           <label for="shortcut" style="font-size: 13px; font-weight: 500;">快捷键</label>
           <input id="shortcut" type="text" readonly value="⌥E" style="width: 112px; height: 32px; box-sizing: border-box; text-align: center; border: 1px solid #D5D9E1; border-radius: 8px; font-size: 13px; background: #F7F8FA; color: #151A2D;">
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #626978; margin-top: 8px;">英文原文</div>
+      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+        <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; font-family: Georgia, 'Songti SC', serif; font-size: 14px; line-height: 1.65; color: #151A2D;">Reading and experience train your model of the world. Even if you forget what you read, its effect persists.</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+            <label for="emphasis" style="font-size: 13px; font-weight: 500;">英文词首加粗</label>
+            <span style="font-size: 12px; color: #626978;">加粗每个英文单词的前半部分。所有网页立即生效，不用先翻译。</span>
+          </div>
+          <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="英文词首加粗" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button>
         </div>
       </div>
     </section>
@@ -74,7 +82,7 @@ button{cursor:pointer}
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":980}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1180}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
