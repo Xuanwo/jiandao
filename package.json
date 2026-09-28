@@ -62,45 +62,5 @@
       "version": ">=22.0.0",
       "onFail": "download"
     }
-  },
-  "nx": {
-    "targets": {
-      "build": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "wxt build"
-        }
-      },
-      "build:firefox": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "wxt build -b firefox"
-        }
-      },
-      "test": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "vitest run"
-        }
-      },
-      "test:cov": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "vitest run --coverage"
-        }
-      },
-      "lint": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "eslint"
-        }
-      },
-      "type-check": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "tsc --noEmit"
-        }
-      }
-    }
   }
 }
