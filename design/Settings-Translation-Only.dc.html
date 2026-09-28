@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>阅读 · 仅译文</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
+a{color:#2B45B8}a:hover{color:#1B2455}
+button,input{font-family:inherit}
+button{cursor:pointer}
+/* The extension paints each word prefix with ::highlight(jiandao-word-prefix): a text shadow of the text color, which keeps the glyph widths. */
+b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
+</style>
+</helmet>
+<div style="width: 720px; height: 440px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 32px 40px;">
+  <section style="display: flex; flex-direction: column; gap: 12px;">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
+        <div style="font-size: 12px; color: #626978;">翻译时</div>
+        <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+          <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.65; color: #151A2D;">
+            <div style="font-size: 14px;">阅读和经历训练的是你对世界的模型。</div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; ">
+            <div style="font-size: 13px; font-weight: 500;">显示方式</div>
+            <div role="group" aria-label="显示方式" style="display: flex; background: #EEF0F4; border-radius: 8px; padding: 2px; gap: 2px;"><button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #626978; font-size: 12px; font-weight: 500;">双语对照</button><button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E3E6EC; border-radius: 6px; background: #FFFFFF; color: #151A2D; font-size: 12px; font-weight: 500;">仅译文</button></div>
+          </div>
+        </div>
+        <div style="font-size: 12px; color: #626978; margin-top: 8px;">所有网页</div>
+        <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+          <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.65; color: #151A2D;"><div style="font-family: Georgia, 'Songti SC', serif;">Reading and experience train your model of the world. Even if you forget what you read, its effect persists.</div></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
+            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <label for="emphasis" style="font-size: 13px; font-weight: 500;">英文词首加粗</label>
+              <span style="font-size: 12px; color: #626978;">加粗每个英文单词的前半部分，不用先翻译。</span>
+            </div>
+            <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="英文词首加粗" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button>
+          </div>
+        </div>
+      </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

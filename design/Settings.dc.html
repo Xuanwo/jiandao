@@ -13,9 +13,11 @@ body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sa
 a{color:#2B45B8}a:hover{color:#1B2455}
 button,input{font-family:inherit}
 button{cursor:pointer}
+/* The extension paints each word prefix with ::highlight(jiandao-word-prefix): a text shadow of the text color, which keeps the glyph widths. */
+b{font-weight:inherit;text-shadow:0.045em 0 0 currentColor}
 </style>
 </helmet>
-<div style="width: 1120px; height: 1180px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
+<div style="width: 1120px; height: 1160px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
   <main style="width: 640px; display: flex; flex-direction: column; gap: 40px;">
 
     <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em;">设置</h1>
@@ -26,48 +28,34 @@ button{cursor:pointer}
     </section>
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
-      <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
-      <div style="font-size: 12px; color: #626978;">翻译</div>
-      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
-          <div style="font-size: 13px; font-weight: 500;">显示方式</div>
-          <div role="group" aria-label="显示方式" style="display: flex; background: #EEF0F4; border-radius: 8px; padding: 2px; gap: 2px;">
-            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E3E6EC; border-radius: 6px; background: #FFFFFF; color: #151A2D; font-size: 12px; font-weight: 500;">双语对照</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #626978; font-size: 12px; font-weight: 500;">仅译文</button>
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
+          <div style="font-size: 12px; color: #626978;">翻译时</div>
+          <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+            <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.65; color: #151A2D;">
+              <div style="font-family: Georgia, 'Songti SC', serif;">Reading and experience train your model of the world.</div>
+              <div style="border-left: 2px solid rgba(242, 74, 44, 0.75); padding-left: 10px; font-size: 13px;">阅读和经历训练的是你对世界的模型。</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC; ">
+              <div style="font-size: 13px; font-weight: 500;">显示方式</div>
+              <div role="group" aria-label="显示方式" style="display: flex; background: #EEF0F4; border-radius: 8px; padding: 2px; gap: 2px;"><button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E3E6EC; border-radius: 6px; background: #FFFFFF; color: #151A2D; font-size: 12px; font-weight: 500;">双语对照</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #626978; font-size: 12px; font-weight: 500;">仅译文</button></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px;">
+              <div style="font-size: 13px; font-weight: 500;">译文样式</div>
+              <div role="group" aria-label="译文样式" style="display: flex; flex-wrap: wrap; gap: 6px;"><button type="button" aria-pressed="true" style="height: 28px; padding: 0 12px; border: 1px solid #1B2455; border-radius: 14px; background: #1B2455; color: #FFFFFF; font-size: 12px;">左侧细线</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">无</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">淡化</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">着色</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">底色</button><button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">自定义 CSS</button></div>
+            </div>
           </div>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
-          <div style="font-size: 13px; font-weight: 500;">译文样式</div>
-          <div role="group" aria-label="译文样式" style="display: flex; flex-wrap: wrap; gap: 6px;">
-            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 12px; border: 1px solid #1B2455; border-radius: 14px; background: #1B2455; color: #FFFFFF; font-size: 12px;">左侧细线</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">无</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">淡化</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">着色</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">底色</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">自定义 CSS</button>
+          <div style="font-size: 12px; color: #626978; margin-top: 8px;">所有网页</div>
+          <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+            <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.65; color: #151A2D;"><div style="font-family: Georgia, 'Songti SC', serif;">Reading and experience train your model of the world. Even if you forget what you read, its effect persists.</div></div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
+              <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+                <label for="emphasis" style="font-size: 13px; font-weight: 500;">英文词首加粗</label>
+                <span style="font-size: 12px; color: #626978;">加粗每个英文单词的前半部分，不用先翻译。</span>
+              </div>
+              <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="英文词首加粗" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button>
+            </div>
           </div>
-          <div style="border-radius: 8px; background: #F1F3F6; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6;">
-            <div style="font-family: Georgia, 'Songti SC', serif; color: #151A2D;">Reading and experience train your model of the world.</div>
-            <div style="border-left: 2px solid rgba(242, 74, 44, 0.75); padding-left: 10px; font-size: 13px;">阅读和经历训练的是你对世界的模型。</div>
-          </div>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
-          <label for="shortcut" style="font-size: 13px; font-weight: 500;">快捷键</label>
-          <input id="shortcut" type="text" readonly value="⌥E" style="width: 112px; height: 32px; box-sizing: border-box; text-align: center; border: 1px solid #D5D9E1; border-radius: 8px; font-size: 13px; background: #F7F8FA; color: #151A2D;">
-        </div>
-      </div>
-      <div style="font-size: 12px; color: #626978; margin-top: 8px;">英文原文</div>
-      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-        <div style="padding: 16px 18px; border-bottom: 1px solid #E3E6EC; background: #FBFBFC; font-family: Georgia, 'Songti SC', serif; font-size: 14px; line-height: 1.65; color: #151A2D;">Reading and experience train your model of the world. Even if you forget what you read, its effect persists.</div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
-          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
-            <label for="emphasis" style="font-size: 13px; font-weight: 500;">英文词首加粗</label>
-            <span style="font-size: 12px; color: #626978;">加粗每个英文单词的前半部分。所有网页立即生效，不用先翻译。</span>
-          </div>
-          <button type="button" id="emphasis" role="switch" aria-checked="false" aria-label="英文词首加粗" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button>
-        </div>
-      </div>
-    </section>
+        </section>
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">译文质量</h2>
@@ -77,12 +65,22 @@ button{cursor:pointer}
       </div>
     </section>
 
+    <section style="display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600;">快捷键</h2>
+      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
+          <label for="shortcut" style="font-size: 13px; font-weight: 500;">翻译此页 / 显示原文</label>
+          <input id="shortcut" type="text" readonly value="⌥E" style="width: 112px; height: 32px; box-sizing: border-box; text-align: center; border: 1px solid #D5D9E1; border-radius: 8px; font-size: 13px; background: #F7F8FA; color: #151A2D;">
+        </div>
+      </div>
+    </section>
+
 
 
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1180}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1160}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }

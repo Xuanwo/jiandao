@@ -3,7 +3,7 @@
   "attachments": {},
   "boards": {
     "Main.dc.html": {
-      "h": 344,
+      "h": 300,
       "title": "弹窗 · 就绪",
       "w": 320,
       "x": 400,
@@ -17,28 +17,28 @@
       "y": 780
     },
     "Popup-Dark.dc.html": {
-      "h": 344,
+      "h": 300,
       "title": "弹窗 · 深色（跟随系统）",
       "w": 320,
       "x": 1200,
       "y": 0
     },
     "Popup-Translating.dc.html": {
-      "h": 344,
+      "h": 300,
       "title": "弹窗 · 翻译中",
       "w": 320,
       "x": 800,
       "y": 0
     },
     "Settings.dc.html": {
-      "h": 1180,
-      "title": "设置 · 单页（翻译服务、阅读、译文质量；无高级、无外观）",
+      "h": 1160,
+      "title": "设置 · 单页（翻译服务、阅读、译文质量、快捷键；无高级、无外观）",
       "w": 1120,
       "x": 0,
       "y": 1760
     },
     "Popup-Setup-Agent.dc.html": {
-      "h": 344,
+      "h": 300,
       "title": "弹窗 · 未配置（引导去设置页）",
       "w": 320,
       "x": 0,
@@ -143,11 +143,25 @@
       "y": 780
     },
     "Settings-Emphasis.dc.html": {
-      "h": 620,
-      "title": "阅读 · 英文词首加粗已打开：两段示例都加粗，中文不变",
+      "h": 560,
+      "title": "阅读 · 英文词首加粗已打开：两段预览里的英文都加粗，中文不变",
       "w": 720,
       "x": 2320,
       "y": 1760
+    },
+    "Settings-Translation-Only.dc.html": {
+      "h": 440,
+      "title": "阅读 · 仅译文：预览只剩译文；译文样式只作用于双语对照，所以隐藏",
+      "w": 720,
+      "x": 3120,
+      "y": 1760
+    },
+    "Popup-Emphasis.dc.html": {
+      "h": 300,
+      "title": "弹窗 · 英文词首加粗已打开：底栏按钮按下，与翻译操作分开",
+      "w": 320,
+      "x": 1600,
+      "y": 0
     }
   },
   "createdOnFiles": {
@@ -213,6 +227,7 @@
     "Main.dc.html",
     "Popup-Translating.dc.html",
     "Popup-Dark.dc.html",
+    "Popup-Emphasis.dc.html",
     "Page.dc.html",
     "Icon.dc.html",
     "Palette.dc.html",
@@ -220,6 +235,7 @@
     "Page-Emphasis-Translated.dc.html",
     "Settings.dc.html",
     "Settings-Emphasis.dc.html",
+    "Settings-Translation-Only.dc.html",
     "Adaptive.dc.html",
     "Service-States.dc.html",
     "Agent-Flow.dc.html",
