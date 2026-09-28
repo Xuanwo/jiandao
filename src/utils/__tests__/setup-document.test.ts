@@ -23,34 +23,34 @@ function configWithOpenAIKey(apiKey: string): Config {
 
 describe("parseSetupDocument", () => {
   it("accepts the minimal document for an official service", () => {
-    const result = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"}}`)
+    const result = parseSetupDocument(`{"jiandao":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"}}`)
     expect(result.ok).toBe(true)
   })
 
   it("accepts every official service and a compatible one with its own wire format", () => {
     for (const type of ["openai", "anthropic", "gemini", "deepseek"]) {
-      expect(parseSetupDocument(JSON.stringify({ plainly: 1, provider: { type, apiKey: "k", model: "m" } })).ok).toBe(true)
+      expect(parseSetupDocument(JSON.stringify({ jiandao: 1, provider: { type, apiKey: "k", model: "m" } })).ok).toBe(true)
     }
-    const xai = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai-compatible","api":"openai-responses","apiKey":"k","model":"grok-4.7","baseURL":"https://api.x.ai/v1"}}`)
+    const xai = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai-compatible","api":"openai-responses","apiKey":"k","model":"grok-4.7","baseURL":"https://api.x.ai/v1"}}`)
     expect(xai.ok).toBe(true)
   })
 
   it("reports each problem with its JSON path so the agent can fix it", () => {
-    const result = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai-compatible","apiKey":"local","model":"qwen3:8b"},"targetLanguage":"zh"}`)
+    const result = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai-compatible","apiKey":"local","model":"qwen3:8b"},"targetLanguage":"zh"}`)
     expect(result.ok).toBe(false)
     if (result.ok)
       return
     expect(result.error).toContain("provider.baseURL: baseURL is required")
     expect(result.error).toContain("targetLanguage:")
 
-    const noModel = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai","apiKey":"sk-abc"}}`)
+    const noModel = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai","apiKey":"sk-abc"}}`)
     expect(noModel.ok).toBe(false)
     if (!noModel.ok)
       expect(noModel.error).toMatch(/^provider\.model:/)
   })
 
   it("rejects unknown fields instead of ignoring them", () => {
-    const result = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai","apiKey":"sk-abc","model":"gpt-6-luna","providerOptions":{}}}`)
+    const result = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai","apiKey":"sk-abc","model":"gpt-6-luna","providerOptions":{}}}`)
     expect(result.ok).toBe(false)
     if (!result.ok)
       expect(result.error).toContain("providerOptions")
@@ -67,7 +67,7 @@ describe("parseSetupDocument", () => {
 describe("applySetupDocument", () => {
   it("adds a new service, makes it the translation service and sets languages", () => {
     const parsed = parseSetupDocument(JSON.stringify({
-      plainly: 1,
+      jiandao: 1,
       provider: { type: "openai-compatible", name: "Ollama", apiKey: "local", model: "qwen3:8b", baseURL: "http://localhost:11434/v1/", body: { reasoning_effort: "none" } },
       targetLanguage: "jpn",
       sourceLanguage: "eng",
@@ -98,7 +98,7 @@ describe("applySetupDocument", () => {
   })
 
   it("replaces the stored service with the same type and endpoint and keeps the others", () => {
-    const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai","apiKey":"sk-new-key","model":"gpt-6-luna","body":{"reasoning":{"effort":"none"}}}}`)
+    const parsed = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai","apiKey":"sk-new-key","model":"gpt-6-luna","body":{"reasoning":{"effort":"none"}}}}`)
     if (!parsed.ok)
       throw new Error(parsed.error)
 
@@ -136,7 +136,7 @@ describe("applySetupDocument", () => {
   })
 
   it("refuses a document without a usable key when no stored service matches", () => {
-    const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-…a9f2","model":"deepseek-flash"}}`)
+    const parsed = parseSetupDocument(`{"jiandao":1,"provider":{"type":"deepseek","apiKey":"sk-…a9f2","model":"deepseek-flash"}}`)
     if (!parsed.ok)
       throw new Error(parsed.error)
 
@@ -144,7 +144,7 @@ describe("applySetupDocument", () => {
   })
 
   it("treats a relay with its own base URL as a different service from the official API", () => {
-    const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai","apiKey":"sk-relay","model":"gpt-6-luna","baseURL":"https://relay.example.com/v1"}}`)
+    const parsed = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai","apiKey":"sk-relay","model":"gpt-6-luna","baseURL":"https://relay.example.com/v1"}}`)
     if (!parsed.ok)
       throw new Error(parsed.error)
 
@@ -158,7 +158,7 @@ describe("applySetupDocument", () => {
 
 describe("applySetupDocument prompt", () => {
   it("installs the document's prompt as the one in use and restores the default with null", () => {
-    const withPrompt = parseSetupDocument(JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-abc", model: "deepseek-flash" }, prompt: { name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" } }))
+    const withPrompt = parseSetupDocument(JSON.stringify({ jiandao: 1, provider: { type: "deepseek", apiKey: "sk-abc", model: "deepseek-flash" }, prompt: { name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" } }))
     if (!withPrompt.ok)
       throw new Error(withPrompt.error)
     const applied = applySetupDocument(DEFAULT_CONFIG, withPrompt.document).config
@@ -168,7 +168,7 @@ describe("applySetupDocument prompt", () => {
     })
     expect(exportSetupDocument(applied)?.prompt).toEqual({ name: "Terse", systemPrompt: "Be terse.", prompt: "Translate: {{input}}" })
 
-    const restore = parseSetupDocument(JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-…-abc", model: "deepseek-flash" }, prompt: null }))
+    const restore = parseSetupDocument(JSON.stringify({ jiandao: 1, provider: { type: "deepseek", apiKey: "sk-…-abc", model: "deepseek-flash" }, prompt: null }))
     if (!restore.ok)
       throw new Error(restore.error)
     const restored = applySetupDocument(applied, restore.document).config
@@ -178,12 +178,12 @@ describe("applySetupDocument prompt", () => {
 
   it("leaves the stored prompt alone when the document does not mention it, and rejects a prompt without {{input}}", () => {
     const stored = { ...DEFAULT_CONFIG, translate: { ...DEFAULT_CONFIG.translate, customPromptsConfig: { promptId: "p1", patterns: [{ id: "p1", name: "Mine", systemPrompt: "", prompt: "{{input}}" }] } } }
-    const untouched = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"}}`)
+    const untouched = parseSetupDocument(`{"jiandao":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"}}`)
     if (!untouched.ok)
       throw new Error(untouched.error)
     expect(applySetupDocument(stored, untouched.document).config.translate.customPromptsConfig).toEqual(stored.translate.customPromptsConfig)
 
-    const bad = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"},"prompt":{"prompt":"Translate this"}}`)
+    const bad = parseSetupDocument(`{"jiandao":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash"},"prompt":{"prompt":"Translate this"}}`)
     expect(bad.ok).toBe(false)
     if (!bad.ok)
       expect(bad.error).toContain("prompt.prompt: prompt must contain {{input}}")
@@ -192,7 +192,7 @@ describe("applySetupDocument prompt", () => {
 
 describe("describeSetupDocument", () => {
   it("tells the reader where page text will go and whether the key is new", () => {
-    const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash","body":{"thinking":{"type":"disabled"}}},"targetLanguage":"cmn","mode":"bilingual"}`)
+    const parsed = parseSetupDocument(`{"jiandao":1,"provider":{"type":"deepseek","apiKey":"sk-abc","model":"deepseek-flash","body":{"thinking":{"type":"disabled"}}},"targetLanguage":"cmn","mode":"bilingual"}`)
     if (!parsed.ok)
       throw new Error(parsed.error)
 
@@ -223,7 +223,7 @@ describe("describeSetupDocument", () => {
       [{ type: "openai-compatible", baseURL: "http://localhost:1234/v1", body: { enable_thinking: false } }, true],
     ]
     for (const [provider, expected] of cases) {
-      const parsed = parseSetupDocument(JSON.stringify({ plainly: 1, provider: { apiKey: "k", model: "m", ...provider } }))
+      const parsed = parseSetupDocument(JSON.stringify({ jiandao: 1, provider: { apiKey: "k", model: "m", ...provider } }))
       if (!parsed.ok)
         throw new Error(parsed.error)
       expect(describeSetupDocument(DEFAULT_CONFIG, parsed.document).thinkingOff, JSON.stringify(provider)).toBe(expected)
@@ -231,7 +231,7 @@ describe("describeSetupDocument", () => {
   })
 
   it("uses the base URL host for custom endpoints and reports a missing key", () => {
-    const parsed = parseSetupDocument(`{"plainly":1,"provider":{"type":"openai-compatible","model":"qwen3:8b","baseURL":"http://localhost:11434/v1"}}`)
+    const parsed = parseSetupDocument(`{"jiandao":1,"provider":{"type":"openai-compatible","model":"qwen3:8b","baseURL":"http://localhost:11434/v1"}}`)
     if (!parsed.ok)
       throw new Error(parsed.error)
 
@@ -264,7 +264,7 @@ describe("exportSetupDocument", () => {
 
     const reparsed = parseSetupDocument(stringifySetupDocument(exported))
     expect(reparsed.ok).toBe(true)
-    expect(exported).toMatchObject({ plainly: 1, provider: { type: "openai", apiKey: "sk-…ijkl", model: "gpt-6-luna" }, targetLanguage: "cmn", sourceLanguage: "auto", mode: "bilingual" })
+    expect(exported).toMatchObject({ jiandao: 1, provider: { type: "openai", apiKey: "sk-…ijkl", model: "gpt-6-luna" }, targetLanguage: "cmn", sourceLanguage: "auto", mode: "bilingual" })
     expect(exported.provider).not.toHaveProperty("api")
   })
 })

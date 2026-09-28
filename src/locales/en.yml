@@ -1,5 +1,5 @@
-name: Plainly
-extName: Plainly
+name: Jiandao
+extName: Jiandao Translate
 extDescription: Translates the web page you are reading, and does nothing else.
 languageCombobox:
   searchLanguages: Search languages…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: Copy instructions for your agent
     copied: Copied
     pasteLabel: Configuration from your agent
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: no API key in the configuration
     apply: Apply and translate this page
     applyOnly: Apply
@@ -91,7 +91,7 @@ options:
         blur: Reveal on hover
       cssPlaceholder: |
         /* Example: tint and highlight the translation */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: Cancel
 translation:
   sameLanguage: Source and target languages must be different
-  noApiKey: Add an API key first. Click the Plainly icon in the toolbar to set it up.
+  noApiKey: Add an API key first. Click the Jiandao icon in the toolbar to set it up.
   failed: Translation failed
   retry: Retry
   unknownError: Something went wrong
 agentInstructions:
   noConfiguration: (none yet)
   text: |
-    I use the browser extension Plainly (素读) to translate web pages. Please set up its translation service for me.
+    I use the browser extension Jiandao (简道翻译) to translate web pages. Please set up its translation service for me.
     Read the guide first: $1
-    Follow it: ask me which service I want, where my API key is and which language I read in. Verify with my key using the request template in the guide until a request succeeds. Write the configuration JSON to my clipboard. Then tell me to paste it into the Plainly popup and apply.
+    Follow it: ask me which service I want, where my API key is and which language I read in. Verify with my key using the request template in the guide until a request succeeds. Write the configuration JSON to my clipboard. Then tell me to paste it into the Jiandao popup and apply.
     My current configuration, with the key masked:
     $2
 shortcutKeySelector:

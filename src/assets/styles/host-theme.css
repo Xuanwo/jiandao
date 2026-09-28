@@ -1,19 +1,19 @@
 :root {
-  --plainly-primary: oklch(0.205 0 0);
-  --plainly-brand: oklch(76.034% 0.12361 82.191);
-  --plainly-brand-strong: oklch(58% 0.11 82.191);
-  --plainly-foreground: oklch(0.985 0 0);
-  --plainly-muted: oklch(0.97 0 0);
-  --plainly-muted-foreground: oklch(0.556 0 0);
+  --jiandao-primary: oklch(0.205 0 0);
+  --jiandao-brand: oklch(76.034% 0.12361 82.191);
+  --jiandao-brand-strong: oklch(58% 0.11 82.191);
+  --jiandao-foreground: oklch(0.985 0 0);
+  --jiandao-muted: oklch(0.97 0 0);
+  --jiandao-muted-foreground: oklch(0.556 0 0);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --plainly-primary: oklch(0.922 0 0);
-    --plainly-brand: oklch(76.034% 0.12361 82.191);
-    --plainly-brand-strong: oklch(80% 0.12 82.191);
-    --plainly-foreground: oklch(0.205 0 0);
-    --plainly-muted: oklch(0.269 0 0);
-    --plainly-muted-foreground: oklch(0.708 0 0);
+    --jiandao-primary: oklch(0.922 0 0);
+    --jiandao-brand: oklch(76.034% 0.12361 82.191);
+    --jiandao-brand-strong: oklch(80% 0.12 82.191);
+    --jiandao-foreground: oklch(0.205 0 0);
+    --jiandao-muted: oklch(0.269 0 0);
+    --jiandao-muted-foreground: oklch(0.708 0 0);
   }
 }

@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for Plainly
+description: Suggest an idea for Jiandao
 title: "[FEATURE] "
 labels: [enhancement]
 assignees: []
@@ -18,7 +18,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This template is used for suggesting a feature for Plainly.
+        This template is used for suggesting a feature for Jiandao.
 
         Bug reports should be opened with the bug report template.
   - type: textarea

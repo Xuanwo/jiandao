@@ -16,7 +16,7 @@ import { trackTranslationFinished, trackTranslationStarted } from "./translation
  */
 export function createLightweightSpinner(ownerDoc: Document): HTMLElement {
   const spinner = ownerDoc.createElement("span")
-  spinner.className = "plainly-spinner"
+  spinner.className = "jiandao-spinner"
   // Inline styles keep the spinner resilient against host page CSS overrides.
   // Use a thin muted arc with transparent sides so bulk page translation does
   // not paint a dense field of high-contrast rings across the screen.
@@ -33,7 +33,7 @@ export function createLightweightSpinner(ownerDoc: Document): HTMLElement {
     padding: 0 !important;
     vertical-align: middle !important;
     border: 1.5px solid transparent !important;
-    border-top: 1.5px solid var(--plainly-muted-foreground) !important;
+    border-top: 1.5px solid var(--jiandao-muted-foreground) !important;
     border-radius: 50% !important;
     box-sizing: content-box !important;
     flex-shrink: 0 !important;
@@ -63,7 +63,7 @@ export function createLightweightSpinner(ownerDoc: Document): HTMLElement {
     // For reduced motion or when Web Animations API isn't available,
     // keep a static muted segment so the loading state stays visible
     // without requiring animation.
-    spinner.style.borderTopColor = "var(--plainly-muted-foreground)"
+    spinner.style.borderTopColor = "var(--jiandao-muted-foreground)"
   }
 
   return spinner

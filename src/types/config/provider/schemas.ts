@@ -11,7 +11,7 @@ const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
 
 /**
  * One translation service. The stored shape mirrors the setup document an
- * agent writes: what the agent verified with curl is what Plainly sends.
+ * agent writes: what the agent verified with curl is what Jiandao sends.
  */
 export const providerConfigItemSchema = z.strictObject({
   id: z.string().nonempty(),
@@ -29,7 +29,7 @@ export const providerConfigItemSchema = z.strictObject({
   temperature: z.number().min(0).optional(),
   /** Extra HTTP headers, sent as given. */
   headers: z.record(z.string(), z.string()).optional(),
-  /** JSON merged into the request body after Plainly's own fields, so it can add or override any of them. */
+  /** JSON merged into the request body after Jiandao's own fields, so it can add or override any of them. */
   body: z.record(z.string(), jsonValueSchema).optional(),
 }).superRefine((provider, ctx) => {
   if (provider.provider === "openai-compatible" && !provider.baseURL) {

@@ -1,5 +1,5 @@
-name: Plainly
-extName: Plainly
+name: Jiandao
+extName: Jiandao
 extDescription: Traduce la página web que estás leyendo y nada más.
 languageCombobox:
   searchLanguages: Buscar idiomas…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: Copiar instrucciones para tu agente
     copied: Copiado
     pasteLabel: Configuración de tu agente
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: la configuración no tiene clave API
     apply: Aplicar y traducir esta página
     applyOnly: Aplicar
@@ -91,7 +91,7 @@ options:
         blur: Mostrar al pasar el cursor
       cssPlaceholder: |
         /* Ejemplo: colorear y resaltar la traducción */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: Cancelar
 translation:
   sameLanguage: Los idiomas de origen y destino deben ser diferentes
-  noApiKey: Primero añade una clave API. Haz clic en el icono de Plainly en la barra de herramientas para configurarla.
+  noApiKey: Primero añade una clave API. Haz clic en el icono de Jiandao en la barra de herramientas para configurarla.
   failed: Error de traducción
   retry: Reintentar
   unknownError: Algo salió mal
 agentInstructions:
   noConfiguration: (aún ninguna)
   text: |
-    Uso la extensión de navegador Plainly (素读) para traducir páginas web. Configura su servicio de traducción, por favor.
+    Uso la extensión de navegador Jiandao (简道翻译) para traducir páginas web. Configura su servicio de traducción, por favor.
     Lee primero la guía: $1
-    Síguela: pregúntame qué servicio quiero, dónde está mi clave API y en qué idioma leo. Verifica la configuración con mi clave y la plantilla de solicitud de la guía hasta que una solicitud funcione. Escribe el JSON de configuración en mi portapapeles. Después dime que lo pegue en la ventana emergente de Plainly y lo aplique.
+    Síguela: pregúntame qué servicio quiero, dónde está mi clave API y en qué idioma leo. Verifica la configuración con mi clave y la plantilla de solicitud de la guía hasta que una solicitud funcione. Escribe el JSON de configuración en mi portapapeles. Después dime que lo pegue en la ventana emergente de Jiandao y lo aplique.
     Mi configuración actual, con la clave oculta:
     $2
 shortcutKeySelector:

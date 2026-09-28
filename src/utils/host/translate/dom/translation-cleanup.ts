@@ -13,7 +13,7 @@ export function removeShadowHostInTranslatedWrapper(wrapper: HTMLElement): void 
   }
 
   // Remove lightweight spinners
-  const spinner = wrapper.querySelector(".plainly-spinner")
+  const spinner = wrapper.querySelector(".jiandao-spinner")
   if (spinner) {
     batchDOMOperation(() => spinner.remove())
   }

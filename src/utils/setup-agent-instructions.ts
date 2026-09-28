@@ -2,7 +2,7 @@ import type { Config } from "@/types/config/config"
 import { i18n } from "#imports"
 import { exportSetupDocument, stringifySetupDocument } from "./setup-document"
 
-export const AGENT_SETUP_GUIDE_URL = "https://github.com/Xuanwo/plainly/blob/main/docs/agent-setup.md"
+export const AGENT_SETUP_GUIDE_URL = "https://github.com/Xuanwo/jiandao/blob/main/docs/agent-setup.md"
 
 /**
  * The text the reader hands to their agent. It points at the guide and

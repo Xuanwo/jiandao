@@ -61,7 +61,7 @@ describe("settings page", () => {
     const textarea = screen.getByLabelText("options.service.paste.label")
     expect(screen.getByRole("button", { name: "options.service.paste.apply" })).toBeDisabled()
 
-    fireEvent.change(textarea, { target: { value: JSON.stringify({ plainly: 1, provider: { type: "deepseek", apiKey: "sk-test", model: "deepseek-flash" } }) } })
+    fireEvent.change(textarea, { target: { value: JSON.stringify({ jiandao: 1, provider: { type: "deepseek", apiKey: "sk-test", model: "deepseek-flash" } }) } })
 
     expect(screen.getByText("DeepSeek", { selector: "span" })).toBeInTheDocument()
     expect(screen.getByText("deepseek-flash", { selector: "span" })).toBeInTheDocument()

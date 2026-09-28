@@ -1,5 +1,5 @@
-name: 素讀
-extName: 素讀
+name: 簡道翻譯
+extName: 簡道翻譯
 extDescription: 翻譯你正在讀的網頁，其他什麼都不做。
 languageCombobox:
   searchLanguages: 搜尋語言…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: 複製給 agent 的說明
     copied: 已複製
     pasteLabel: agent 產生的設定
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: 設定裡沒有 API 金鑰
     apply: 套用並翻譯此頁
     applyOnly: 套用
@@ -91,7 +91,7 @@ options:
         blur: 游標停留時顯示
       cssPlaceholder: |
         /* 範例：為譯文著色並加上底色 */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: 取消
 translation:
   sameLanguage: 來源語言和目標語言必須不同
-  noApiKey: 尚未填入 API 金鑰。請點一下工具列上的素讀圖示進行設定。
+  noApiKey: 尚未填入 API 金鑰。請點一下工具列上的簡道翻譯圖示進行設定。
   failed: 翻譯失敗
   retry: 重試
   unknownError: 發生錯誤
 agentInstructions:
   noConfiguration: （尚未設定）
   text: |
-    我在用瀏覽器擴充功能 Plainly（素讀）翻譯網頁，請幫我設定它的翻譯服務。
+    我在用瀏覽器擴充功能簡道翻譯（Jiandao）來翻譯網頁，請幫我設定它的翻譯服務。
     先閱讀說明：$1
-    依照說明操作：問清楚我要用哪家服務、API 金鑰在哪裡、我讀什麼語言；用我的金鑰依照說明裡的請求範本驗證，直到請求成功；把設定 JSON 寫入我的剪貼簿；最後告訴我在 Plainly 彈出視窗裡貼上並套用。
+    依照說明操作：問清楚我要用哪家服務、API 金鑰在哪裡、我讀什麼語言；用我的金鑰依照說明裡的請求範本驗證，直到請求成功；把設定 JSON 寫入我的剪貼簿；最後告訴我在 Jiandao 彈出視窗裡貼上並套用。
     我目前的設定（金鑰已遮蔽）：
     $2
 shortcutKeySelector:

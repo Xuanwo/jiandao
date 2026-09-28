@@ -1,5 +1,5 @@
-name: Plainly
-extName: Plainly
+name: Jiandao
+extName: Jiandao
 extDescription: 지금 읽고 있는 웹 페이지를 번역합니다. 그 외에는 아무것도 하지 않습니다.
 languageCombobox:
   searchLanguages: 언어 검색…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: 에이전트용 안내 복사
     copied: 복사됨
     pasteLabel: 에이전트가 만든 구성
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: 구성에 API 키가 없습니다
     apply: 적용하고 이 페이지 번역
     applyOnly: 적용
@@ -91,7 +91,7 @@ options:
         blur: 마우스를 올리면 표시
       cssPlaceholder: |
         /* 예: 번역에 색을 입히고 강조하기 */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: 취소
 translation:
   sameLanguage: 원본 언어와 대상 언어는 달라야 합니다
-  noApiKey: 먼저 API 키를 추가하세요. 툴바의 Plainly 아이콘을 클릭하면 설정할 수 있습니다.
+  noApiKey: 먼저 API 키를 추가하세요. 툴바의 Jiandao 아이콘을 클릭하면 설정할 수 있습니다.
   failed: 번역 실패
   retry: 다시 시도
   unknownError: 문제가 발생했습니다
 agentInstructions:
   noConfiguration: (아직 없음)
   text: |
-    브라우저 확장 프로그램 Plainly(素读)로 웹 페이지를 번역하고 있습니다. 번역 서비스를 설정해 주세요.
+    브라우저 확장 프로그램 Jiandao(简道翻译)로 웹 페이지를 번역하고 있습니다. 번역 서비스를 설정해 주세요.
     먼저 가이드를 읽어 주세요: $1
-    가이드를 따라 주세요: 제가 원하는 서비스, API 키의 위치, 제가 읽는 언어를 물어봐 주세요. 가이드의 요청 템플릿으로 제 키를 사용해 요청이 성공할 때까지 검증해 주세요. 구성 JSON을 제 클립보드에 써 주세요. 그런 다음 Plainly 팝업에 붙여 넣고 적용하라고 알려 주세요.
+    가이드를 따라 주세요: 제가 원하는 서비스, API 키의 위치, 제가 읽는 언어를 물어봐 주세요. 가이드의 요청 템플릿으로 제 키를 사용해 요청이 성공할 때까지 검증해 주세요. 구성 JSON을 제 클립보드에 써 주세요. 그런 다음 Jiandao 팝업에 붙여 넣고 적용하라고 알려 주세요.
     현재 구성(키는 가려져 있습니다):
     $2
 shortcutKeySelector:

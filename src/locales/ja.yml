@@ -1,5 +1,5 @@
-name: 素読
-extName: 素読
+name: Jiandao
+extName: Jiandao
 extDescription: 読んでいるウェブページを翻訳します。それ以外のことはしません。
 languageCombobox:
   searchLanguages: 言語を検索…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: エージェント向けの手順をコピー
     copied: コピーしました
     pasteLabel: エージェントが作成した構成
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: 構成に API キーがありません
     apply: 適用してこのページを翻訳
     applyOnly: 適用
@@ -91,7 +91,7 @@ options:
         blur: ホバーで表示
       cssPlaceholder: |
         /* 例：翻訳に色とハイライトを付ける */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: キャンセル
 translation:
   sameLanguage: ソース言語とターゲット言語は異なる必要があります
-  noApiKey: まず API キーを追加してください。ツールバーの素読アイコンをクリックすると設定できます。
+  noApiKey: まず API キーを追加してください。ツールバーの Jiandao アイコンをクリックすると設定できます。
   failed: 翻訳に失敗しました
   retry: 再試行
   unknownError: 問題が発生しました
 agentInstructions:
   noConfiguration: （まだありません）
   text: |
-    ブラウザー拡張機能 Plainly（素读）でウェブページを翻訳しています。翻訳サービスを設定してください。
+    ブラウザー拡張機能 Jiandao（简道翻译）でウェブページを翻訳しています。翻訳サービスを設定してください。
     まずガイドを読んでください：$1
-    ガイドに従ってください：使いたいサービス、API キーの場所、私が読む言語を私に聞いてください。ガイドのリクエストテンプレートを使って私のキーで検証し、リクエストが成功するまで続けてください。構成の JSON を私のクリップボードに書き込んでください。最後に、Plainly のポップアップに貼り付けて適用するよう私に伝えてください。
+    ガイドに従ってください：使いたいサービス、API キーの場所、私が読む言語を私に聞いてください。ガイドのリクエストテンプレートを使って私のキーで検証し、リクエストが成功するまで続けてください。構成の JSON を私のクリップボードに書き込んでください。最後に、Jiandao のポップアップに貼り付けて適用するよう私に伝えてください。
     現在の構成（キーは伏せてあります）：
     $2
 shortcutKeySelector:

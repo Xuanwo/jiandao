@@ -3,7 +3,7 @@ import { APP_NAME } from "@/utils/constants/app"
 
 /**
  * The translation and summary caches in IndexedDB. The database name and
- * version match what Plainly 1.0 created through Dexie (which stores its
+ * version match what Jiandao 1.0 created through Dexie (which stores its
  * schema version times ten), so existing caches open as they are.
  */
 

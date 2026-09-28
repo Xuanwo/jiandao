@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 
 const LOCALE_TEXTS = import.meta.glob<string>("../*.yml", { query: "?raw", import: "default", eager: true })
 
-// Each case is [file name, file text], for example ["ja.yml", "name: 素読\n…"].
+// Each case is [file name, file text], for example ["ja.yml", "name: Jiandao\n…"].
 // en.yml is the reference, so it is not a case.
 const LOCALE_CASES: [string, string][] = Object.entries(LOCALE_TEXTS)
   .map(([path, text]): [string, string] => [path.replace("../", ""), text])

@@ -8,7 +8,7 @@ export function mountHostToast(): () => void {
   const target = document.body ?? document.documentElement
   const shadowHost = document.createElement("div")
   shadowHost.classList.add(REACT_SHADOW_HOST_CLASS)
-  shadowHost.setAttribute("data-plainly-host-toast", "")
+  shadowHost.setAttribute("data-jiandao-host-toast", "")
 
   const shadowRoot = shadowHost.attachShadow({ mode: "open" })
   const hostBuilder = new ShadowHostBuilder(shadowRoot, {

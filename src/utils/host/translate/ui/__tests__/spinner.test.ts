@@ -24,10 +24,10 @@ describe("spinner", () => {
 
     ensurePresetStylesMock.mockImplementation((root: Document | ShadowRoot) => {
       expect(root).toBe(document)
-      expect(wrapper.querySelector(".plainly-spinner")).toBeNull()
+      expect(wrapper.querySelector(".jiandao-spinner")).toBeNull()
 
       const style = document.createElement("style")
-      style.id = "plainly-preset-styles"
+      style.id = "jiandao-preset-styles"
       document.head.appendChild(style)
     })
 
@@ -35,9 +35,9 @@ describe("spinner", () => {
     const spinner = createSpinnerInside(wrapper)
 
     expect(ensurePresetStylesMock).toHaveBeenCalledOnce()
-    expect(document.head.querySelector("#plainly-preset-styles")).not.toBeNull()
+    expect(document.head.querySelector("#jiandao-preset-styles")).not.toBeNull()
     expect(wrapper.lastElementChild).toBe(spinner)
-    expect(spinner.className).toBe("plainly-spinner")
+    expect(spinner.className).toBe("jiandao-spinner")
   })
 
   it("ensures preset styles on the containing shadow root before appending the spinner", async () => {
@@ -48,10 +48,10 @@ describe("spinner", () => {
 
     ensurePresetStylesMock.mockImplementation((root: Document | ShadowRoot) => {
       expect(root).toBe(shadow)
-      expect(wrapper.querySelector(".plainly-spinner")).toBeNull()
+      expect(wrapper.querySelector(".jiandao-spinner")).toBeNull()
 
       const style = document.createElement("style")
-      style.id = "plainly-preset-styles"
+      style.id = "jiandao-preset-styles"
       shadow.appendChild(style)
     })
 
@@ -59,16 +59,16 @@ describe("spinner", () => {
     const spinner = createSpinnerInside(wrapper)
 
     expect(ensurePresetStylesMock).toHaveBeenCalledOnce()
-    expect(shadow.querySelector("#plainly-preset-styles")).not.toBeNull()
+    expect(shadow.querySelector("#jiandao-preset-styles")).not.toBeNull()
     expect(wrapper.lastElementChild).toBe(spinner)
-    expect(spinner.className).toBe("plainly-spinner")
+    expect(spinner.className).toBe("jiandao-spinner")
   })
 
   it("uses a thin gray spinner arc without a background ring", async () => {
     const { createLightweightSpinner } = await import("../spinner")
     const spinner = createLightweightSpinner(document)
 
-    expect(spinner.style.borderTopColor).toBe("var(--plainly-muted-foreground)")
+    expect(spinner.style.borderTopColor).toBe("var(--jiandao-muted-foreground)")
     expect(spinner.style.borderRightColor).toBe("transparent")
     expect(spinner.style.borderBottomColor).toBe("transparent")
     expect(spinner.style.borderLeftColor).toBe("transparent")
@@ -102,6 +102,6 @@ describe("spinner", () => {
     const spinner = createLightweightSpinner(document)
 
     expect(animateMock).not.toHaveBeenCalled()
-    expect(spinner.style.borderTopColor).toBe("var(--plainly-muted-foreground)")
+    expect(spinner.style.borderTopColor).toBe("var(--jiandao-muted-foreground)")
   })
 })

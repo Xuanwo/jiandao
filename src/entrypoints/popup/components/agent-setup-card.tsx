@@ -20,7 +20,7 @@ function describePreviewInline(preview: { providerName: string, modelId: string,
 /**
  * First-run path. The reader hands instructions to their agent, the agent
  * verifies a configuration against the real service and puts it on the
- * clipboard, the reader pastes it here. Plainly never asks for a key by hand.
+ * clipboard, the reader pastes it here. Jiandao never asks for a key by hand.
  */
 export function AgentSetupCard() {
   const textareaId = useId()

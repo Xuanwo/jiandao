@@ -14,7 +14,7 @@ import { getRequestHost, resolveBaseURL, resolveRequestApi } from "@/utils/provi
 
 /**
  * The setup document is the only way a translation service gets configured.
- * An agent writes it, the reader pastes it, Plainly previews and applies it.
+ * An agent writes it, the reader pastes it, Jiandao previews and applies it.
  * It describes intent, not storage: the internal Config may change shape,
  * this document is versioned and stays stable.
  */
@@ -46,9 +46,9 @@ export const setupPromptSchema = z.strictObject({
 }).refine(prompt => prompt.prompt.includes("{{input}}"), { path: ["prompt"], message: "prompt must contain {{input}}" })
 
 export const setupDocumentSchema = z.strictObject({
-  plainly: z.literal(SETUP_DOCUMENT_VERSION).describe("Document format version. Always 1."),
+  jiandao: z.literal(SETUP_DOCUMENT_VERSION).describe("Document format version. Always 1."),
   provider: setupProviderSchema,
-  prompt: setupPromptSchema.nullable().optional().describe("Translation prompt to use. null restores Plainly's built-in prompt. Omit to leave the current prompt as it is."),
+  prompt: setupPromptSchema.nullable().optional().describe("Translation prompt to use. null restores Jiandao's built-in prompt. Omit to leave the current prompt as it is."),
   targetLanguage: langCodeISO6393Schema.optional().describe("ISO 639-3 code of the language to translate into, e.g. \"cmn\" for Simplified Chinese, \"eng\" for English."),
   sourceLanguage: langCodeISO6393Schema.or(z.literal("auto")).optional().describe("ISO 639-3 code of the page language, or \"auto\" to detect it."),
   mode: translationModeSchema.optional().describe("\"bilingual\" shows the translation under each paragraph; \"translationOnly\" replaces the original."),
@@ -300,7 +300,7 @@ export function exportSetupDocument(config: Config): SetupDocument | null {
   const prompt = promptId ? patterns.find(pattern => pattern.id === promptId) : undefined
 
   return {
-    plainly: SETUP_DOCUMENT_VERSION,
+    jiandao: SETUP_DOCUMENT_VERSION,
     provider: {
       type: provider.provider,
       ...(provider.api && { api: provider.api }),

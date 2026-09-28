@@ -1,7 +1,7 @@
 import { DEFAULT_REQUEST_API, isProviderType } from "@/types/config/provider"
 
 /**
- * Plainly 1.0 stored the model as `{ model, isCustomModel, customModel }` and
+ * Jiandao 1.0 stored the model as `{ model, isCustomModel, customModel }` and
  * request options in the AI SDK's own vocabulary (`providerOptions`). Both
  * became plain values: `model` is the ID the service expects, `body` is JSON
  * merged into the request. This runs on every stored config before schema

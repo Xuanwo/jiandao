@@ -18,7 +18,7 @@ export class CSSRegistry {
 
     const style = document.createElement("style")
     style.textContent = css
-    style.setAttribute("data-plainly-react-shadow-css-key", key)
+    style.setAttribute("data-jiandao-react-shadow-css-key", key)
     document.head.appendChild(style)
     this.registry.set(key, { node: style, count: 1 })
 

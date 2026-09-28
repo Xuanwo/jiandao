@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/Xuanwo/plainly/blob/main/schema/plainly-setup.schema.json",
-  "title": "Plainly setup document",
-  "description": "Configuration for Plainly's translation service. Written by an agent, pasted into Plainly by the reader. See docs/agent-setup.md.",
+  "$id": "https://github.com/Xuanwo/jiandao/blob/main/schema/jiandao-setup.schema.json",
+  "title": "Jiandao setup document",
+  "description": "Configuration for Jiandao's translation service. Written by an agent, pasted into Jiandao by the reader. See docs/agent-setup.md.",
   "type": "object",
   "properties": {
-    "plainly": {
+    "jiandao": {
       "type": "number",
       "const": 1,
       "description": "Document format version. Always 1."
@@ -87,7 +87,7 @@
       "additionalProperties": false
     },
     "prompt": {
-      "description": "Translation prompt to use. null restores Plainly's built-in prompt. Omit to leave the current prompt as it is.",
+      "description": "Translation prompt to use. null restores Jiandao's built-in prompt. Omit to leave the current prompt as it is.",
       "anyOf": [
         {
           "type": "object",
@@ -505,7 +505,7 @@
     }
   },
   "required": [
-    "plainly",
+    "jiandao",
     "provider"
   ],
   "additionalProperties": false,

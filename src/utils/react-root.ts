@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import type { Root } from "react-dom/client"
 import { createRoot } from "react-dom/client"
 
-const REACT_ROOT_REGISTRY_KEY = Symbol.for("plainly.react-root-registry")
+const REACT_ROOT_REGISTRY_KEY = Symbol.for("jiandao.react-root-registry")
 
 type RootRegistryHost = typeof globalThis & {
   [REACT_ROOT_REGISTRY_KEY]?: WeakMap<HTMLElement, Root>

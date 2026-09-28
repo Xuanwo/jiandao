@@ -1,5 +1,5 @@
 name: Report a bug
-description: Create a report to help improve Plainly
+description: Create a report to help improve Jiandao
 labels: [bug]
 title: "[BUG] "
 assignees: []
@@ -18,7 +18,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This template is used for reporting an issue with Plainly.
+        This template is used for reporting an issue with Jiandao.
 
         Feature requests should be opened with the feature request template.
   - type: textarea
@@ -41,7 +41,7 @@ body:
       placeholder: |
         Ex:
         1. Open a news article page
-        2. Click the Plainly icon to open the popup
+        2. Click the Jiandao icon to open the popup
         3. Enable Immersive Translation
         4. Observe translation not appearing on the page
     validations:

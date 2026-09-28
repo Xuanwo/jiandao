@@ -1,16 +1,16 @@
-# Setting up Plainly with an agent
+# Setting up Jiandao with an agent
 
 This guide is written for a coding agent (Claude Code, Codex, or similar)
-acting on behalf of a person who uses Plainly. Plainly has no settings form
+acting on behalf of a person who uses Jiandao. Jiandao has no settings form
 for the translation service. The service is configured by a small JSON
 document that you produce, verify against the real API, and place on the
-person's clipboard. The person pastes it into Plainly, checks a preview and
+person's clipboard. The person pastes it into Jiandao, checks a preview and
 applies it.
 
-Plainly runs entirely in the browser. It has no server and no account. Page
+Jiandao runs entirely in the browser. It has no server and no account. Page
 text goes straight from the browser to the service you configure here, in
 the request shape that service documents. There is no SDK in between: the
-request body you verify with `curl` is the body Plainly sends, plus the
+request body you verify with `curl` is the body Jiandao sends, plus the
 prompt.
 
 ## What to do
@@ -34,7 +34,7 @@ prompt.
 
    ```bash
    jq -n --arg k "$KEY" '{
-     plainly: 1,
+     jiandao: 1,
      provider: { type: "deepseek", apiKey: $k, model: "deepseek-flash",
                  body: { thinking: { type: "disabled" } } },
      targetLanguage: "cmn",
@@ -42,27 +42,27 @@ prompt.
    }' | pbcopy          # macOS. Linux: wl-copy or xclip -selection clipboard. Windows: clip
    ```
 
-5. **Tell the person**: open the Plainly popup (the toolbar icon), paste into
-   the box, click apply. Plainly shows what will change, including the host
+5. **Tell the person**: open the Jiandao popup (the toolbar icon), paste into
+   the box, click apply. Jiandao shows what will change, including the host
    that page text will be sent to, sends one short request to confirm, and
    clears the clipboard. If the confirmation fails, the person will paste the
    error text back to you.
 
 To change an existing configuration, ask the person to click “Copy
-instructions for your agent” in Plainly’s settings and paste it to you; the
+instructions for your agent” in Jiandao’s settings and paste it to you; the
 text ends with the current document. The key in it is masked (`sk-…a9f2`).
-Return the document with the masked key unchanged and Plainly keeps the
+Return the document with the masked key unchanged and Jiandao keeps the
 stored key; only a new key needs the clipboard step above.
 
 ## The document
 
-The JSON Schema is at [`schema/plainly-setup.schema.json`](../schema/plainly-setup.schema.json).
+The JSON Schema is at [`schema/jiandao-setup.schema.json`](../schema/jiandao-setup.schema.json).
 Unknown fields are rejected, so the person sees the error instead of a
 silently ignored setting.
 
 ```json
 {
-  "plainly": 1,
+  "jiandao": 1,
   "provider": {
     "type": "openai",
     "apiKey": "sk-…",
@@ -77,7 +77,7 @@ silently ignored setting.
 
 | Field                  | Required                | Meaning                                                                                                                                                                                                                                                                                                                       |
 | ---------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plainly`              | yes                     | Format version. Always `1`.                                                                                                                                                                                                                                                                                                   |
+| `jiandao`              | yes                     | Format version. Always `1`.                                                                                                                                                                                                                                                                                                   |
 | `provider.type`        | yes                     | `openai`, `anthropic`, `gemini`, `deepseek`, or `openai-compatible` for any other endpoint that speaks the OpenAI chat completions API (Ollama, LM Studio, vLLM, OpenRouter, Groq, Mistral, Qwen, GLM, Moonshot, MiniMax, Doubao, gateways).                                                                                  |
 | `provider.api`         | no                      | Wire format: `openai-chat`, `openai-responses`, `anthropic` or `gemini`. Defaults from `type`: `openai` → `openai-responses`, `anthropic` → `anthropic`, `gemini` → `gemini`, `deepseek` and `openai-compatible` → `openai-chat`. Set `openai-responses` for a compatible service that speaks the Responses API, such as xAI. |
 | `provider.apiKey`      | for a new service       | The key. Endpoints without authentication still need a non-empty value such as `"local"`. A masked value from an export keeps the stored key.                                                                                                                                                                                 |
@@ -85,16 +85,16 @@ silently ignored setting.
 | `provider.baseURL`     | for `openai-compatible` | Base URL up to and including the version path, e.g. `http://localhost:11434/v1`. Omit for an official API.                                                                                                                                                                                                                    |
 | `provider.name`        | no                      | Display name. Defaults to the service name.                                                                                                                                                                                                                                                                                   |
 | `provider.headers`     | no                      | Extra HTTP headers for every request.                                                                                                                                                                                                                                                                                         |
-| `provider.body`        | no                      | JSON merged into every request body, exactly as the API documents it. Objects merge key by key; anything else replaces Plainly's value. See the recipes.                                                                                                                                                                      |
+| `provider.body`        | no                      | JSON merged into every request body, exactly as the API documents it. Objects merge key by key; anything else replaces Jiandao's value. See the recipes.                                                                                                                                                                      |
 | `provider.temperature` | no                      | Sampling temperature. Sent only when set. Anthropic's current models accept only `1`.                                                                                                                                                                                                                                         |
-| `prompt`               | no                      | The translation prompt: `{ "name", "systemPrompt", "prompt" }`. `prompt` must contain `{{input}}` and may use `{{targetLanguage}}`, `{{webTitle}}`, `{{webDescription}}`, `{{webContent}}`, `{{webSummary}}`. `null` restores Plainly's built-in prompt. Omit to keep the current one.                                        |
+| `prompt`               | no                      | The translation prompt: `{ "name", "systemPrompt", "prompt" }`. `prompt` must contain `{{input}}` and may use `{{targetLanguage}}`, `{{webTitle}}`, `{{webDescription}}`, `{{webContent}}`, `{{webSummary}}`. `null` restores Jiandao's built-in prompt. Omit to keep the current one.                                        |
 | `targetLanguage`       | no                      | ISO 639-3 code the person reads in: `cmn` Simplified Chinese, `cmn-Hant` Traditional Chinese, `yue` Cantonese, `eng`, `jpn`, `kor`, `fra`, `deu`, `spa`, … The full list is the `LANG_CODE_ISO6393_OPTIONS` in [`src/definitions/index.ts`](../src/definitions/index.ts).                                                     |
 | `sourceLanguage`       | no                      | ISO 639-3 code of the pages, or `auto`.                                                                                                                                                                                                                                                                                       |
 | `mode`                 | no                      | `bilingual` (translation under each paragraph) or `translationOnly`.                                                                                                                                                                                                                                                          |
 
 A document replaces the stored service with the same `type` and `baseURL`,
 or adds a new one. Other services and every other setting stay as they are.
-Plainly has no editor for prompts or models: when the person wants a
+Jiandao has no editor for prompts or models: when the person wants a
 different prompt, model or option, they hand you the current configuration
 and you return the changed document.
 
@@ -118,7 +118,7 @@ reference; check the reference when a model is newer than this guide.
 ## Verification templates
 
 Use the shortest possible input. One successful response is enough. Each
-template is the request Plainly sends, without the translation prompt.
+template is the request Jiandao sends, without the translation prompt.
 
 **OpenAI** (Responses API):
 
@@ -128,7 +128,7 @@ curl -sS https://api.openai.com/v1/responses \
   -d '{"model":"gpt-6-luna","input":"Translate to Simplified Chinese: Hello","reasoning":{"effort":"none"}}'
 ```
 
-**Anthropic** (Messages API; `max_tokens` is required, Plainly sends 8192):
+**Anthropic** (Messages API; `max_tokens` is required, Jiandao sends 8192):
 
 ```bash
 curl -sS https://api.anthropic.com/v1/messages \
@@ -158,7 +158,7 @@ A `200` with a non-empty answer means the configuration works. A `400` or
 `body` and try again. A `401` means the key is wrong; a `404` on
 `openai-compatible` usually means `baseURL` is missing its version path.
 
-## Opening Plainly
+## Opening Jiandao
 
 The popup is the toolbar icon. The settings page also has an import box:
 `chrome-extension://bjfjdmmojplcohcbmkoogopanjbojmok/options.html#import` in

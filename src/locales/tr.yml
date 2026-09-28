@@ -1,5 +1,5 @@
-name: Plainly
-extName: Plainly
+name: Jiandao
+extName: Jiandao
 extDescription: Okuduğunuz web sayfasını çevirir, başka hiçbir şey yapmaz.
 languageCombobox:
   searchLanguages: Dil ara…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: Ajanınız için talimatları kopyala
     copied: Kopyalandı
     pasteLabel: Ajanınızdan gelen yapılandırma
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: yapılandırmada API anahtarı yok
     apply: Uygula ve bu sayfayı çevir
     applyOnly: Uygula
@@ -91,7 +91,7 @@ options:
         blur: Üzerine gelince göster
       cssPlaceholder: |
         /* Örnek: çeviriyi renklendirip vurgulayın */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: İptal
 translation:
   sameLanguage: Kaynak ve hedef diller farklı olmalıdır
-  noApiKey: Önce bir API anahtarı ekleyin. Ayarlamak için araç çubuğundaki Plainly simgesine tıklayın.
+  noApiKey: Önce bir API anahtarı ekleyin. Ayarlamak için araç çubuğundaki Jiandao simgesine tıklayın.
   failed: Çeviri başarısız oldu
   retry: Yeniden dene
   unknownError: Bir sorun oluştu
 agentInstructions:
   noConfiguration: (henüz yok)
   text: |
-    Web sayfalarını çevirmek için Plainly (素读) tarayıcı uzantısını kullanıyorum. Lütfen çeviri hizmetini benim için ayarla.
+    Web sayfalarını çevirmek için Jiandao (简道翻译) tarayıcı uzantısını kullanıyorum. Lütfen çeviri hizmetini benim için ayarla.
     Önce kılavuzu oku: $1
-    Kılavuzu izle: hangi hizmeti istediğimi, API anahtarımın nerede olduğunu ve hangi dilde okuduğumu bana sor. Kılavuzdaki istek şablonuyla anahtarımı kullanarak bir istek başarılı olana kadar doğrula. Yapılandırma JSON'unu panoma yaz. Sonra bana bunu Plainly açılır penceresine yapıştırıp uygulamamı söyle.
+    Kılavuzu izle: hangi hizmeti istediğimi, API anahtarımın nerede olduğunu ve hangi dilde okuduğumu bana sor. Kılavuzdaki istek şablonuyla anahtarımı kullanarak bir istek başarılı olana kadar doğrula. Yapılandırma JSON'unu panoma yaz. Sonra bana bunu Jiandao açılır penceresine yapıştırıp uygulamamı söyle.
     Anahtarı gizlenmiş geçerli yapılandırmam:
     $2
 shortcutKeySelector:

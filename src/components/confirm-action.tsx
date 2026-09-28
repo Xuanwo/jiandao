@@ -55,7 +55,7 @@ export function ConfirmAction({ trigger, title, description, confirmLabel, cance
         aria-describedby={descriptionId}
         onClose={() => setOpen(false)}
         onClick={event => event.target === event.currentTarget && setOpen(false)}
-        className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl bg-background p-0 text-foreground ring-1 ring-foreground/10 backdrop:bg-black/10 open:animate-[plainly-fade-in_120ms_ease-out]"
+        className="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl bg-background p-0 text-foreground ring-1 ring-foreground/10 backdrop:bg-black/10 open:animate-[jiandao-fade-in_120ms_ease-out]"
       >
         <div className="flex flex-col gap-1.5 p-4">
           <h2 id={titleId} className="text-base font-medium">{title}</h2>

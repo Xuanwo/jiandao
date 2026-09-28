@@ -3,7 +3,7 @@ import { configSchema } from "@/types/config/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { migrateStoredConfig } from "../migrate"
 
-/** The three services Plainly 1.0 stored on a fresh install, with a key added to one. */
+/** The three services Jiandao 1.0 stored on a fresh install, with a key added to one. */
 const legacyConfig = {
   ...DEFAULT_CONFIG,
   providersConfig: [

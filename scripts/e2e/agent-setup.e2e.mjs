@@ -41,7 +41,7 @@ it("user sets up the service from the popup: Given no key, When the agent's docu
 
   // A document the agent got wrong is refused line by line, with the JSON path.
   const box = page.getByLabel("Configuration from your agent")
-  await box.fill(`{"plainly":1,"provider":{"type":"openai-compatible","apiKey":"local","model":"fake-model"}}`)
+  await box.fill(`{"jiandao":1,"provider":{"type":"openai-compatible","apiKey":"local","model":"fake-model"}}`)
   await page.getByText(/provider\.baseURL: baseURL is required/).waitFor()
   assert.equal(await page.getByRole("button", { name: "Apply" }).isDisabled(), true)
 

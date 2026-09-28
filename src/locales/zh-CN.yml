@@ -1,5 +1,5 @@
-name: 素读
-extName: 素读
+name: 简道翻译
+extName: 简道翻译
 extDescription: 翻译你正在读的网页，别的什么都不做。
 languageCombobox:
   searchLanguages: 搜索语言…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: 复制给 agent 的说明
     copied: 已复制
     pasteLabel: agent 生成的配置
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: 配置里没有 API Key
     apply: 应用并翻译此页
     applyOnly: 应用
@@ -91,7 +91,7 @@ options:
         blur: 悬停显示
       cssPlaceholder: |
         /* 示例：给译文着色并加底色 */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: 取消
 translation:
   sameLanguage: 源语言和目标语言必须不同
-  noApiKey: 还没有填写 API Key。点击工具栏里的素读图标即可设置。
+  noApiKey: 还没有填写 API Key。点击工具栏里的简道翻译图标即可设置。
   failed: 翻译失败
   retry: 重试
   unknownError: 出了点问题
 agentInstructions:
   noConfiguration: （尚未配置）
   text: |
-    我在用浏览器扩展 Plainly（素读）翻译网页，请帮我配置它的翻译服务。
+    我在用浏览器扩展简道翻译（Jiandao）来翻译网页，请帮我配置它的翻译服务。
     先阅读说明：$1
-    按说明操作：问清我要用哪家服务、API Key 在哪里、我读什么语言；用我的 Key 按说明里的请求模板验证，直到请求成功；把配置 JSON 写入我的剪贴板；最后告诉我在 Plainly 弹窗里粘贴并应用。
+    按说明操作：问清我要用哪家服务、API Key 在哪里、我读什么语言；用我的 Key 按说明里的请求模板验证，直到请求成功；把配置 JSON 写入我的剪贴板；最后告诉我在 Jiandao 弹窗里粘贴并应用。
     我当前的配置（密钥已脱敏）：
     $2
 shortcutKeySelector:

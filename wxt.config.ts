@@ -44,7 +44,7 @@ export default defineConfig({
       },
       browser_specific_settings: {
         gecko: {
-          id: "plainly@xuanwo.io",
+          id: "jiandao@xuanwo.io",
           // Firefox 140 is the first release that shows data_collection_permissions
           // in the install prompt; older releases would need an in-extension consent UI.
           strict_min_version: "140.0",

@@ -1,10 +1,10 @@
-# 素读
+# 简道翻译
 
-Plainly · [English](./README.md)
+Jiandao · [English](./README.md)
 
-素读只做一件事：翻译你正在读的网页。
+简道翻译只做一件事：翻译你正在读的网页。
 
-译文放在每段原文下方，也可以只显示译文。设置保存在你的浏览器里，文本直接发给你配置的模型服务商。素读没有服务器，没有账号，也不收集使用数据。详见[隐私政策](./PRIVACY.md)。
+译文放在每段原文下方，也可以只显示译文。设置保存在你的浏览器里，文本直接发给你配置的模型服务商。简道翻译没有服务器，没有账号，也不收集使用数据。详见[隐私政策](./PRIVACY.md)。
 
 ## 能做什么
 
@@ -15,13 +15,13 @@ Plainly · [English](./README.md)
 
 ## 配置
 
-素读没有翻译服务的设置表单，配置由你的 coding agent 完成：在弹窗里点“复制给 agent 的说明”，把这段话贴给 Claude Code、Codex 或任何能执行命令的 agent，它会用你的 API Key 验证一份配置并放进剪贴板，你再贴回弹窗、点应用即可。面向 agent 的细节见 [docs/agent-setup.md](./docs/agent-setup.md)，现成的 skill 在 [skills/plainly-setup](./skills/plainly-setup/SKILL.md)。
+简道翻译没有翻译服务的设置表单，配置由你的 coding agent 完成：在弹窗里点“复制给 agent 的说明”，把这段话贴给 Claude Code、Codex 或任何能执行命令的 agent，它会用你的 API Key 验证一份配置并放进剪贴板，你再贴回弹窗、点应用即可。面向 agent 的细节见 [docs/agent-setup.md](./docs/agent-setup.md)，现成的 skill 在 [skills/jiandao-setup](./skills/jiandao-setup/SKILL.md)。
 
 ## 没有什么
 
-素读从 [Read Frog（陪读蛙）](https://github.com/mengxi-ream/read-frog) fork 而来，去掉了阅读网页以外的一切：视频字幕、输入框翻译、悬浮工具栏、朗读、自定义 AI 动作、托管存储与账号、配置同步、统计和实验功能开关。
+简道翻译从 [Read Frog（陪读蛙）](https://github.com/mengxi-ream/read-frog) fork 而来，去掉了阅读网页以外的一切：视频字幕、输入框翻译、悬浮工具栏、朗读、自定义 AI 动作、托管存储与账号、配置同步、统计和实验功能开关。
 
-需要这些功能的话，陪读蛙和同类工具做得很好。素读保持小巧，让页面保持安静。
+需要这些功能的话，陪读蛙和同类工具做得很好。简道翻译保持小巧，让页面保持安静。
 
 ## 开发
 
@@ -36,6 +36,6 @@ pnpm build
 
 ## 许可
 
-素读是 Read Frog 的修改版本，感谢 Read Frog 的作者和贡献者提供原始作品。
+简道翻译是 Read Frog 的修改版本，感谢 Read Frog 的作者和贡献者提供原始作品。
 
-素读与上游一样按 GNU General Public License version 3 分发，见 [LICENSE](./LICENSE)。遇到问题请在本仓库反馈，不要提交给 Read Frog 项目。
+简道翻译与上游一样按 GNU General Public License version 3 分发，见 [LICENSE](./LICENSE)。遇到问题请在本仓库反馈，不要提交给 Read Frog 项目。

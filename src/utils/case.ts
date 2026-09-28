@@ -1,4 +1,4 @@
-/** Splits on separators and on lower→upper boundaries: "cmn-Hant" → ["cmn", "Hant"], "plainly custom" → ["plainly", "custom"]. */
+/** Splits on separators and on lower→upper boundaries: "cmn-Hant" → ["cmn", "Hant"], "jiandao custom" → ["jiandao", "custom"]. */
 function words(text: string): string[] {
   return text
     .replace(/([a-z\d])([A-Z])/g, "$1 $2")

@@ -5,16 +5,16 @@ import { describe, expect, it } from "vitest"
 import { z } from "zod"
 import { setupDocumentSchema } from "../setup-document"
 
-const SCHEMA_PATH = resolve(__dirname, "../../../schema/plainly-setup.schema.json")
+const SCHEMA_PATH = resolve(__dirname, "../../../schema/jiandao-setup.schema.json")
 
 /** The JSON Schema agents read. `pnpm schema:setup` rewrites the committed file from the zod schema. */
 export function buildSetupJsonSchema(): Record<string, unknown> {
   const schema = z.toJSONSchema(setupDocumentSchema, { target: "draft-7" }) as Record<string, unknown>
   return {
     $schema: "http://json-schema.org/draft-07/schema#",
-    $id: "https://github.com/Xuanwo/plainly/blob/main/schema/plainly-setup.schema.json",
-    title: "Plainly setup document",
-    description: "Configuration for Plainly's translation service. Written by an agent, pasted into Plainly by the reader. See docs/agent-setup.md.",
+    $id: "https://github.com/Xuanwo/jiandao/blob/main/schema/jiandao-setup.schema.json",
+    title: "Jiandao setup document",
+    description: "Configuration for Jiandao's translation service. Written by an agent, pasted into Jiandao by the reader. See docs/agent-setup.md.",
     ...schema,
   }
 }
@@ -33,7 +33,7 @@ describe("setup document JSON Schema", () => {
   it("keeps the fields agents rely on and rejects unknown ones", () => {
     const schema = buildSetupJsonSchema()
     const properties = schema.properties as Record<string, unknown>
-    expect(Object.keys(properties)).toEqual(["plainly", "provider", "prompt", "targetLanguage", "sourceLanguage", "mode"])
+    expect(Object.keys(properties)).toEqual(["jiandao", "provider", "prompt", "targetLanguage", "sourceLanguage", "mode"])
     expect(schema.additionalProperties).toBe(false)
     const provider = properties.provider as { properties: Record<string, unknown>, additionalProperties: boolean }
     expect(Object.keys(provider.properties)).toEqual(["type", "api", "name", "apiKey", "model", "baseURL", "headers", "body", "temperature"])

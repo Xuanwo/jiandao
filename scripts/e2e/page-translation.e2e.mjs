@@ -58,7 +58,7 @@ async function translateArticle(path = "/article") {
   await article.bringToFront()
   await article.locator("body").click()
   await article.keyboard.press("Alt+E")
-  const blocks = article.locator(".plainly-translated-block-content")
+  const blocks = article.locator(".jiandao-translated-block-content")
   await blocks.nth(4).waitFor({ timeout: 20_000 })
   return { article, translations: await blocks.allTextContents() }
 }

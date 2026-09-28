@@ -1,11 +1,11 @@
 @import "@/assets/styles/host-theme.css";
 
-.plainly-translated-block-content[data-plainly-custom-translation-style="line"] {
-  border-left: 2px solid color-mix(in srgb, var(--plainly-brand) 55%, transparent);
+.jiandao-translated-block-content[data-jiandao-custom-translation-style="line"] {
+  border-left: 2px solid color-mix(in srgb, var(--jiandao-brand) 55%, transparent);
   padding-left: 12px;
 }
 
-[data-plainly-custom-translation-style="blur"] {
+[data-jiandao-custom-translation-style="blur"] {
   filter: blur(4px);
   opacity: 0.75;
   transition:
@@ -13,38 +13,38 @@
     opacity 0.1s ease-in-out;
 }
 
-[data-plainly-custom-translation-style="blur"]:hover {
+[data-jiandao-custom-translation-style="blur"]:hover {
   filter: blur(0);
   opacity: 1;
 }
 
-.plainly-translated-block-content[data-plainly-custom-translation-style="blockquote"] {
-  border-left: 4px solid var(--plainly-brand);
+.jiandao-translated-block-content[data-jiandao-custom-translation-style="blockquote"] {
+  border-left: 4px solid var(--jiandao-brand);
   padding: 4px 0 4px 8px;
 }
 
-[data-plainly-custom-translation-style="weakened"] {
+[data-jiandao-custom-translation-style="weakened"] {
   opacity: 1;
-  color: var(--plainly-muted-foreground) !important;
+  color: var(--jiandao-muted-foreground) !important;
 }
 
-[data-plainly-custom-translation-style="dashedLine"] {
-  text-decoration: underline dashed var(--plainly-brand) !important;
+[data-jiandao-custom-translation-style="dashedLine"] {
+  text-decoration: underline dashed var(--jiandao-brand) !important;
   text-underline-offset: 5px;
 }
 
-[data-plainly-custom-translation-style="border"] {
-  border: 1px solid var(--plainly-brand);
+[data-jiandao-custom-translation-style="border"] {
+  border: 1px solid var(--jiandao-brand);
   padding: 2px 4px;
   border-radius: 4px;
 }
 
-[data-plainly-custom-translation-style="textColor"] {
-  color: var(--plainly-brand-strong) !important;
+[data-jiandao-custom-translation-style="textColor"] {
+  color: var(--jiandao-brand-strong) !important;
 }
 
-[data-plainly-custom-translation-style="background"] {
-  background-color: color-mix(in srgb, var(--plainly-brand) 15%, transparent);
+[data-jiandao-custom-translation-style="background"] {
+  background-color: color-mix(in srgb, var(--jiandao-brand) 15%, transparent);
   padding: 2px 4px;
   border-radius: 4px;
 }

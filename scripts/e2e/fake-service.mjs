@@ -15,7 +15,7 @@ function article(description) {
  * to translate at `/article` (`?description=` adds a meta description).
  * `POST /v1/chat/completions` splits the last user message at the standalone
  * `%%` lines and answers each part with "【译】" and the first 24 characters
- * of the part's last line, keeping the batch separators Plainly uses, so a
+ * of the part's last line, keeping the batch separators Jiandao uses, so a
  * translated page is easy to recognize.
  * Every request is recorded in `requests` for assertions.
  */
@@ -64,10 +64,10 @@ export async function startFakeService() {
   }
 }
 
-/** A setup document that points Plainly at the fake service. */
+/** A setup document that points Jiandao at the fake service. */
 export function setupDocumentFor(origin, overrides = {}) {
   return {
-    plainly: 1,
+    jiandao: 1,
     provider: {
       type: "openai-compatible",
       name: "Local gateway",

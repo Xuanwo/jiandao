@@ -1,12 +1,12 @@
-# Plainly
+# Jiandao
 
-素读 · [中文](./README.zh-CN.md)
+简道翻译 · [中文](./README.zh-CN.md)
 
-Plainly translates the web page you are reading, and does nothing else.
+Jiandao translates the web page you are reading, and does nothing else.
 
 The translation sits under each paragraph, or replaces the original if you
 prefer. Settings stay in your browser. Text goes straight to the model provider
-you configure. There is no Plainly server, no account, and no telemetry. See
+you configure. There is no Jiandao server, no account, and no telemetry. See
 the [privacy policy](./PRIVACY.md).
 
 ## What It Does
@@ -21,22 +21,22 @@ the [privacy policy](./PRIVACY.md).
 
 ## Setting Up
 
-Plainly has no settings form for the translation service. Your coding agent
+Jiandao has no settings form for the translation service. Your coding agent
 configures it: click **Copy instructions for your agent** in the popup, paste
 the text into Claude Code, Codex or any agent with shell access, and it will
 verify a configuration with your API key and put it on your clipboard. Paste
 that into the popup and apply. The details for agents are in
 [docs/agent-setup.md](./docs/agent-setup.md); a ready-made skill is in
-[skills/plainly-setup](./skills/plainly-setup/SKILL.md).
+[skills/jiandao-setup](./skills/jiandao-setup/SKILL.md).
 
 ## What It Leaves Out
 
-Plainly began as a fork of [Read Frog](https://github.com/mengxi-ream/read-frog)
+Jiandao began as a fork of [Read Frog](https://github.com/mengxi-ream/read-frog)
 and removed everything that is not reading a page: video subtitles, input box
 translation, floating toolbars, text to speech, custom AI actions, hosted
 storage and accounts, config sync, statistics, and experimental switches.
 
-If you need those, Read Frog and similar tools do them well. Plainly stays
+If you need those, Read Frog and similar tools do them well. Jiandao stays
 small so that the page stays quiet.
 
 ## Development
@@ -58,9 +58,9 @@ screenshot of each page. CI runs the same tests.
 
 ## License
 
-Plainly is a modified version of Read Frog. Thanks to the Read Frog authors and
+Jiandao is a modified version of Read Frog. Thanks to the Read Frog authors and
 contributors for the original work.
 
-Plainly is distributed under the GNU General Public License version 3, the same
+Jiandao is distributed under the GNU General Public License version 3, the same
 license as upstream. See [LICENSE](./LICENSE). Please report problems here
 rather than to the Read Frog project.

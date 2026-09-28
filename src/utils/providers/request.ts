@@ -5,7 +5,7 @@ import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
 
 /**
  * One text request to a translation service, sent as the service's own API
- * expects it. There is no SDK in between: the body Plainly sends is the body
+ * expects it. There is no SDK in between: the body Jiandao sends is the body
  * the agent verified with curl, plus whatever `provider.body` adds.
  */
 

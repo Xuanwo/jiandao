@@ -6,7 +6,7 @@ import { getRequestErrorMeta } from "@/utils/request/retry-policy"
 import { extractResponseText, mergeBody, prepareRequest, ProviderRequestError, requestText } from "../request"
 
 /**
- * A local server that records what Plainly sends and answers whatever the
+ * A local server that records what Jiandao sends and answers whatever the
  * test tells it to, so each wire format is checked on the wire and not
  * against a mock of fetch.
  */

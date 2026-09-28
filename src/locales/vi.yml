@@ -1,5 +1,5 @@
-name: Plainly
-extName: Plainly
+name: Jiandao
+extName: Jiandao
 extDescription: Dịch trang web bạn đang đọc, và không làm gì khác.
 languageCombobox:
   searchLanguages: Tìm ngôn ngữ…
@@ -30,7 +30,7 @@ popup:
     copyInstructions: Sao chép hướng dẫn cho agent
     copied: Đã sao chép
     pasteLabel: Cấu hình từ agent của bạn
-    placeholder: '{ "plainly": 1, "provider": { … } }'
+    placeholder: '{ "jiandao": 1, "provider": { … } }'
     keyMissing: cấu hình không có API Key
     apply: Áp dụng và dịch trang này
     applyOnly: Áp dụng
@@ -91,7 +91,7 @@ options:
         blur: Hiện khi di chuột
       cssPlaceholder: |
         /* Ví dụ: tô màu và tô nền cho bản dịch */
-        [data-plainly-custom-translation-style='custom'] {
+        [data-jiandao-custom-translation-style='custom'] {
           color: #414535;
           background-color: light-dark(#F2E3BC, #C19875);
           padding: 2px 4px;
@@ -153,16 +153,16 @@ options:
       cancel: Hủy
 translation:
   sameLanguage: Ngôn ngữ nguồn và đích phải khác nhau
-  noApiKey: Hãy thêm API Key trước. Nhấp vào biểu tượng Plainly trên thanh công cụ để cài đặt.
+  noApiKey: Hãy thêm API Key trước. Nhấp vào biểu tượng Jiandao trên thanh công cụ để cài đặt.
   failed: Dịch thất bại
   retry: Thử lại
   unknownError: Đã xảy ra sự cố
 agentInstructions:
   noConfiguration: (chưa có)
   text: |
-    Tôi dùng tiện ích trình duyệt Plainly (素读) để dịch trang web. Hãy thiết lập dịch vụ dịch của nó cho tôi.
+    Tôi dùng tiện ích trình duyệt Jiandao (简道翻译) để dịch trang web. Hãy thiết lập dịch vụ dịch của nó cho tôi.
     Trước hết hãy đọc hướng dẫn: $1
-    Làm theo hướng dẫn: hỏi tôi muốn dùng dịch vụ nào, API Key của tôi ở đâu và tôi đọc bằng ngôn ngữ nào. Xác minh bằng khóa của tôi với mẫu yêu cầu trong hướng dẫn cho đến khi một yêu cầu thành công. Ghi JSON cấu hình vào bộ nhớ tạm của tôi. Sau đó bảo tôi dán nó vào cửa sổ bật lên của Plainly và áp dụng.
+    Làm theo hướng dẫn: hỏi tôi muốn dùng dịch vụ nào, API Key của tôi ở đâu và tôi đọc bằng ngôn ngữ nào. Xác minh bằng khóa của tôi với mẫu yêu cầu trong hướng dẫn cho đến khi một yêu cầu thành công. Ghi JSON cấu hình vào bộ nhớ tạm của tôi. Sau đó bảo tôi dán nó vào cửa sổ bật lên của Jiandao và áp dụng.
     Cấu hình hiện tại của tôi, khóa đã được che:
     $2
 shortcutKeySelector:

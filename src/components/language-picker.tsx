@@ -108,7 +108,7 @@ export function LanguagePicker<V extends string>({ items, value, onChange, rende
     <div ref={rootRef} className="contents">
       {renderTrigger({ "onClick": toggle, "aria-expanded": open, "aria-haspopup": "listbox" })}
       {open && (
-        <div className={cn("absolute z-50 flex flex-col overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 animate-[plainly-fade-in_100ms_ease-out]", panelClassName)}>
+        <div className={cn("absolute z-50 flex flex-col overflow-hidden rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 animate-[jiandao-fade-in_100ms_ease-out]", panelClassName)}>
           <input
             ref={inputRef}
             role="combobox"

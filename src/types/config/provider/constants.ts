@@ -9,7 +9,7 @@ export function isProviderType(provider: string): provider is ProviderType {
   return (PROVIDER_TYPES as readonly string[]).includes(provider)
 }
 
-/** The wire formats Plainly speaks. Each is one HTTP request and one JSON response. */
+/** The wire formats Jiandao speaks. Each is one HTTP request and one JSON response. */
 export const REQUEST_APIS = ["openai-chat", "openai-responses", "anthropic", "gemini"] as const
 export type RequestApi = typeof REQUEST_APIS[number]
 

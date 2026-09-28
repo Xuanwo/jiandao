@@ -9,7 +9,7 @@
 @custom-variant data-unchecked (&:where([data-unchecked]:not([data-unchecked="false"])));
 @custom-variant data-disabled (&:where([data-disabled]:not([data-disabled="false"])));
 
-@keyframes plainly-fade-in {
+@keyframes jiandao-fade-in {
   from {
     opacity: 0;
     transform: translateY(2px);
@@ -30,7 +30,7 @@
 }
 
 @theme inline {
-  /* Use plainly-prefixed theme tokens to avoid collisions with host-page custom properties inside shadow roots. */
+  /* Use jiandao-prefixed theme tokens to avoid collisions with host-page custom properties inside shadow roots. */
   --font-sans: var(--rf-font-sans);
   --font-mono: var(--rf-font-mono);
   --color-background: var(--rf-background);
