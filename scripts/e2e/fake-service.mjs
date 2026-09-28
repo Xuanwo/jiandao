@@ -1,26 +1,31 @@
 import http from "node:http"
 
-const ARTICLE = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Reading and Experience</title></head><body style="max-width:640px;margin:40px auto;font:16px/1.6 Georgia,serif">
+function article(description) {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Reading and Experience</title>${description ? `<meta name="description" content="${description}">` : ""}</head><body style="max-width:640px;margin:40px auto;font:16px/1.6 Georgia,serif">
 <h1>Reading and Experience</h1>
 <p>A few months ago I finished a new book, and in reviews I keep noticing words like gripping and explosive. I did not set out to write a gripping book, but that is what happened.</p>
 <p>Reading and experience train your model of the world. And even if you forget the experience or what you read, its effect on your model of the world persists.</p>
 <p>Your mind is like a compiled program you have lost the source of. It works, but you do not know why.</p>
 <p>So what you want to do is to read things that you will be glad to have compiled into your model of the world, even if you do not remember them.</p>
 </body></html>`
+}
 
 /**
  * A local stand-in for an OpenAI-compatible service, plus an English article
- * to translate. `POST /v1/chat/completions` answers each paragraph of the
- * request with "【译】" and the paragraph's first characters, keeping the
- * batch separators Plainly uses, so a translated page is easy to recognize.
+ * to translate at `/article` (`?description=` adds a meta description).
+ * `POST /v1/chat/completions` splits the last user message at the standalone
+ * `%%` lines and answers each part with "【译】" and the first 24 characters
+ * of the part's last line, keeping the batch separators Plainly uses, so a
+ * translated page is easy to recognize.
  * Every request is recorded in `requests` for assertions.
  */
 export async function startFakeService() {
   const requests = []
   const server = http.createServer(async (request, response) => {
-    if (request.method === "GET" && request.url === "/article") {
+    const url = new URL(request.url, "http://localhost")
+    if (request.method === "GET" && url.pathname === "/article") {
       response.setHeader("Content-Type", "text/html; charset=utf-8")
-      response.end(ARTICLE)
+      response.end(article(url.searchParams.get("description")))
       return
     }
     let body = ""
