@@ -1,4 +1,5 @@
 import type { WebPageContext } from "@/types/content"
+import { extractArticleText } from "@/utils/content/article"
 import { getDocumentDescription } from "@/utils/content/metadata"
 import { logger } from "@/utils/logger"
 import { truncateWebPageContent } from "./webpage-content"
@@ -10,33 +11,20 @@ export interface CachedWebPageContext extends WebPageContext {
 
 let cachedWebPageContext: CachedWebPageContext | null = null
 
-function createDefuddleSnapshotDocument() {
-  const clonedDoc = document.implementation.createHTMLDocument(document.title)
-  clonedDoc.documentElement.innerHTML = document.documentElement.outerHTML
-  return clonedDoc
-}
-
-async function extractWebpageContent(): Promise<string> {
+function extractWebpageContent(): string {
   try {
-    const { default: Defuddle, createMarkdownContent } = await import("defuddle/full")
-    const snapshotDoc = createDefuddleSnapshotDocument()
-    const result = new Defuddle(snapshotDoc, {
-      separateMarkdown: true,
-      url: window.location.href,
-      useAsync: false,
-    }).parse()
-
-    if (result.contentMarkdown)
-      return result.contentMarkdown
-    if (result.content)
-      return createMarkdownContent(result.content, window.location.href)
+    return extractArticleText(document)
   }
   catch (error) {
-    logger.warn("Defuddle parsing failed, falling back to body text:", error)
+    logger.warn("Article extraction failed, falling back to body text:", error)
+    return document.body?.textContent || ""
   }
-  return document.body?.textContent || ""
 }
 
+/**
+ * Title, description and main text of the page, read once per URL before
+ * translation changes the DOM, so the model's context stays the original.
+ */
 export async function getOrCreateWebPageContext(): Promise<CachedWebPageContext | null> {
   if (typeof window === "undefined" || typeof document === "undefined")
     return null
@@ -50,7 +38,7 @@ export async function getOrCreateWebPageContext(): Promise<CachedWebPageContext 
     url: currentUrl,
     webTitle: document.title || "",
     webDescription: getDocumentDescription(document),
-    webContent: truncateWebPageContent(await extractWebpageContent()),
+    webContent: truncateWebPageContent(extractWebpageContent()),
   }
   return cachedWebPageContext
 }
