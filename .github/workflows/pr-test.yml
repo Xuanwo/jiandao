@@ -1,13 +1,29 @@
 name: PR - Test & Build
 
+# Default branch pushes save the caches that PR runs restore. Both default
+# branch names are listed, so a fork that uses master works the same.
+# Renovate merges passing updates without a PR, so its branch pushes run CI.
+# PRs run for every base branch, so each layer of a PR stack gets CI.
 on:
-  pull_request:
+  push:
     branches:
       - main
+      - master
+      - "renovate/**"
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test-and-build:
     name: Test & Build
+    # A Renovate PR from this repository already has a push run.
+    if: &not-renovate-pr-duplicate >-
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name != github.repository ||
+      !startsWith(github.head_ref, 'renovate/')
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -31,6 +47,15 @@ jobs:
         run: pnpm install --frozen-lockfile
         shell: bash
 
+      - name: Cache prek hook environments
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/prek
+          key: prek-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('prek.toml') }}
+
+      - name: Run prek checks
+        run: pnpm exec prek run --all-files --stage manual --show-diff-on-failure
+
       - name: ESLint
         run: pnpm lint
 
@@ -45,6 +70,7 @@ jobs:
 
   e2e:
     name: E2E
+    if: *not-renovate-pr-duplicate
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -18,7 +18,7 @@ const resetCss = `/* WXT-inspired Shadow DOM Reset */
     /* Restore modern font stack */
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  
+
   /* Ensure proper box-sizing for all elements */
   *, *::before, *::after {
     box-sizing: border-box;

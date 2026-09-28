@@ -1,0 +1,53 @@
+default_stages = [
+  "pre-commit",
+  "manual"
+]
+
+[[repos]]
+repo = "builtin"
+hooks = [
+  # design/ is exported from the design canvas (see AGENTS.md), which owns
+  # its files: the logo source image and the canvas.json formatting.
+  { id = "check-added-large-files", args = [ "--enforce-all" ], exclude = '^design/assets/jiandao-logo\.png$' },
+  { id = "check-case-conflict" },
+  { id = "check-executables-have-shebangs" },
+  { id = "check-illegal-windows-names" },
+  { id = "check-json", exclude = '(^|/)tsconfig[^/]*\.json$' },
+  { id = "check-jsonc", types = [ "json" ], files = '(^|/)tsconfig[^/]*\.json$', args = [ "--allow-trailing-commas" ] },
+  { id = "check-merge-conflict" },
+  { id = "check-shebang-scripts-are-executable" },
+  { id = "check-symlinks" },
+  { id = "check-toml" },
+  { id = "check-vcs-permalinks" },
+  { id = "check-xml" },
+  { id = "check-yaml", args = [ "--allow-multiple-documents" ] },
+  { id = "destroyed-symlinks" },
+  { id = "detect-private-key" },
+  { id = "fix-byte-order-marker" },
+  { id = "end-of-file-fixer", exclude = '^design/' },
+  { id = "mixed-line-ending" },
+  { id = "trailing-whitespace" },
+  { id = "no-commit-to-branch", stages = [ "pre-commit" ] },
+]
+
+# Workflow syntax and expression checks complement ESLint's YAML formatting.
+[[repos]]
+repo = "https://github.com/rhysd/actionlint"
+rev = "v1.7.12"
+hooks = [ { id = "actionlint" } ]
+
+# Run security checks offline so local results do not depend on GitHub credentials.
+[[repos]]
+repo = "https://github.com/woodruffw/zizmor-pre-commit"
+rev = "v1.30.0"
+hooks = [
+  { id = "zizmor", args = [
+    "--offline",
+    "--no-progress"
+  ] }
+]
+
+[[repos]]
+repo = "https://github.com/crate-ci/typos"
+rev = "v1.50.1"
+hooks = [ { id = "typos", args = [ "--force-exclude" ] } ]

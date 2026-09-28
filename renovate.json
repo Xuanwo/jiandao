@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "forkProcessing": "enabled",
+  "extends": [
+    "config:best-practices",
+    "group:linters",
+    "security:openssf-scorecard"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["*"],
+      "minimumReleaseAge": "7 days",
+      "internalChecksFilter": "strict"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "groupName": "stable non-major dependencies",
+      "groupSlug": "stable-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "why-is-node-running 3.2.2 has no provenance: keep the override off 3.2.2, but allow later versions.",
+      "matchDepTypes": ["pnpm-workspace.overrides"],
+      "matchPackageNames": ["why-is-node-running"],
+      "allowedVersions": "!/^3\\.2\\.2$/"
+    }
+  ],
+  "automergeType": "branch",
+  "timezone": "Asia/Shanghai"
+}

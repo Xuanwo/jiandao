@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@12.6.0",
   "description": "Translates the web page you are reading, and does nothing else.",
   "scripts": {
     "build": "wxt build",
@@ -37,6 +37,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.0.0",
     "@eslint-react/eslint-plugin": "^5.8.18",
+    "@j178/prek": "0.5.3",
     "@tailwindcss/postcss": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -59,7 +60,7 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=22.0.0",
+      "version": ">=22.13.0",
       "onFail": "download"
     }
   }

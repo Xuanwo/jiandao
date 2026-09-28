@@ -89,11 +89,14 @@ pnpm build:firefox
 
 ```bash
 pnpm install
+pnpm exec prek install  # 每个克隆执行一次，安装 Git hooks
 pnpm dev         # 启动开发模式，自动打开加载了扩展的 Chrome
 pnpm test        # 单元测试
 pnpm type-check
 pnpm build
 ```
+
+[prek](https://github.com/j178/prek) 在每次提交前运行 [`prek.toml`](./prek.toml) 中的检查：文件格式、actionlint、zizmor 和 typos，并阻止直接提交到 `master` 或 `main`。`pnpm install` 不会安装这些 hooks，需要自己运行 `pnpm exec prek install`。如果 `git config --get core.hooksPath` 输出以前 Husky 留下的 `.husky/_`，先运行 `git config --local --unset core.hooksPath`，否则 prek 会把 hook 写进那个目录。运行 `pnpm exec prek run --all-files --stage manual` 可执行与 CI 相同的检查。
 
 `pnpm test:e2e` 会先构建扩展，再通过开发依赖 [Playwright](https://playwright.dev/) 在无头 Chromium 中打开它。首次运行前执行 `pnpm exec playwright-core install --no-shell chromium` 下载 Chromium；Linux 上加 `--with-deps` 同时安装系统库。测试失败时，报告会列出浏览器日志、打开的页面和已保存的配置；把 `E2E_ARTIFACTS` 设为一个目录，还会把每个页面的截图保存到那里。CI 也会运行这些测试。
 

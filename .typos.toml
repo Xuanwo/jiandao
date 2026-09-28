@@ -1,0 +1,16 @@
+[files]
+# ISO language identifiers and non-English translations are not English prose.
+# design/ is exported from the design canvas (see AGENTS.md), which owns its files.
+extend-exclude = [
+  "/design/",
+  "src/definitions/index.ts",
+  "src/locales/{es,ja,ko,ru,tr,vi,zh-CN,zh-TW}.yml",
+]
+
+[default.extend-words]
+tha = "tha"
+yor = "yor"
+som = "som"
+bre = "bre"
+mak = "mak"
+ede = "ede"
