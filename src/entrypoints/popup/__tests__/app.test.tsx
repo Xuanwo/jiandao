@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 import type { Config } from "@/types/config/config"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, describe, expect, it, vi } from "vitest"
+import { storage } from "#imports"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { configAtom } from "@/utils/atoms/config"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
+import { sendMessage } from "@/utils/message"
 import { openOptionsPage } from "@/utils/navigation"
 import App from "../app"
 import { activeTabAtom, pageTranslationEnabledAtom, translationProgressAtom } from "../atoms"
@@ -79,5 +81,18 @@ describe("popup app", () => {
 
     expect(screen.getByRole("button", { name: /popup\.translate/ })).toBeDisabled()
     expect(screen.getByText("popup.notTranslatable")).toBeInTheDocument()
+  })
+
+  it("catches up with progress that finished while it was opening", async () => {
+    // The last report reached the background after the popup read it and before the popup listened.
+    vi.mocked(sendMessage).mockImplementation(((type: string) => Promise.resolve(
+      type === "getTranslationProgressByTabId" ? { total: 20, done: 20, failed: 0 } : type === "getEnablePageTranslationByTabId" ? true : undefined,
+    )) as typeof sendMessage)
+    // The popup keeps its config in step with storage, so storage holds the same config.
+    await storage.setItem(`local:${CONFIG_STORAGE_KEY}`, configWithKey)
+    renderPopup({ config: configWithKey, enabled: true })
+
+    await waitFor(() => expect(screen.getByText("popup.translated")).toBeInTheDocument())
+    vi.mocked(sendMessage).mockImplementation((() => Promise.resolve(undefined)) as typeof sendMessage)
   })
 })
