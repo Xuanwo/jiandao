@@ -26,14 +26,8 @@ popup:
     missingKey: no key yet
   setup:
     title: No translation service yet
-    description: Hand the instructions to your agent. It verifies a configuration with your key and puts it on the clipboard; paste it below.
-    copyInstructions: Copy instructions for your agent
-    copied: Copied
-    pasteLabel: Configuration from your agent
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: no API key in the configuration
-    apply: Apply and translate this page
-    applyOnly: Apply
+    description: Paste the configuration your agent generates on the settings page, and you can translate.
+    openSettings: Set up in settings
 errorRecovery:
   title: Something went wrong
   description: Recovery mode is active. Refresh the page or reset settings and try again.
@@ -52,24 +46,36 @@ options:
   title: Settings
   service:
     title: Translation service
-    status:
-      none: No service
-      unconfigured: No key yet
-      configured: Not tested
-      testing: Testing…
-      ok: Connected
-      failed: Connection failed
-    testConnection: Test the connection
-    sendsTo: Page text goes to $1
+    empty:
+      title: No translation service yet
+      description: Hand the instructions to your agent. It verifies the service configuration with your key and puts it on the clipboard; paste it below.
     copyInstructions: Copy instructions for your agent
     copied: Copied
-    paste:
-      open: Paste configuration
-      label: Configuration from your agent
-      keyMissing: The configuration has no API key.
-      cancel: Cancel
-      apply: Apply
-      applying: Confirming…
+    edit: Edit
+    test: Test connection
+    testing: Testing…
+    status:
+      ok: Connected
+      failed: Connection failed
+      unchecked: Not checked
+    checkedAt: checked $1
+    sendsTo: Page text goes to $1
+    key: Key $1
+    newKey: new key
+    keptKey: stored key kept
+    keyMissing: The configuration has no API key
+    thinkingOff: thinking off
+    label:
+      current: Current
+      after: After
+      connection: Connection
+    unchanged: "Same as the current service. It is selected: paste to replace it, or change a single field."
+    failedNotSaved: Failed, nothing saved
+    editorLabel: Translation service configuration
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: Cancel
+    apply: Apply
+    applying: Checking…
   reading:
     title: Reading
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: CSS has syntax errors
         tooLong: CSS is too long
         allSaved: All changes saved
-    range:
-      title: Translate
-      main: Main content
-      all: Whole page
     shortcut:
       title: Shortcut
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: Prompt
       default: Default
-  advanced:
-    title: Advanced
-    rate: Requests per second
-    capacity: Requests in flight at once
-    maxCharactersPerBatch: Characters per request
-    maxItemsPerBatch: Paragraphs per request
-    preloadMargin: Translate ahead of the viewport (px)
-    preloadThreshold: Visible fraction before translating
-    minCharacters: Skip paragraphs shorter than N characters
-    minWords: Skip paragraphs shorter than N words
-    minError: Value must be at least $1
-    rangeError: Value must be between $1 and $2
-    cache:
-      title: Translation cache
-      clear: Clear
-      clearing: Clearing…
-      dialog:
-        title: Clear the translation cache?
-        description: Every cached translation and page summary is removed. Pages will be translated again on demand.
-        confirm: Clear
-        cancel: Cancel
-  appearance:
-    title: Appearance
-    system: System
-    light: Light
-    dark: Dark
-  reset:
-    title: All settings
-    dialog:
-      title: Reset all settings?
-      description: Every setting, including API keys and prompts, goes back to its default value.
-      confirm: Reset
+      custom: Custom
+      edit: Edit
+      system: System prompt
+      template: Prompt template
+      tokens: "The template must contain {{input}}. Available: {{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}"
+      missingInput: The template is missing {{input}}.
+      restore: Restore default
       cancel: Cancel
+      apply: Apply
 translation:
   sameLanguage: Source and target languages must be different
   noApiKey: Add an API key first. Click the Jiandao icon in the toolbar to set it up.
@@ -162,7 +140,7 @@ agentInstructions:
   text: |
     I use the browser extension Jiandao (简道翻译) to translate web pages. Please set up its translation service for me.
     Read the guide first: $1
-    Follow it: ask me which service I want, where my API key is and which language I read in. Verify with my key using the request template in the guide until a request succeeds. Write the configuration JSON to my clipboard. Then tell me to paste it into the Jiandao popup and apply.
+    Follow it: ask me which service I want and where my API key is. Verify with my key using the request template in the guide until a request succeeds. Write the service configuration JSON to my clipboard. Then tell me to paste it under "Translation service" on the Jiandao settings page and apply it.
     My current configuration, with the key masked:
     $2
 shortcutKeySelector:

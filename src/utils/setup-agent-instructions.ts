@@ -11,7 +11,7 @@ export const AGENT_SETUP_GUIDE_URL = "https://github.com/Xuanwo/jiandao/blob/mai
  */
 export function buildAgentInstructions(config: Config): string {
   const current = exportSetupDocument(config)
-  const currentText = current?.provider.apiKey
+  const currentText = current?.apiKey
     ? stringifySetupDocument(current)
     : i18n.t("agentInstructions.noConfiguration")
   return i18n.t("agentInstructions.text", [AGENT_SETUP_GUIDE_URL, currentText])

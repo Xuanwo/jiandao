@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from "vitest"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { hasNoWalkAncestor, isCustomDontWalkIntoElement, isDontWalkIntoAndDontTranslateAsChildElement } from "../filter"
 
 function setHost(host: string) {
@@ -25,7 +24,7 @@ describe("isCustomDontWalkIntoElement", () => {
 
     expect(isCustomDontWalkIntoElement(proseMirror)).toBe(true)
     // integration via filter.ts
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror, DEFAULT_CONFIG)).toBe(true)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror)).toBe(true)
   })
 
   it("does not match on non-configured host", () => {
@@ -35,7 +34,7 @@ describe("isCustomDontWalkIntoElement", () => {
     document.body.appendChild(el)
 
     expect(isCustomDontWalkIntoElement(el)).toBe(false)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(el, DEFAULT_CONFIG)).toBe(false)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(el)).toBe(false)
   })
 
   it("only matches configured element when multiple nodes present on chatgpt.com", () => {
@@ -51,8 +50,8 @@ describe("isCustomDontWalkIntoElement", () => {
 
     expect(isCustomDontWalkIntoElement(proseMirror)).toBe(true)
     expect(isCustomDontWalkIntoElement(other)).toBe(false)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror, DEFAULT_CONFIG)).toBe(true)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(other, DEFAULT_CONFIG)).toBe(false)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror)).toBe(true)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(other)).toBe(false)
   })
 
   it("uses hostname when host includes port (host !== hostname)", () => {
@@ -71,8 +70,8 @@ describe("isCustomDontWalkIntoElement", () => {
 
     expect(isCustomDontWalkIntoElement(proseMirror)).toBe(true)
     expect(isCustomDontWalkIntoElement(other)).toBe(false)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror, DEFAULT_CONFIG)).toBe(true)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(other, DEFAULT_CONFIG)).toBe(false)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror)).toBe(true)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(other)).toBe(false)
   })
 
   it("does not match on non-configured host when host !== hostname", () => {
@@ -91,8 +90,8 @@ describe("isCustomDontWalkIntoElement", () => {
 
     expect(isCustomDontWalkIntoElement(proseMirror)).toBe(false)
     expect(isCustomDontWalkIntoElement(other)).toBe(false)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror, DEFAULT_CONFIG)).toBe(false)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(other, DEFAULT_CONFIG)).toBe(false)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(proseMirror)).toBe(false)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(other)).toBe(false)
   })
 
   it("matches shreddit-post-flair element on www.reddit.com", () => {
@@ -102,7 +101,7 @@ describe("isCustomDontWalkIntoElement", () => {
     document.body.appendChild(postFlair)
 
     expect(isCustomDontWalkIntoElement(postFlair)).toBe(true)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(postFlair, DEFAULT_CONFIG)).toBe(true)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(postFlair)).toBe(true)
   })
 
   it("matches github review diff table and blocks its descendants", () => {
@@ -122,7 +121,7 @@ describe("isCustomDontWalkIntoElement", () => {
     document.body.appendChild(diffTable)
 
     expect(isCustomDontWalkIntoElement(diffTable)).toBe(true)
-    expect(isDontWalkIntoAndDontTranslateAsChildElement(diffTable, DEFAULT_CONFIG)).toBe(true)
-    expect(hasNoWalkAncestor(td, DEFAULT_CONFIG)).toBe(true)
+    expect(isDontWalkIntoAndDontTranslateAsChildElement(diffTable)).toBe(true)
+    expect(hasNoWalkAncestor(td)).toBe(true)
   })
 })

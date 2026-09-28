@@ -1,9 +1,8 @@
+import type { Pace } from "./pace"
 import type { RequestRetryPolicy } from "./retry-policy"
-import { requestQueueConfigSchema } from "@/types/config/translate"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
-import { deepMerge } from "@/utils/object"
 import { BinaryHeapPQ } from "./priority-queue"
-import { defaultRequestRetryPolicy } from "./retry-policy"
+import { defaultRequestRetryPolicy, getRequestErrorMeta } from "./retry-policy"
 
 export interface RequestTask {
   id: string
@@ -26,6 +25,11 @@ export interface QueueOptions {
   maxRetries: number
   baseRetryDelayMs: number
   retryPolicy?: RequestRetryPolicy
+  /**
+   * Lets the service set the pace: `rate` and `capacity` then come from it,
+   * and every success or throttled request is reported to it.
+   */
+  pace?: Pace
 }
 
 export class RequestQueue {
@@ -40,9 +44,9 @@ export class RequestQueue {
   private lastRefill: number
 
   constructor(private options: QueueOptions) {
-    this.options = options
+    this.options = { ...options }
     this.retryPolicy = options.retryPolicy ?? defaultRequestRetryPolicy
-    this.bucketTokens = options.capacity
+    this.bucketTokens = this.capacity
     this.lastRefill = Date.now()
     this.waitingQueue = new BinaryHeapPQ<QueuedRequestTask>()
   }
@@ -83,20 +87,12 @@ export class RequestQueue {
     return promise
   }
 
-  setQueueOptions(options: Partial<QueueOptions>) {
-    const { retryPolicy, ...queueOptions } = options
-    const parseConfigStatus = requestQueueConfigSchema.partial().safeParse(queueOptions)
-    if (parseConfigStatus.error) {
-      throw new Error(parseConfigStatus.error.issues[0].message)
-    }
-    this.options = deepMerge(this.options, queueOptions)
-    if (retryPolicy) {
-      this.retryPolicy = retryPolicy
-    }
-    if (queueOptions.capacity) {
-      this.bucketTokens = queueOptions.capacity
-      this.lastRefill = Date.now()
-    }
+  private get rate(): number {
+    return this.options.pace?.rate ?? this.options.rate
+  }
+
+  private get capacity(): number {
+    return this.options.pace?.capacity ?? this.options.capacity
   }
 
   private schedule() {
@@ -128,7 +124,7 @@ export class RequestQueue {
       if (nextTask) {
         const now = Date.now()
         const delayUntilScheduled = Math.max(0, nextTask.scheduleAt - now)
-        const msUntilNextToken = this.bucketTokens >= 1 ? 0 : Math.ceil((1 - this.bucketTokens) / this.options.rate * 1000)
+        const msUntilNextToken = this.bucketTokens >= 1 ? 0 : Math.ceil((1 - this.bucketTokens) / this.rate * 1000)
         const delay = Math.max(delayUntilScheduled, msUntilNextToken)
 
         this.nextScheduleTimer = setTimeout(() => {
@@ -166,6 +162,7 @@ export class RequestQueue {
       }
 
       // console.info(`✅ Task ${task.id} completed successfully at ${Date.now()}`)
+      this.recordSuccess()
       if (!task.drained) {
         task.resolve(result)
       }
@@ -182,6 +179,8 @@ export class RequestQueue {
       if (task.drained) {
         return
       }
+
+      this.recordFailure(error)
 
       const now = Date.now()
       const decision = this.retryPolicy.decide(error, {
@@ -264,11 +263,27 @@ export class RequestQueue {
     task.reject(error)
   }
 
+  private recordSuccess() {
+    this.options.pace?.recordSuccess()
+  }
+
+  private recordFailure(error: unknown) {
+    const pace = this.options.pace
+    if (!pace)
+      return
+    const { kind, statusCode } = getRequestErrorMeta(error)
+    if (kind === "rate-limit" || kind === "timeout" || statusCode === 429) {
+      this.refillTokens()
+      pace.recordThrottle()
+      this.bucketTokens = Math.min(this.bucketTokens, this.capacity)
+    }
+  }
+
   private refillTokens() {
     const now = Date.now()
     const timeSinceLastRefill = now - this.lastRefill
-    const tokensToAdd = (timeSinceLastRefill / 1000) * this.options.rate
-    this.bucketTokens = Math.min(this.bucketTokens + tokensToAdd, this.options.capacity)
+    const tokensToAdd = (timeSinceLastRefill / 1000) * this.rate
+    this.bucketTokens = Math.min(this.bucketTokens + tokensToAdd, this.capacity)
 
     // if (tokensToAdd > 0.01) { // Only log if meaningful tokens were added
     //   console.log(`🪣 Token bucket refilled: ${oldTokens.toFixed(2)} -> ${this.bucketTokens.toFixed(2)} (+${tokensToAdd.toFixed(2)}) after ${timeSinceLastRefill}ms`)

@@ -25,15 +25,9 @@ popup:
     none: 尚無服務
     missingKey: 尚未設定金鑰
   setup:
-    title: 尚未設定翻譯服務
-    description: 把說明交給你的 agent，它會用你的金鑰驗證一份設定並放進剪貼簿，貼到下面就行。
-    copyInstructions: 複製給 agent 的說明
-    copied: 已複製
-    pasteLabel: agent 產生的設定
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: 設定裡沒有 API 金鑰
-    apply: 套用並翻譯此頁
-    applyOnly: 套用
+    title: 還沒有翻譯服務
+    description: 在設定頁貼上 agent 產生的設定，就能翻譯。
+    openSettings: 前往設定
 errorRecovery:
   title: 應用程式發生異常
   description: 已進入復原模式。請重新整理頁面或重設設定後再試一次。
@@ -52,24 +46,36 @@ options:
   title: 設定
   service:
     title: 翻譯服務
-    status:
-      none: 無服務
-      unconfigured: 尚未設定金鑰
-      configured: 尚未測試
-      testing: 測試中…
-      ok: 已連線
-      failed: 連線失敗
-    testConnection: 測試連線
-    sendsTo: 網頁文字會傳送到 $1
+    empty:
+      title: 還沒有翻譯服務
+      description: 把說明交給你的 agent。它會用你的金鑰驗證翻譯服務的設定，放進剪貼簿，你貼到下面。
     copyInstructions: 複製給 agent 的說明
     copied: 已複製
-    paste:
-      open: 貼上設定
-      label: agent 產生的設定
-      keyMissing: 設定裡沒有 API 金鑰。
-      cancel: 取消
-      apply: 套用
-      applying: 確認中…
+    edit: 修改
+    test: 測試連線
+    testing: 測試中…
+    status:
+      ok: 已連線
+      failed: 連線失敗
+      unchecked: 未檢查
+    checkedAt: $1檢查
+    sendsTo: 網頁文字傳送到 $1
+    key: 金鑰 $1
+    newKey: 新金鑰
+    keptKey: 沿用已儲存的金鑰
+    keyMissing: 設定裡沒有 API 金鑰
+    thinkingOff: 已關閉思考
+    label:
+      current: 目前
+      after: 套用後
+      connection: 連線
+    unchanged: 與目前相同。已全選，貼上即可整個取代，也可以只改一個欄位。
+    failedNotSaved: 失敗，沒有儲存
+    editorLabel: 翻譯服務設定
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: 取消
+    apply: 套用
+    applying: 檢查中…
   reading:
     title: 閱讀
     mode:
@@ -105,52 +111,24 @@ options:
         syntaxError: CSS 存在語法錯誤
         tooLong: CSS 過長
         allSaved: 所有變更已儲存
-    range:
-      title: 翻譯範圍
-      main: 主要內容
-      all: 整個頁面
     shortcut:
       title: 快速鍵
   quality:
     title: 譯文品質
     context:
-      title: 參考整頁上下文
+      title: 結合全文脈絡
     prompt:
       title: 提示詞
       default: 預設
-  advanced:
-    title: 進階
-    rate: 每秒請求數
-    capacity: 同時進行的請求數上限
-    maxCharactersPerBatch: 每次請求的字元數上限
-    maxItemsPerBatch: 每次請求的段落數上限
-    preloadMargin: 提前翻譯可視範圍以下的內容（px）
-    preloadThreshold: 可見比例達到多少才翻譯
-    minCharacters: 略過少於 N 個字元的段落
-    minWords: 略過少於 N 個字詞的段落
-    minError: 數值不得小於 $1
-    rangeError: 數值必須在 $1 到 $2 之間
-    cache:
-      title: 譯文快取
-      clear: 清除
-      clearing: 清除中…
-      dialog:
-        title: 要清除翻譯快取嗎？
-        description: 所有快取的譯文和頁面摘要都會被刪除，頁面會在需要時重新翻譯。
-        confirm: 清除
-        cancel: 取消
-  appearance:
-    title: 外觀
-    system: 跟隨系統設定
-    light: 淺色
-    dark: 深色
-  reset:
-    title: 所有設定
-    dialog:
-      title: 要重設所有設定嗎？
-      description: 包括 API 金鑰和提示詞在內的所有設定都會恢復為預設值。
-      confirm: 重設
+      custom: 自訂
+      edit: 修改
+      system: 系統提示詞
+      template: 提示詞範本
+      tokens: 範本必須包含 {{input}}。可用：{{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}
+      missingInput: 範本裡缺少 {{input}}。
+      restore: 恢復預設
       cancel: 取消
+      apply: 套用
 translation:
   sameLanguage: 來源語言和目標語言必須不同
   noApiKey: 尚未填入 API 金鑰。請點一下工具列上的簡道翻譯圖示進行設定。
@@ -160,9 +138,9 @@ translation:
 agentInstructions:
   noConfiguration: （尚未設定）
   text: |
-    我在用瀏覽器擴充功能簡道翻譯（Jiandao）來翻譯網頁，請幫我設定它的翻譯服務。
+    我在用瀏覽器擴充功能簡道翻譯（Jiandao）翻譯網頁，請幫我設定它的翻譯服務。
     先閱讀說明：$1
-    依照說明操作：問清楚我要用哪家服務、API 金鑰在哪裡、我讀什麼語言；用我的金鑰依照說明裡的請求範本驗證，直到請求成功；把設定 JSON 寫入我的剪貼簿；最後告訴我在 Jiandao 彈出視窗裡貼上並套用。
+    照說明操作：問清楚我要用哪家服務、API 金鑰在哪裡；用我的金鑰依說明裡的請求範本驗證，直到請求成功；把翻譯服務的設定 JSON 寫入我的剪貼簿；最後告訴我在簡道翻譯設定頁的「翻譯服務」裡貼上並套用。
     我目前的設定（金鑰已遮蔽）：
     $2
 shortcutKeySelector:

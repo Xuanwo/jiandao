@@ -3,9 +3,9 @@ import { i18n } from "#imports"
 import { SegmentedControl } from "@/components/segmented-control"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { featureProviderConfigAtom } from "@/utils/atoms/provider"
-import { AgentSetupCard } from "./components/agent-setup-card"
 import { LanguageRow } from "./components/language-row"
 import { PopupFooter } from "./components/popup-footer"
+import { SetupPromptCard } from "./components/setup-prompt-card"
 import { TranslateButton } from "./components/translate-button"
 import { usePopupSync } from "./use-popup-sync"
 
@@ -28,7 +28,7 @@ function DisplayModeControl() {
 /**
  * Popup layout reads top to bottom as one sentence: from this language, into
  * that language, shown this way, translate. When the chosen service has no
- * key yet, the agent setup card takes the action's place.
+ * key yet, a card pointing to the settings page takes the action's place.
  */
 export default function App() {
   usePopupSync()
@@ -40,7 +40,7 @@ export default function App() {
       <div className="flex flex-col gap-3.5 px-4 pt-4 pb-4">
         <LanguageRow muted={needsApiKey} />
         {needsApiKey
-          ? <AgentSetupCard />
+          ? <SetupPromptCard />
           : (
               <>
                 <DisplayModeControl />

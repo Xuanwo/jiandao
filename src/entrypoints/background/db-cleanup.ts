@@ -56,19 +56,6 @@ async function cleanupOldTranslationCache() {
   }
 }
 
-export async function cleanupAllTranslationCache() {
-  try {
-    // Delete all translation cache entries
-    await cacheDb.translationCache.clear()
-
-    logger.info(`Cache cleanup: Deleted all translation cache entries`)
-  }
-  catch (error) {
-    logger.error("Failed to cleanup all cache:", error)
-    throw error
-  }
-}
-
 async function cleanupOldSummaryCache() {
   try {
     const cutoffDate = new Date()
@@ -83,18 +70,5 @@ async function cleanupOldSummaryCache() {
   }
   catch (error) {
     logger.error("Failed to cleanup old summary cache:", error)
-  }
-}
-
-export async function cleanupAllSummaryCache() {
-  try {
-    // Delete all article summary cache entries
-    await cacheDb.articleSummaryCache.clear()
-
-    logger.info(`Summary cache cleanup: Deleted all article summary cache entries`)
-  }
-  catch (error) {
-    logger.error("Failed to cleanup all summary cache:", error)
-    throw error
   }
 }

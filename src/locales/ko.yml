@@ -26,14 +26,8 @@ popup:
     missingKey: 키 없음
   setup:
     title: 아직 번역 서비스가 없습니다
-    description: 안내를 에이전트에게 전달하세요. 에이전트가 키로 구성을 검증하고 클립보드에 넣어 줍니다. 아래에 붙여 넣으세요.
-    copyInstructions: 에이전트용 안내 복사
-    copied: 복사됨
-    pasteLabel: 에이전트가 만든 구성
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: 구성에 API 키가 없습니다
-    apply: 적용하고 이 페이지 번역
-    applyOnly: 적용
+    description: 에이전트가 만든 구성을 설정 페이지에 붙여 넣으면 번역할 수 있습니다.
+    openSettings: 설정에서 구성하기
 errorRecovery:
   title: 문제가 발생했습니다
   description: 복구 모드가 활성화되었습니다. 페이지를 새로고침하거나 설정을 초기화한 뒤 다시 시도하세요.
@@ -52,24 +46,36 @@ options:
   title: 설정
   service:
     title: 번역 서비스
-    status:
-      none: 서비스 없음
-      unconfigured: 키 없음
-      configured: 테스트 안 됨
-      testing: 테스트 중…
-      ok: 연결됨
-      failed: 연결 실패
-    testConnection: 연결 테스트
-    sendsTo: "페이지 텍스트 전송 대상: $1"
+    empty:
+      title: 아직 번역 서비스가 없습니다
+      description: 안내를 에이전트에게 전달하세요. 에이전트가 키로 번역 서비스 구성을 확인해 클립보드에 넣어 줍니다. 아래에 붙여 넣으세요.
     copyInstructions: 에이전트용 안내 복사
     copied: 복사됨
-    paste:
-      open: 구성 붙여 넣기
-      label: 에이전트가 만든 구성
-      keyMissing: 구성에 API 키가 없습니다.
-      cancel: 취소
-      apply: 적용
-      applying: 확인 중…
+    edit: 수정
+    test: 연결 테스트
+    testing: 테스트 중…
+    status:
+      ok: 연결됨
+      failed: 연결 실패
+      unchecked: 확인 안 함
+    checkedAt: $1 확인
+    sendsTo: "페이지 텍스트 전송 대상: $1"
+    key: 키 $1
+    newKey: 새 키
+    keptKey: 저장된 키 유지
+    keyMissing: 구성에 API 키가 없습니다
+    thinkingOff: 생각 끔
+    label:
+      current: 현재
+      after: 적용 후
+      connection: 연결
+    unchanged: 현재와 같습니다. 전체가 선택되어 있으니 붙여 넣으면 통째로 바뀌고, 필드 하나만 고칠 수도 있습니다.
+    failedNotSaved: 실패, 저장하지 않음
+    editorLabel: 번역 서비스 구성
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: 취소
+    apply: 적용
+    applying: 확인 중…
   reading:
     title: 읽기
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: CSS에 구문 오류가 있습니다
         tooLong: CSS가 너무 깁니다
         allSaved: 모든 변경사항이 저장되었습니다
-    range:
-      title: 번역 범위
-      main: 본문
-      all: 페이지 전체
     shortcut:
       title: 단축키
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: 프롬프트
       default: 기본
-  advanced:
-    title: 고급
-    rate: 초당 요청 수
-    capacity: 동시에 처리할 요청 수
-    maxCharactersPerBatch: 요청당 문자 수
-    maxItemsPerBatch: 요청당 단락 수
-    preloadMargin: 화면보다 앞서 번역할 거리(px)
-    preloadThreshold: 번역 전에 보여야 하는 비율
-    minCharacters: N자보다 짧은 단락 건너뛰기
-    minWords: N단어보다 짧은 단락 건너뛰기
-    minError: 값은 $1 이상이어야 합니다
-    rangeError: 값은 $1에서 $2 사이여야 합니다
-    cache:
-      title: 번역 캐시
-      clear: 지우기
-      clearing: 지우는 중…
-      dialog:
-        title: 번역 캐시를 지울까요?
-        description: 캐시된 모든 번역과 페이지 요약이 삭제됩니다. 페이지는 필요할 때 다시 번역됩니다.
-        confirm: 지우기
-        cancel: 취소
-  appearance:
-    title: 외관
-    system: 시스템
-    light: 라이트
-    dark: 다크
-  reset:
-    title: 모든 설정
-    dialog:
-      title: 모든 설정을 초기화할까요?
-      description: API 키와 프롬프트를 포함한 모든 설정이 기본값으로 돌아갑니다.
-      confirm: 초기화
+      custom: 사용자 지정
+      edit: 수정
+      system: 시스템 프롬프트
+      template: 프롬프트 템플릿
+      tokens: "템플릿에는 {{input}}이 있어야 합니다. 사용 가능: {{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}"
+      missingInput: 템플릿에 {{input}}이 없습니다.
+      restore: 기본값으로 되돌리기
       cancel: 취소
+      apply: 적용
 translation:
   sameLanguage: 원본 언어와 대상 언어는 달라야 합니다
   noApiKey: 먼저 API 키를 추가하세요. 툴바의 Jiandao 아이콘을 클릭하면 설정할 수 있습니다.
@@ -162,8 +140,8 @@ agentInstructions:
   text: |
     브라우저 확장 프로그램 Jiandao(简道翻译)로 웹 페이지를 번역하고 있습니다. 번역 서비스를 설정해 주세요.
     먼저 가이드를 읽어 주세요: $1
-    가이드를 따라 주세요: 제가 원하는 서비스, API 키의 위치, 제가 읽는 언어를 물어봐 주세요. 가이드의 요청 템플릿으로 제 키를 사용해 요청이 성공할 때까지 검증해 주세요. 구성 JSON을 제 클립보드에 써 주세요. 그런 다음 Jiandao 팝업에 붙여 넣고 적용하라고 알려 주세요.
-    현재 구성(키는 가려져 있습니다):
+    가이드를 따라 주세요: 제가 원하는 서비스와 API 키의 위치를 물어봐 주세요. 가이드의 요청 템플릿으로 제 키를 사용해 요청이 성공할 때까지 확인해 주세요. 번역 서비스 구성 JSON을 제 클립보드에 써 주세요. 마지막으로 Jiandao 설정 페이지의 "번역 서비스"에 붙여 넣고 적용하라고 알려 주세요.
+    현재 구성(키는 가려짐):
     $2
 shortcutKeySelector:
   placeholder: 단축키를 누르세요

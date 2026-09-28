@@ -1,35 +1,11 @@
-import type { LangCodeISO6393 } from "@/definitions"
-import type { Config } from "@/types/config/config"
-import { ISO6393_TO_6391 } from "@/definitions"
-import { getDetectedCodeFromStorage, getFinalSourceCode } from "@/utils/config/languages"
+const LETTER_RE = /\p{L}/u
 
-function countWords(text: string, sourceCode: LangCodeISO6393): number {
-  // Convert ISO 639-3 (e.g., 'eng') to ISO 639-1 (e.g., 'en') for Intl.Segmenter
-  const locale = ISO6393_TO_6391[sourceCode] ?? "en"
-  const segmenter = new Intl.Segmenter(locale, { granularity: "word" })
-  return [...segmenter.segment(text)].filter(s => s.isWordLike).length
-}
-
-async function getSourceCode(configSourceCode: LangCodeISO6393 | "auto"): Promise<LangCodeISO6393> {
-  const detectedCode = await getDetectedCodeFromStorage()
-  return getFinalSourceCode(configSourceCode, detectedCode)
-}
-
-export async function shouldFilterSmallParagraph(
-  text: string,
-  config: Config,
-): Promise<boolean> {
-  const { minCharactersPerNode, minWordsPerNode } = config.translate.page
-  const { sourceCode } = config.language
-
-  if (minCharactersPerNode > 0 && text.length < minCharactersPerNode)
-    return true
-
-  if (minWordsPerNode > 0) {
-    const finalSourceCode = await getSourceCode(sourceCode)
-    if (countWords(text, finalSourceCode) < minWordsPerNode)
-      return true
-  }
-
-  return false
+/**
+ * Paragraphs not worth a request: text without a single letter (numbers,
+ * prices, dates, symbols) and single characters such as icons or bullets.
+ * Code blocks never get here; the DOM walk skips <pre>.
+ */
+export function shouldFilterSmallParagraph(text: string): boolean {
+  const trimmed = text.trim()
+  return [...trimmed].length < 2 || !LETTER_RE.test(trimmed)
 }

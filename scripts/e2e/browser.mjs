@@ -126,6 +126,22 @@ export async function clickButton(page, name) {
   await page.getByRole("button", { name, exact: true }).click()
 }
 
+/**
+ * Pastes a setup document into the translation service section of the
+ * settings page and applies it, the way the reader does after the agent put
+ * it on the clipboard. Waits until the check passed and the preview is back.
+ */
+export async function configureService(page, extensionId, doc) {
+  await page.goto(`chrome-extension://${extensionId}/options.html#service`)
+  const section = page.locator("#service")
+  const edit = section.getByRole("button", { name: "Edit", exact: true })
+  if (await edit.isVisible())
+    await edit.click()
+  await section.getByLabel("Translation service configuration").fill(JSON.stringify(doc, null, 2))
+  await section.getByRole("button", { name: "Apply", exact: true }).click()
+  await section.getByText("Connected", { exact: true }).waitFor({ timeout: 15_000 })
+}
+
 /** The extension's stored config, read in the service worker. */
 export async function storedConfig(context) {
   const worker = context.serviceWorkers()[0] ?? await context.waitForEvent("serviceworker")

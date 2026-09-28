@@ -5,7 +5,6 @@ import type {
 } from "@/types/background-generate-text"
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
-import type { BatchQueueConfig, RequestQueueConfig } from "@/types/config/translate"
 import type { TranslationProgress } from "@/types/translation-progress"
 import { browser } from "#imports"
 
@@ -34,10 +33,6 @@ interface ProtocolMap {
   enqueueTranslateRequest: (data: { text: string, langConfig: Config["language"], providerConfig: ProviderConfig, scheduleAt: number, hash: string, webTitle?: string | null, webDescription?: string | null, webContent?: string | null, webSummary?: string | null }) => Promise<string>
   getOrGenerateWebPageSummary: (data: { webTitle: string, webContent: string, providerConfig: ProviderConfig }) => Promise<string | null>
   backgroundGenerateText: (data: BackgroundGenerateTextPayload) => Promise<BackgroundGenerateTextResponse>
-  setTranslateRequestQueueConfig: (data: Partial<RequestQueueConfig>) => void
-  setTranslateBatchQueueConfig: (data: Partial<BatchQueueConfig>) => void
-  // cache management
-  clearAllTranslationRelatedCache: () => Promise<void>
 }
 
 type MessageType = keyof ProtocolMap

@@ -1,4 +1,3 @@
-import type { Config } from "@/types/config/config"
 import type { TransNode } from "@/types/dom"
 import {
   BLOCK_ATTRIBUTE,
@@ -139,7 +138,6 @@ export function isDontWalkIntoButTranslateAsChildElement(element: HTMLElement): 
   return dontWalkClass || dontWalkTag
 }
 
-// historical regression
 function isInsideContentContainer(element: HTMLElement): boolean {
   let current: HTMLElement | null = element.parentElement
   while (current) {
@@ -151,11 +149,20 @@ function isInsideContentContainer(element: HTMLElement): boolean {
   return false
 }
 
-export function isDontWalkIntoAndDontTranslateAsChildElement(element: HTMLElement, config: Config): boolean {
+/**
+ * Whether the page marks up its main content with <article> or <main>. Only
+ * then are page chrome elements (header, nav, footer) outside it skipped; a
+ * page without that markup is translated as a whole.
+ */
+function hasContentContainer(element: HTMLElement): boolean {
+  return !!element.ownerDocument?.querySelector("article, main")
+}
+
+export function isDontWalkIntoAndDontTranslateAsChildElement(element: HTMLElement): boolean {
   const dontWalkCustomElement = isCustomDontWalkIntoElement(element)
-  const dontWalkContent = config.translate.page.range !== "all"
-    && MAIN_CONTENT_IGNORE_TAGS.has(element.tagName)
+  const dontWalkContent = MAIN_CONTENT_IGNORE_TAGS.has(element.tagName)
     && !isInsideContentContainer(element)
+    && hasContentContainer(element)
   const dontWalkInvalidTag = DONT_WALK_AND_TRANSLATE_TAGS.has(element.tagName)
   const dontWalkCSS
     = window.getComputedStyle(element).display === "none"
@@ -240,10 +247,10 @@ export function isTranslatedContentNode(node: Node): boolean {
 /**
  * Check if an element has an ancestor that should not be walked into
  */
-export function hasNoWalkAncestor(element: HTMLElement, config: Config): boolean {
+export function hasNoWalkAncestor(element: HTMLElement): boolean {
   let current: HTMLElement | null = element.parentElement
   while (current) {
-    if (isDontWalkIntoButTranslateAsChildElement(current) || isDontWalkIntoAndDontTranslateAsChildElement(current, config)) {
+    if (isDontWalkIntoButTranslateAsChildElement(current) || isDontWalkIntoAndDontTranslateAsChildElement(current)) {
       return true
     }
     current = current.parentElement

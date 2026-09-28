@@ -6,8 +6,13 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { openOptionsPage } from "@/utils/navigation"
 import App from "../app"
 import { activeTabAtom, pageTranslationEnabledAtom, translationProgressAtom } from "../atoms"
+
+vi.mock("@/utils/navigation", () => ({
+  openOptionsPage: vi.fn(() => Promise.resolve()),
+}))
 
 vi.mock("@/utils/message", () => ({
   onMessage: vi.fn(() => vi.fn()),
@@ -42,30 +47,15 @@ describe("popup app", () => {
     cleanup()
   })
 
-  it("shows the agent setup card when the active service has no key", () => {
+  it("points to the settings page instead of configuring anything while the service has no key", () => {
     renderPopup()
 
     expect(screen.getByText("popup.setup.title")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "popup.setup.copyInstructions" })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
+    expect(screen.queryByRole("textbox")).toBeNull()
     expect(screen.queryByRole("button", { name: /popup\.translate$/ })).toBeNull()
-  })
 
-  it("enables applying once a pasted configuration is valid and carries a key", () => {
-    renderPopup()
-    const textarea = screen.getByLabelText("popup.setup.pasteLabel")
-
-    fireEvent.change(textarea, { target: { value: "not json" } })
-    expect(screen.getByText(/Not valid JSON/)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
-
-    fireEvent.change(textarea, { target: { value: JSON.stringify({ jiandao: 1, provider: { type: "openai", apiKey: "sk-…a9f2", model: "gpt-6-luna" } }) } })
-    expect(screen.getByText(/popup\.setup\.keyMissing/)).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeDisabled()
-
-    fireEvent.change(textarea, { target: { value: JSON.stringify({ jiandao: 1, provider: { type: "openai", apiKey: "sk-real-key", model: "gpt-6-luna" } }) } })
-    expect(screen.getByText("OpenAI · gpt-6-luna · api.openai.com")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "popup.setup.apply" })).toBeEnabled()
+    fireEvent.click(screen.getByRole("button", { name: "popup.setup.openSettings" }))
+    expect(openOptionsPage).toHaveBeenCalledWith({ section: "service" })
   })
 
   it("shows the translate action and display mode once a key is set", () => {

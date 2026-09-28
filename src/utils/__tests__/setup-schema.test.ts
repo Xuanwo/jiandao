@@ -14,7 +14,7 @@ export function buildSetupJsonSchema(): Record<string, unknown> {
     $schema: "http://json-schema.org/draft-07/schema#",
     $id: "https://github.com/Xuanwo/jiandao/blob/main/schema/jiandao-setup.schema.json",
     title: "Jiandao setup document",
-    description: "Configuration for Jiandao's translation service. Written by an agent, pasted into Jiandao by the reader. See docs/agent-setup.md.",
+    description: "Jiandao's translation service. Written by an agent, pasted by the reader into the translation service section of Jiandao's settings page. See docs/agent-setup.md.",
     ...schema,
   }
 }
@@ -32,11 +32,8 @@ describe("setup document JSON Schema", () => {
 
   it("keeps the fields agents rely on and rejects unknown ones", () => {
     const schema = buildSetupJsonSchema()
-    const properties = schema.properties as Record<string, unknown>
-    expect(Object.keys(properties)).toEqual(["jiandao", "provider", "prompt", "targetLanguage", "sourceLanguage", "mode"])
+    expect(Object.keys(schema.properties as Record<string, unknown>)).toEqual(["type", "api", "name", "apiKey", "model", "baseURL", "headers", "body", "temperature"])
+    expect(schema.required).toEqual(["type", "model"])
     expect(schema.additionalProperties).toBe(false)
-    const provider = properties.provider as { properties: Record<string, unknown>, additionalProperties: boolean }
-    expect(Object.keys(provider.properties)).toEqual(["type", "api", "name", "apiKey", "model", "baseURL", "headers", "body", "temperature"])
-    expect(provider.additionalProperties).toBe(false)
   })
 })

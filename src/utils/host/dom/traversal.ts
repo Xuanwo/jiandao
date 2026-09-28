@@ -45,7 +45,7 @@ export function extractTextContent(node: TransNode, config: Config): string {
   //   return ''
   // }
 
-  if (isDontWalkIntoAndDontTranslateAsChildElement(node, config)) {
+  if (isDontWalkIntoAndDontTranslateAsChildElement(node)) {
     return ""
   }
 
@@ -64,7 +64,7 @@ export function walkAndLabelElement(
   walkId: string,
   config: Config,
 ): { forceBlock: boolean, isInlineNode: boolean } {
-  if (isDontWalkIntoButTranslateAsChildElement(element) || isDontWalkIntoAndDontTranslateAsChildElement(element, config)) {
+  if (isDontWalkIntoButTranslateAsChildElement(element) || isDontWalkIntoAndDontTranslateAsChildElement(element)) {
     return {
       forceBlock: false,
       isInlineNode: false,
@@ -88,7 +88,7 @@ export function walkAndLabelElement(
     if (child.nodeType === Node.TEXT_NODE)
       return true
     if (isHTMLElement(child)) {
-      return !((isDontWalkIntoButTranslateAsChildElement(child) || isDontWalkIntoAndDontTranslateAsChildElement(child, config)))
+      return !((isDontWalkIntoButTranslateAsChildElement(child) || isDontWalkIntoAndDontTranslateAsChildElement(child)))
     }
     return false
   })

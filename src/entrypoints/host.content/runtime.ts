@@ -1,6 +1,5 @@
 import type { ContentScriptContext } from "#imports"
-import type { Config } from "@/types/config/config"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { PRELOAD_MARGIN_PX, PRELOAD_THRESHOLD } from "@/utils/constants/translate"
 import { detectPageLanguageLightweight } from "@/utils/content/page-language"
 import { ensurePresetStyles } from "@/utils/host/translate/ui/style-injector"
 import { logger } from "@/utils/logger"
@@ -11,18 +10,17 @@ import { mountHostToast } from "./mount-host-toast"
 import { bindTranslationShortcutKey } from "./translation-control/bind-translation-shortcut"
 import { PageTranslationManager } from "./translation-control/page-translation"
 
-export async function bootstrapHostContent(ctx: ContentScriptContext, initialConfig: Config | null) {
+export async function bootstrapHostContent(ctx: ContentScriptContext) {
   ensurePresetStyles(document)
 
   const cleanupUrlListener = setupUrlChangeListener()
 
   const removeHostToast = window === window.top ? mountHostToast() : () => {}
 
-  const preloadConfig = initialConfig?.translate.page.preload ?? DEFAULT_CONFIG.translate.page.preload
   const manager = new PageTranslationManager({
     root: null,
-    rootMargin: `${preloadConfig.margin}px`,
-    threshold: preloadConfig.threshold,
+    rootMargin: `${PRELOAD_MARGIN_PX}px`,
+    threshold: PRELOAD_THRESHOLD,
   })
 
   const cleanupTranslationShortcut = await bindTranslationShortcutKey(manager)

@@ -26,14 +26,8 @@ popup:
     missingKey: キー未設定
   setup:
     title: 翻訳サービスがまだありません
-    description: 手順をエージェントに渡してください。エージェントがあなたのキーで構成を検証し、クリップボードにコピーします。下に貼り付けてください。
-    copyInstructions: エージェント向けの手順をコピー
-    copied: コピーしました
-    pasteLabel: エージェントが作成した構成
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: 構成に API キーがありません
-    apply: 適用してこのページを翻訳
-    applyOnly: 適用
+    description: エージェントが生成した設定を設定ページに貼り付けると、翻訳できます。
+    openSettings: 設定を開く
 errorRecovery:
   title: 問題が発生しました
   description: 復旧モードになっています。ページを再読み込みするか、設定をリセットしてからもう一度お試しください。
@@ -52,24 +46,36 @@ options:
   title: 設定
   service:
     title: 翻訳サービス
-    status:
-      none: サービスなし
-      unconfigured: キー未設定
-      configured: 未テスト
-      testing: テスト中…
-      ok: 接続済み
-      failed: 接続に失敗しました
-    testConnection: 接続テスト
-    sendsTo: "ページのテキストの送信先: $1"
-    copyInstructions: エージェント向けの手順をコピー
+    empty:
+      title: 翻訳サービスがまだありません
+      description: 説明をエージェントに渡してください。エージェントがあなたのキーで翻訳サービスの設定を確認し、クリップボードに入れます。下に貼り付けてください。
+    copyInstructions: エージェント向けの説明をコピー
     copied: コピーしました
-    paste:
-      open: 構成を貼り付け
-      label: エージェントが作成した構成
-      keyMissing: 構成に API キーがありません。
-      cancel: キャンセル
-      apply: 適用
-      applying: 確認中…
+    edit: 編集
+    test: 接続をテスト
+    testing: テスト中…
+    status:
+      ok: 接続済み
+      failed: 接続に失敗
+      unchecked: 未確認
+    checkedAt: $1に確認
+    sendsTo: ページのテキストの送信先：$1
+    key: キー $1
+    newKey: 新しいキー
+    keptKey: 保存済みのキーを使用
+    keyMissing: 設定に API キーがありません
+    thinkingOff: 思考オフ
+    label:
+      current: 現在
+      after: 適用後
+      connection: 接続
+    unchanged: 現在と同じです。全体が選択されているので、貼り付ければ丸ごと置き換わります。1 つの項目だけ変えることもできます。
+    failedNotSaved: 失敗しました。保存していません
+    editorLabel: 翻訳サービスの設定
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: キャンセル
+    apply: 適用
+    applying: 確認中…
   reading:
     title: 閲覧
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: CSS に構文エラーがあります
         tooLong: CSS が長すぎます
         allSaved: すべての変更が保存されました
-    range:
-      title: 翻訳範囲
-      main: メインコンテンツ
-      all: ページ全体
     shortcut:
       title: ショートカット
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: プロンプト
       default: デフォルト
-  advanced:
-    title: 詳細設定
-    rate: 1 秒あたりのリクエスト数
-    capacity: 同時に送るリクエスト数
-    maxCharactersPerBatch: 1 リクエストあたりの文字数
-    maxItemsPerBatch: 1 リクエストあたりの段落数
-    preloadMargin: 表示領域より先に翻訳する距離（px）
-    preloadThreshold: 翻訳を始める表示割合
-    minCharacters: N 文字未満の段落をスキップ
-    minWords: N 語未満の段落をスキップ
-    minError: 値は $1 以上にしてください
-    rangeError: 値は $1 から $2 の間である必要があります
-    cache:
-      title: 翻訳キャッシュ
-      clear: クリア
-      clearing: クリア中…
-      dialog:
-        title: 翻訳キャッシュをクリアしますか？
-        description: キャッシュされた翻訳とページの要約はすべて削除されます。ページは必要なときに再度翻訳されます。
-        confirm: クリア
-        cancel: キャンセル
-  appearance:
-    title: 外観
-    system: システム
-    light: ライト
-    dark: ダーク
-  reset:
-    title: すべての設定
-    dialog:
-      title: すべての設定をリセットしますか？
-      description: API キーとプロンプトを含むすべての設定がデフォルト値に戻ります。
-      confirm: リセット
+      custom: カスタム
+      edit: 編集
+      system: システムプロンプト
+      template: プロンプトテンプレート
+      tokens: テンプレートには {{input}} が必要です。使用可能：{{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}
+      missingInput: テンプレートに {{input}} がありません。
+      restore: デフォルトに戻す
       cancel: キャンセル
+      apply: 適用
 translation:
   sameLanguage: ソース言語とターゲット言語は異なる必要があります
   noApiKey: まず API キーを追加してください。ツールバーの Jiandao アイコンをクリックすると設定できます。
@@ -162,8 +140,8 @@ agentInstructions:
   text: |
     ブラウザー拡張機能 Jiandao（简道翻译）でウェブページを翻訳しています。翻訳サービスを設定してください。
     まずガイドを読んでください：$1
-    ガイドに従ってください：使いたいサービス、API キーの場所、私が読む言語を私に聞いてください。ガイドのリクエストテンプレートを使って私のキーで検証し、リクエストが成功するまで続けてください。構成の JSON を私のクリップボードに書き込んでください。最後に、Jiandao のポップアップに貼り付けて適用するよう私に伝えてください。
-    現在の構成（キーは伏せてあります）：
+    ガイドに従ってください：使いたいサービスと API キーの場所を私に聞いてください。ガイドのリクエストテンプレートを使い、私のキーでリクエストが成功するまで確認してください。翻訳サービスの設定 JSON を私のクリップボードに書き込んでください。最後に、Jiandao の設定ページの「翻訳サービス」に貼り付けて適用するよう伝えてください。
+    現在の設定（キーはマスク済み）：
     $2
 shortcutKeySelector:
   placeholder: ショートカットキーを押してください

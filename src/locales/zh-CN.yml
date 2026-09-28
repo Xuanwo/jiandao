@@ -26,14 +26,8 @@ popup:
     missingKey: 未配置
   setup:
     title: 还没有翻译服务
-    description: 把说明交给你的 agent，它会用你的密钥验证一份配置并放进剪贴板，贴到下面就行。
-    copyInstructions: 复制给 agent 的说明
-    copied: 已复制
-    pasteLabel: agent 生成的配置
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: 配置里没有 API Key
-    apply: 应用并翻译此页
-    applyOnly: 应用
+    description: 在设置页贴入 agent 生成的配置，就能翻译。
+    openSettings: 去设置里配置
 errorRecovery:
   title: 应用发生异常
   description: 已进入恢复模式。刷新页面或重置设置后再试。
@@ -52,24 +46,36 @@ options:
   title: 设置
   service:
     title: 翻译服务
-    status:
-      none: 尚无服务
-      unconfigured: 未填密钥
-      configured: 未测试
-      testing: 测试中…
-      ok: 已连接
-      failed: 连接失败
-    testConnection: 测试连接
-    sendsTo: 网页文本发往 $1
+    empty:
+      title: 还没有翻译服务
+      description: 把说明交给你的 agent。它用你的密钥验证好翻译服务的配置，放进剪贴板，你贴到下面。
     copyInstructions: 复制给 agent 的说明
     copied: 已复制
-    paste:
-      open: 粘贴配置
-      label: agent 生成的配置
-      keyMissing: 配置里没有 API Key。
-      cancel: 取消
-      apply: 应用
-      applying: 确认中…
+    edit: 修改
+    test: 测试连接
+    testing: 测试中…
+    status:
+      ok: 已连接
+      failed: 连接失败
+      unchecked: 未检查
+    checkedAt: $1检查
+    sendsTo: 网页文本发往 $1
+    key: Key $1
+    newKey: 新 Key
+    keptKey: 沿用已存的 Key
+    keyMissing: 配置里没有 API Key
+    thinkingOff: 已关闭思考
+    label:
+      current: 当前
+      after: 应用后
+      connection: 连接
+    unchanged: 与当前相同。已全选，粘贴即可整体替换，也可以只改一个字段。
+    failedNotSaved: 失败，没有保存
+    editorLabel: 翻译服务配置
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: 取消
+    apply: 应用
+    applying: 检查中…
   reading:
     title: 阅读
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: CSS 存在语法错误
         tooLong: CSS 过长
         allSaved: 所有更改已保存
-    range:
-      title: 翻译范围
-      main: 正文
-      all: 整页
     shortcut:
       title: 快捷键
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: 提示词
       default: 默认
-  advanced:
-    title: 高级
-    rate: 每秒请求数
-    capacity: 同时进行的请求上限
-    maxCharactersPerBatch: 每次请求最多字符
-    maxItemsPerBatch: 每次请求最多段落
-    preloadMargin: 提前翻译视口下方（px）
-    preloadThreshold: 可见比例达到多少才翻译
-    minCharacters: 跳过少于 N 个字符的段落
-    minWords: 跳过少于 N 个词的段落
-    minError: 数值不能小于 $1
-    rangeError: 数值必须在 $1 到 $2 之间
-    cache:
-      title: 译文缓存
-      clear: 清除
-      clearing: 清除中…
-      dialog:
-        title: 清除翻译缓存？
-        description: 所有缓存的译文和页面摘要都会被删除，页面会在需要时重新翻译。
-        confirm: 清除
-        cancel: 取消
-  appearance:
-    title: 外观
-    system: 跟随系统
-    light: 浅色
-    dark: 深色
-  reset:
-    title: 全部设置
-    dialog:
-      title: 重置所有设置？
-      description: 包括 API Key 和提示词在内的所有设置都会恢复默认值。
-      confirm: 重置
+      custom: 自定义
+      edit: 修改
+      system: 系统提示词
+      template: 提示词模板
+      tokens: 模板必须包含 {{input}}。可用：{{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}
+      missingInput: 模板里缺少 {{input}}。
+      restore: 恢复默认
       cancel: 取消
+      apply: 应用
 translation:
   sameLanguage: 源语言和目标语言必须不同
   noApiKey: 还没有填写 API Key。点击工具栏里的简道翻译图标即可设置。
@@ -162,7 +140,7 @@ agentInstructions:
   text: |
     我在用浏览器扩展简道翻译（Jiandao）来翻译网页，请帮我配置它的翻译服务。
     先阅读说明：$1
-    按说明操作：问清我要用哪家服务、API Key 在哪里、我读什么语言；用我的 Key 按说明里的请求模板验证，直到请求成功；把配置 JSON 写入我的剪贴板；最后告诉我在 Jiandao 弹窗里粘贴并应用。
+    按说明操作：问清我要用哪家服务、API Key 在哪里；用我的 Key 按说明里的请求模板验证，直到请求成功；把翻译服务的配置 JSON 写入我的剪贴板；最后告诉我在简道翻译设置页的“翻译服务”里粘贴并应用。
     我当前的配置（密钥已脱敏）：
     $2
 shortcutKeySelector:

@@ -1,12 +1,8 @@
-import type { LangCodeISO6393 } from "@/definitions"
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig, ProviderType, RequestApi } from "@/types/config/provider"
-import type { TranslationMode } from "@/types/config/translate"
 import { z } from "zod"
-import { langCodeISO6393Schema } from "@/definitions"
 import { configSchema } from "@/types/config/config"
 import { PROVIDER_TYPES, REQUEST_APIS } from "@/types/config/provider"
-import { translationModeSchema } from "@/types/config/translate"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { getUniqueName } from "@/utils/name"
@@ -14,17 +10,16 @@ import { getRequestHost, resolveBaseURL, resolveRequestApi } from "@/utils/provi
 
 /**
  * The setup document is the only way a translation service gets configured.
- * An agent writes it, the reader pastes it, Jiandao previews and applies it.
- * It describes intent, not storage: the internal Config may change shape,
- * this document is versioned and stays stable.
+ * An agent writes it, the reader pastes it into the settings page, Jiandao
+ * previews and applies it. It describes the service and nothing else:
+ * languages, display and the prompt are separate settings. It describes
+ * intent, not storage, so the internal Config may change shape.
  */
-export const SETUP_DOCUMENT_VERSION = 1
-
 const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
   z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)]),
 )
 
-export const setupProviderSchema = z.strictObject({
+export const setupDocumentSchema = z.strictObject({
   type: z.enum(PROVIDER_TYPES).describe("Which service. \"openai\", \"anthropic\", \"gemini\" and \"deepseek\" are the official APIs. \"openai-compatible\" is any other endpoint that speaks the OpenAI chat completions API, such as Ollama, LM Studio, OpenRouter or a gateway; it needs baseURL."),
   api: z.enum(REQUEST_APIS).optional().describe("Wire format. Defaults per type: openai → openai-responses, anthropic → anthropic, gemini → gemini, deepseek and openai-compatible → openai-chat. Set \"openai-responses\" for a compatible service that only speaks the Responses API, such as xAI."),
   name: z.string().trim().min(1).optional().describe("Display name. Defaults to the service type's name."),
@@ -39,38 +34,7 @@ export const setupProviderSchema = z.strictObject({
     ctx.addIssue({ code: "custom", path: ["baseURL"], message: "baseURL is required for an openai-compatible service" })
 })
 
-export const setupPromptSchema = z.strictObject({
-  name: z.string().trim().min(1).optional().describe("Shown in settings. Defaults to \"Custom\"."),
-  systemPrompt: z.string().optional().describe("System message. Omit for none."),
-  prompt: z.string().min(1).describe("User message template. Must contain {{input}}; may use {{targetLanguage}}, {{webTitle}}, {{webDescription}}, {{webContent}}, {{webSummary}}."),
-}).refine(prompt => prompt.prompt.includes("{{input}}"), { path: ["prompt"], message: "prompt must contain {{input}}" })
-
-export const setupDocumentSchema = z.strictObject({
-  jiandao: z.literal(SETUP_DOCUMENT_VERSION).describe("Document format version. Always 1."),
-  provider: setupProviderSchema,
-  prompt: setupPromptSchema.nullable().optional().describe("Translation prompt to use. null restores Jiandao's built-in prompt. Omit to leave the current prompt as it is."),
-  targetLanguage: langCodeISO6393Schema.optional().describe("ISO 639-3 code of the language to translate into, e.g. \"cmn\" for Simplified Chinese, \"eng\" for English."),
-  sourceLanguage: langCodeISO6393Schema.or(z.literal("auto")).optional().describe("ISO 639-3 code of the page language, or \"auto\" to detect it."),
-  mode: translationModeSchema.optional().describe("\"bilingual\" shows the translation under each paragraph; \"translationOnly\" replaces the original."),
-})
-
 export type SetupDocument = z.infer<typeof setupDocumentSchema>
-export type SetupProvider = SetupDocument["provider"]
-export type SetupPrompt = z.infer<typeof setupPromptSchema>
-
-const CUSTOM_PROMPT_ID = "agent-prompt"
-
-/** The prompt config a document asks for; undefined leaves the stored prompt alone. */
-function buildPromptsConfig(prompt: SetupDocument["prompt"]): Config["translate"]["customPromptsConfig"] | undefined {
-  if (prompt === undefined)
-    return undefined
-  if (prompt === null)
-    return { promptId: null, patterns: [] }
-  return {
-    promptId: CUSTOM_PROMPT_ID,
-    patterns: [{ id: CUSTOM_PROMPT_ID, name: prompt.name ?? "Custom", systemPrompt: prompt.systemPrompt ?? "", prompt: prompt.prompt }],
-  }
-}
 
 export type SetupDocumentParseResult
   = | { ok: true, document: SetupDocument }
@@ -117,7 +81,7 @@ export function isMaskedApiKey(apiKey: string): boolean {
   Matching a document to stored providers
   ────────────────────────────── */
 
-function toProviderShape(provider: Pick<SetupProvider, "type" | "baseURL">): Pick<ProviderConfig, "provider" | "baseURL"> {
+function toProviderShape(provider: Pick<SetupDocument, "type" | "baseURL">): Pick<ProviderConfig, "provider" | "baseURL"> {
   return { provider: provider.type, baseURL: provider.baseURL }
 }
 
@@ -125,7 +89,7 @@ function toProviderShape(provider: Pick<SetupProvider, "type" | "baseURL">): Pic
  * The provider a document replaces: same type and same endpoint. Two OpenAI
  * entries with different relay URLs are different services.
  */
-export function findMatchingProvider(providersConfig: ProviderConfig[], provider: SetupProvider): ProviderConfig | undefined {
+export function findMatchingProvider(providersConfig: ProviderConfig[], provider: SetupDocument): ProviderConfig | undefined {
   const wanted = resolveBaseURL(toProviderShape(provider))
   return providersConfig.find(candidate =>
     candidate.provider === provider.type
@@ -138,7 +102,7 @@ function readPath(value: unknown, path: string[]): unknown {
 }
 
 /** True when the body turns thinking off or down for this wire format; null when the document sets no body. */
-export function describesThinkingOff(body: SetupProvider["body"], api: RequestApi): boolean | null {
+export function describesThinkingOff(body: SetupDocument["body"], api: RequestApi): boolean | null {
   if (!body)
     return null
   switch (api) {
@@ -183,13 +147,12 @@ export interface ApplySetupDocumentResult {
 
 /**
  * Returns the config with the document applied: the matching service is
- * replaced (or a new one appended), it becomes the translation service, and
- * the language and display settings change only where the document sets them.
+ * replaced (or a new one appended) and becomes the translation service.
  * Every other service and setting stays as it is. The result is validated
  * against the config schema before it is returned.
  */
 export function applySetupDocument(config: Config, document: SetupDocument): ApplySetupDocumentResult {
-  const { provider } = document
+  const provider = document
   const existing = findMatchingProvider(config.providersConfig, provider)
 
   const documentKey = provider.apiKey && !isMaskedApiKey(provider.apiKey) ? provider.apiKey : undefined
@@ -219,21 +182,10 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
     ? config.providersConfig.map(p => p.id === existing.id ? next : p)
     : [...config.providersConfig, next]
 
-  const promptsConfig = buildPromptsConfig(document.prompt)
   const candidate: Config = {
     ...config,
     providersConfig,
-    language: {
-      ...config.language,
-      ...(document.targetLanguage && { targetCode: document.targetLanguage }),
-      ...(document.sourceLanguage && { sourceCode: document.sourceLanguage }),
-    },
-    translate: {
-      ...config.translate,
-      providerId: next.id,
-      ...(document.mode && { mode: document.mode }),
-      ...(promptsConfig && { customPromptsConfig: promptsConfig }),
-    },
+    translate: { ...config.translate, providerId: next.id },
   }
 
   const parsed = configSchema.safeParse(candidate)
@@ -256,17 +208,12 @@ export interface SetupPreview {
   host: string
   keyStatus: "new" | "reused" | "missing"
   thinkingOff: boolean | null
-  targetLanguage?: LangCodeISO6393
-  sourceLanguage?: LangCodeISO6393 | "auto"
-  mode?: TranslationMode
-  /** Name of the prompt the document sets; undefined when it leaves the prompt alone or restores the default. */
-  promptName?: string
   replaces: boolean
 }
 
 /** What applying the document would change, for the reader to check before confirming. */
 export function describeSetupDocument(config: Config, document: SetupDocument): SetupPreview {
-  const { provider } = document
+  const provider = document
   const existing = findMatchingProvider(config.providersConfig, provider)
   const hasDocumentKey = !!provider.apiKey && !isMaskedApiKey(provider.apiKey)
   const api = resolveRequestApi({ provider: provider.type, api: provider.api })
@@ -279,10 +226,6 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
     host: getRequestHost(toProviderShape(provider)),
     keyStatus: hasDocumentKey ? "new" : existing?.apiKey ? "reused" : "missing",
     thinkingOff: describesThinkingOff(provider.body, api),
-    targetLanguage: document.targetLanguage,
-    sourceLanguage: document.sourceLanguage,
-    mode: document.mode,
-    promptName: document.prompt ? document.prompt.name ?? "Custom" : undefined,
     replaces: !!existing,
   }
 }
@@ -290,32 +233,23 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
 /**
  * The current translation service as a setup document, with the key masked.
  * An agent edits this and hands it back; applying it keeps the stored key.
+ * The name is left out while it is the service type's default.
  */
 export function exportSetupDocument(config: Config): SetupDocument | null {
   const provider = config.providersConfig.find(p => p.id === config.translate.providerId)
   if (!provider)
     return null
 
-  const { promptId, patterns } = config.translate.customPromptsConfig
-  const prompt = promptId ? patterns.find(pattern => pattern.id === promptId) : undefined
-
   return {
-    jiandao: SETUP_DOCUMENT_VERSION,
-    provider: {
-      type: provider.provider,
-      ...(provider.api && { api: provider.api }),
-      name: provider.name,
-      ...(provider.apiKey && { apiKey: maskApiKey(provider.apiKey) }),
-      model: provider.model,
-      ...(provider.baseURL && { baseURL: provider.baseURL }),
-      ...(provider.headers && { headers: provider.headers }),
-      ...(provider.body && { body: provider.body }),
-      ...(provider.temperature !== undefined && { temperature: provider.temperature }),
-    },
-    ...(prompt && { prompt: { name: prompt.name, ...(prompt.systemPrompt && { systemPrompt: prompt.systemPrompt }), prompt: prompt.prompt } }),
-    targetLanguage: config.language.targetCode,
-    sourceLanguage: config.language.sourceCode,
-    mode: config.translate.mode,
+    type: provider.provider,
+    ...(provider.api && { api: provider.api }),
+    ...(provider.name !== PROVIDER_ITEMS[provider.provider].name && { name: provider.name }),
+    ...(provider.apiKey && { apiKey: maskApiKey(provider.apiKey) }),
+    model: provider.model,
+    ...(provider.baseURL && { baseURL: provider.baseURL }),
+    ...(provider.headers && { headers: provider.headers }),
+    ...(provider.body && { body: provider.body }),
+    ...(provider.temperature !== undefined && { temperature: provider.temperature }),
   }
 }
 

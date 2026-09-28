@@ -1,6 +1,5 @@
 import "@/utils/zod-config"
 import { defineContentScript } from "#imports"
-import { getLocalConfig } from "@/utils/config/storage"
 
 declare global {
   interface Window {
@@ -17,9 +16,7 @@ export default defineContentScript({
       return
     window.__READ_FROG_HOST_INJECTED__ = true
 
-    const initialConfig = await getLocalConfig()
-
     const { bootstrapHostContent } = await import("./runtime")
-    await bootstrapHostContent(ctx, initialConfig)
+    await bootstrapHostContent(ctx)
   },
 })

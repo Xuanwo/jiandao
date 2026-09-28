@@ -26,14 +26,8 @@ popup:
     missingKey: sin clave
   setup:
     title: Aún no hay servicio de traducción
-    description: Pasa las instrucciones a tu agente. Verifica una configuración con tu clave y la copia al portapapeles; pégala abajo.
-    copyInstructions: Copiar instrucciones para tu agente
-    copied: Copiado
-    pasteLabel: Configuración de tu agente
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: la configuración no tiene clave API
-    apply: Aplicar y traducir esta página
-    applyOnly: Aplicar
+    description: Pega en la página de ajustes la configuración que genera tu agente y podrás traducir.
+    openSettings: Configurar en ajustes
 errorRecovery:
   title: Algo salió mal
   description: El modo de recuperación está activo. Actualiza la página o restablece la configuración y vuelve a intentarlo.
@@ -52,24 +46,36 @@ options:
   title: Configuración
   service:
     title: Servicio de traducción
-    status:
-      none: Sin servicio
-      unconfigured: Sin clave
-      configured: Sin probar
-      testing: Probando…
-      ok: Conectado
-      failed: Error de conexión
-    testConnection: Probar conexión
-    sendsTo: El texto de la página va a $1
+    empty:
+      title: Aún no hay servicio de traducción
+      description: Pasa las instrucciones a tu agente. Verificará la configuración del servicio con tu clave y la dejará en el portapapeles; pégala abajo.
     copyInstructions: Copiar instrucciones para tu agente
     copied: Copiado
-    paste:
-      open: Pegar configuración
-      label: Configuración de tu agente
-      keyMissing: La configuración no tiene clave API.
-      cancel: Cancelar
-      apply: Aplicar
-      applying: Confirmando…
+    edit: Editar
+    test: Probar conexión
+    testing: Probando…
+    status:
+      ok: Conectado
+      failed: Error de conexión
+      unchecked: Sin comprobar
+    checkedAt: comprobado $1
+    sendsTo: El texto de la página va a $1
+    key: Clave $1
+    newKey: clave nueva
+    keptKey: se mantiene la clave guardada
+    keyMissing: La configuración no tiene clave de API
+    thinkingOff: razonamiento desactivado
+    label:
+      current: Actual
+      after: Después
+      connection: Conexión
+    unchanged: "Igual que el servicio actual. Está seleccionado: pega para sustituirlo o cambia un solo campo."
+    failedNotSaved: Falló, no se guardó nada
+    editorLabel: Configuración del servicio de traducción
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: Cancelar
+    apply: Aplicar
+    applying: Comprobando…
   reading:
     title: Lectura
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: El CSS tiene errores de sintaxis
         tooLong: El CSS es demasiado largo
         allSaved: Todos los cambios guardados
-    range:
-      title: Traducir
-      main: Contenido principal
-      all: Toda la página
     shortcut:
       title: Atajo
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: Prompt
       default: Predeterminado
-  advanced:
-    title: Avanzado
-    rate: Solicitudes por segundo
-    capacity: Solicitudes simultáneas
-    maxCharactersPerBatch: Caracteres por solicitud
-    maxItemsPerBatch: Párrafos por solicitud
-    preloadMargin: Traducir por delante del área visible (px)
-    preloadThreshold: Fracción visible antes de traducir
-    minCharacters: Omitir párrafos de menos de N caracteres
-    minWords: Omitir párrafos de menos de N palabras
-    minError: El valor debe ser al menos $1
-    rangeError: El valor debe estar entre $1 y $2
-    cache:
-      title: Caché de traducciones
-      clear: Borrar
-      clearing: Borrando…
-      dialog:
-        title: ¿Borrar la caché de traducciones?
-        description: Se eliminan todas las traducciones y los resúmenes de página guardados. Las páginas se volverán a traducir cuando sea necesario.
-        confirm: Borrar
-        cancel: Cancelar
-  appearance:
-    title: Apariencia
-    system: Sistema
-    light: Claro
-    dark: Oscuro
-  reset:
-    title: Toda la configuración
-    dialog:
-      title: ¿Restablecer toda la configuración?
-      description: Toda la configuración, incluidas las claves API y los prompts, vuelve a sus valores predeterminados.
-      confirm: Restablecer
+      custom: Personalizado
+      edit: Editar
+      system: Prompt del sistema
+      template: Plantilla del prompt
+      tokens: "La plantilla debe contener {{input}}. Disponibles: {{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}"
+      missingInput: A la plantilla le falta {{input}}.
+      restore: Restablecer el predeterminado
       cancel: Cancelar
+      apply: Aplicar
 translation:
   sameLanguage: Los idiomas de origen y destino deben ser diferentes
   noApiKey: Primero añade una clave API. Haz clic en el icono de Jiandao en la barra de herramientas para configurarla.
@@ -162,7 +140,7 @@ agentInstructions:
   text: |
     Uso la extensión de navegador Jiandao (简道翻译) para traducir páginas web. Configura su servicio de traducción, por favor.
     Lee primero la guía: $1
-    Síguela: pregúntame qué servicio quiero, dónde está mi clave API y en qué idioma leo. Verifica la configuración con mi clave y la plantilla de solicitud de la guía hasta que una solicitud funcione. Escribe el JSON de configuración en mi portapapeles. Después dime que lo pegue en la ventana emergente de Jiandao y lo aplique.
+    Síguela: pregúntame qué servicio quiero y dónde está mi clave de API. Verifica con mi clave usando la plantilla de solicitud de la guía hasta que una solicitud funcione. Escribe el JSON de configuración del servicio en mi portapapeles. Después dime que lo pegue en "Servicio de traducción" de la página de ajustes de Jiandao y lo aplique.
     Mi configuración actual, con la clave oculta:
     $2
 shortcutKeySelector:

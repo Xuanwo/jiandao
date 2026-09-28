@@ -131,7 +131,7 @@ export class PageTranslationManager implements IPageTranslationManager {
     }, this.intersectionOptions)
 
     // Initialize walkability state for existing elements
-    this.addWalkBlockedElements(document.body, config)
+    this.addWalkBlockedElements(document.body)
     await this.observeTopLevelParagraphs(document.body, config)
 
     // Start observing mutations from document.body and all shadow roots
@@ -316,7 +316,7 @@ export class PageTranslationManager implements IPageTranslationManager {
     }
 
     // Skip if container has an ancestor that should not be walked into
-    if (hasNoWalkAncestor(container, config))
+    if (hasNoWalkAncestor(container))
       return
 
     walkAndLabelElement(container, this.walkId, config)
@@ -375,18 +375,18 @@ export class PageTranslationManager implements IPageTranslationManager {
    * Track the same blocked states that the traversal skips, so hidden accordion
    * panels can be re-walked when the site reveals an existing subtree.
    */
-  private isWalkBlockedElement(element: HTMLElement, config: Config): boolean {
+  private isWalkBlockedElement(element: HTMLElement): boolean {
     return isDontWalkIntoButTranslateAsChildElement(element)
-      || isDontWalkIntoAndDontTranslateAsChildElement(element, config)
+      || isDontWalkIntoAndDontTranslateAsChildElement(element)
   }
 
   /**
    * Handle attribute changes and only trigger observation
    * when element transitions from blocked to walkable.
    */
-  private didChangeToWalkable(element: HTMLElement, config: Config): boolean {
+  private didChangeToWalkable(element: HTMLElement): boolean {
     const wasWalkBlocked = this.walkBlockedElementsCache.has(element)
-    const isWalkBlockedNow = this.isWalkBlockedElement(element, config)
+    const isWalkBlockedNow = this.isWalkBlockedElement(element)
 
     // Update cache with current state
     if (isWalkBlockedNow) {
@@ -402,8 +402,8 @@ export class PageTranslationManager implements IPageTranslationManager {
   /**
    * Initialize walkability state for an element and its descendants
    */
-  private addWalkBlockedElements(element: HTMLElement, config: Config): void {
-    const walkBlockedElements = deepQueryTopLevelSelector(element, el => this.isWalkBlockedElement(el, config))
+  private addWalkBlockedElements(element: HTMLElement): void {
+    const walkBlockedElements = deepQueryTopLevelSelector(element, el => this.isWalkBlockedElement(el))
     walkBlockedElements.forEach(el => this.walkBlockedElementsCache.add(el))
   }
 
@@ -437,7 +437,7 @@ export class PageTranslationManager implements IPageTranslationManager {
       if (rec.type === "childList") {
         rec.addedNodes.forEach((node) => {
           if (isHTMLElement(node)) {
-            this.addWalkBlockedElements(node, config)
+            this.addWalkBlockedElements(node)
             void this.observeTopLevelParagraphs(node, config)
             this.observeIsolatedDescendantsMutations(node)
           }
@@ -445,7 +445,7 @@ export class PageTranslationManager implements IPageTranslationManager {
       }
       else if (this.isWalkabilityAttributeMutation(rec)) {
         const el = rec.target
-        if (isHTMLElement(el) && this.didChangeToWalkable(el, config)) {
+        if (isHTMLElement(el) && this.didChangeToWalkable(el)) {
           void this.observeTopLevelParagraphs(el, config)
         }
       }

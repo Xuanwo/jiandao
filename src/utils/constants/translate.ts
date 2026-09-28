@@ -1,33 +1,21 @@
-export const MIN_TRANSLATE_RATE = 1
-export const MIN_TRANSLATE_CAPACITY = 1
-export const MIN_BATCH_CHARACTERS = 1
-export const MIN_BATCH_ITEMS = 1
+/*
+ * Request pacing adapts to each service instead of being a setting (see
+ * utils/request/pace.ts). A service Jiandao has not used yet starts at
+ * INITIAL_REQUEST_RATE; after that it starts from the pace it has learned.
+ */
+export const INITIAL_REQUEST_RATE = 4
+export const MIN_REQUEST_RATE = 0.5
+/** A numerical guard only; a service's own 429s and timeouts set its real limit. */
+export const MAX_REQUEST_RATE = 256
+/** Requests may burst up to this many seconds' worth at the current rate. */
+export const REQUEST_BURST_SECONDS = 4
 
-export const DEFAULT_REQUEST_RATE = 8
-export const DEFAULT_REQUEST_CAPACITY = 60
-
+/** Batch limits a service starts with. A service that loses paragraphs in a batch gets smaller batches. */
 export const DEFAULT_MAX_CHARACTER_PER_BATCH = 1000
 export const DEFAULT_MAX_ITEMS_PER_BATCH = 4
 
-export const DEFAULT_BATCH_CONFIG = {
-  maxCharactersPerBatch: DEFAULT_MAX_CHARACTER_PER_BATCH,
-  maxItemsPerBatch: DEFAULT_MAX_ITEMS_PER_BATCH,
-}
-
 export const DEFAULT_AUTO_TRANSLATE_SHORTCUT_KEY = "Alt+E"
 
-export const MIN_PRELOAD_MARGIN = 0
-export const MAX_PRELOAD_MARGIN = 10000
-export const DEFAULT_PRELOAD_MARGIN = 1000
-
-export const MIN_PRELOAD_THRESHOLD = 0
-export const MAX_PRELOAD_THRESHOLD = 1
-export const DEFAULT_PRELOAD_THRESHOLD = 0
-
-export const MIN_CHARACTERS_PER_NODE = 0
-export const MAX_CHARACTERS_PER_NODE = 1000
-export const DEFAULT_MIN_CHARACTERS_PER_NODE = 0
-
-export const MIN_WORDS_PER_NODE = 0
-export const MAX_WORDS_PER_NODE = 100
-export const DEFAULT_MIN_WORDS_PER_NODE = 0
+/** Paragraphs this far below the viewport are translated before they scroll in. */
+export const PRELOAD_MARGIN_PX = 1000
+export const PRELOAD_THRESHOLD = 0

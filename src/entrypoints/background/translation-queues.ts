@@ -1,10 +1,9 @@
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
-import type { BatchQueueConfig, RequestQueueConfig } from "@/types/config/translate"
 import type { WebPagePromptContext } from "@/types/content"
 import type { PromptResolver } from "@/utils/host/translate/api/ai"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { BATCH_SEPARATOR, BATCH_SEPARATOR_LINE_PATTERN } from "@/utils/constants/prompt"
+import { DEFAULT_MAX_CHARACTER_PER_BATCH, DEFAULT_MAX_ITEMS_PER_BATCH, INITIAL_REQUEST_RATE, MAX_REQUEST_RATE, MIN_REQUEST_RATE, REQUEST_BURST_SECONDS } from "@/utils/constants/translate"
 import { generateArticleSummary } from "@/utils/content/summary"
 import { cleanText } from "@/utils/content/utils"
 import { cacheDb } from "@/utils/db/cache-db"
@@ -15,8 +14,9 @@ import { logger } from "@/utils/logger"
 import { onMessage } from "@/utils/message"
 import { getTranslatePrompt } from "@/utils/prompts/translate"
 import { BatchQueue } from "@/utils/request/batch-queue"
+import { Pace } from "@/utils/request/pace"
 import { RequestQueue } from "@/utils/request/request-queue"
-import { ensureInitializedConfig } from "./config"
+import { serviceLimitsKey, ServiceLimitsStore } from "@/utils/request/service-limits"
 
 export function parseBatchResult(result: string): string[] {
   return result.trim().split(BATCH_SEPARATOR_LINE_PATTERN).map(t => t.trim())
@@ -94,30 +94,41 @@ export interface TranslateBatchData<TContext = unknown> {
   context?: TContext
 }
 
-interface TranslationQueueSetupConfig<TContext = unknown> {
-  requestQueueConfig: RequestQueueConfig
-  batchQueueConfig: BatchQueueConfig
-  promptResolver: PromptResolver<TContext>
-}
+/**
+ * One request queue per service and model, each with the pace that service
+ * tolerates. The pace and the batch sizes a service handles are learned while
+ * translating and kept in `limits`, so the next session starts from them
+ * instead of probing again (design/Adaptive.dc.html).
+ */
+function createTranslationQueues<TContext>(promptResolver: PromptResolver<TContext>, limits: ServiceLimitsStore) {
+  const requestQueues = new Map<string, RequestQueue>()
 
-async function createTranslationQueues<TContext>(config: TranslationQueueSetupConfig<TContext>) {
-  const { rate, capacity } = config.requestQueueConfig
-  const { maxCharactersPerBatch, maxItemsPerBatch } = config.batchQueueConfig
-  const { promptResolver } = config
-
-  const requestQueue = new RequestQueue({
-    rate,
-    capacity,
-    timeoutMs: 20_000,
-    maxRetries: 2,
-    baseRetryDelayMs: 1_000,
-  })
+  const requestQueueFor = (providerConfig: ProviderConfig): RequestQueue => {
+    const key = serviceLimitsKey(providerConfig)
+    let queue = requestQueues.get(key)
+    if (!queue) {
+      const pace = new Pace(
+        { minRate: MIN_REQUEST_RATE, maxRate: MAX_REQUEST_RATE, burstSeconds: REQUEST_BURST_SECONDS },
+        limits.get(key)?.pace ?? { rate: INITIAL_REQUEST_RATE, ceiling: null },
+        state => limits.update(key, { pace: state }),
+      )
+      queue = new RequestQueue({
+        rate: pace.rate,
+        capacity: pace.capacity,
+        timeoutMs: 20_000,
+        maxRetries: 2,
+        baseRetryDelayMs: 1_000,
+        pace,
+      })
+      requestQueues.set(key, queue)
+    }
+    return queue
+  }
 
   const batchQueue = new BatchQueue<TranslateBatchData<TContext>, string>({
-    maxCharactersPerBatch,
-    maxItemsPerBatch,
+    maxCharactersPerBatch: DEFAULT_MAX_CHARACTER_PER_BATCH,
+    maxItemsPerBatch: DEFAULT_MAX_ITEMS_PER_BATCH,
     batchDelay: 100,
-    maxRetries: 3,
     enableFallbackToIndividual: true,
     getBatchKey: (data) => {
       return stringHash(
@@ -125,6 +136,10 @@ async function createTranslationQueues<TContext>(config: TranslationQueueSetupCo
         data.context ? JSON.stringify(data.context) : "",
       )
     },
+    // Batch sizes a service has shown it cannot handle stay small for that service, across sessions.
+    getLimitKey: data => serviceLimitsKey(data.providerConfig),
+    learnedLimits: key => limits.get(key)?.batch,
+    onLimitsLearned: (key, batch) => limits.update(key, { batch }),
     getCharacters: data => data.text.length,
     executeBatch: async (dataList) => {
       const hash = await sha256Hex(...dataList.map(d => d.hash))
@@ -134,14 +149,14 @@ async function createTranslationQueues<TContext>(config: TranslationQueueSetupCo
         return await executeBatchTranslation(dataList, promptResolver)
       }
 
-      return requestQueue.enqueue(batchThunk, earliestScheduleAt, hash)
+      return requestQueueFor(dataList[0].providerConfig).enqueue(batchThunk, earliestScheduleAt, hash)
     },
     executeIndividual: async (data) => {
       const { text, langConfig, providerConfig, hash, scheduleAt, context } = data
       const thunk = async () => {
         return executeTranslate(text, langConfig, providerConfig, promptResolver, { context })
       }
-      return requestQueue.enqueue(thunk, scheduleAt, hash)
+      return requestQueueFor(providerConfig).enqueue(thunk, scheduleAt, hash)
     },
     onError: (error, context) => {
       const errorType = context.isFallback ? "Individual request" : "Batch request"
@@ -152,19 +167,12 @@ async function createTranslationQueues<TContext>(config: TranslationQueueSetupCo
     },
   })
 
-  return { requestQueue, batchQueue }
+  return { requestQueueFor, batchQueue }
 }
 
-export async function setUpWebPageTranslationQueue() {
-  const config = await ensureInitializedConfig()
-
-  const { translate: { requestQueueConfig, batchQueueConfig } } = config ?? DEFAULT_CONFIG
-
-  const { requestQueue, batchQueue } = await createTranslationQueues({
-    requestQueueConfig,
-    batchQueueConfig,
-    promptResolver: getTranslatePrompt,
-  })
+export function setUpWebPageTranslationQueue() {
+  const limits = new ServiceLimitsStore()
+  const { requestQueueFor, batchQueue } = createTranslationQueues(getTranslatePrompt, limits)
 
   onMessage("enqueueTranslateRequest", async (message) => {
     const { data: { text, langConfig, providerConfig, scheduleAt, hash, webTitle, webDescription, webContent, webSummary } } = message
@@ -185,6 +193,8 @@ export async function setUpWebPageTranslationQueue() {
       webSummary: normalizePromptContextValue(webSummary),
     }
 
+    // Learned limits decide the first batch size and pace, so they must be read before the first request.
+    await limits.load()
     const data = { text, langConfig, providerConfig, hash, scheduleAt, context }
     result = await batchQueue.enqueue(data)
 
@@ -207,16 +217,7 @@ export async function setUpWebPageTranslationQueue() {
       return null
     }
 
-    return await getOrGenerateWebPageSummary(webTitle, webContent, providerConfig, requestQueue)
-  })
-
-  onMessage("setTranslateRequestQueueConfig", (message) => {
-    const { data } = message
-    requestQueue.setQueueOptions(data)
-  })
-
-  onMessage("setTranslateBatchQueueConfig", (message) => {
-    const { data } = message
-    batchQueue.setBatchConfig(data)
+    await limits.load()
+    return await getOrGenerateWebPageSummary(webTitle, webContent, providerConfig, requestQueueFor(providerConfig))
   })
 }

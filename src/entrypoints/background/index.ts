@@ -4,7 +4,7 @@ import { logger } from "@/utils/logger"
 import { onMessage } from "@/utils/message"
 import { openOptionsPage } from "@/utils/navigation"
 import { ensureInitializedConfig } from "./config"
-import { cleanupAllSummaryCache, cleanupAllTranslationCache, setUpDatabaseCleanup } from "./db-cleanup"
+import { setUpDatabaseCleanup } from "./db-cleanup"
 import { setupIframeInjection } from "./iframe-injection"
 import { setupLLMGenerateTextMessageHandlers } from "./llm-generate-text"
 import { setupTranslationProgress } from "./translation-progress"
@@ -29,15 +29,10 @@ export default defineBackground({
       await openOptionsPage(message.data)
     })
 
-    onMessage("clearAllTranslationRelatedCache", async () => {
-      await cleanupAllTranslationCache()
-      await cleanupAllSummaryCache()
-    })
-
     translationMessage()
     setupTranslationProgress()
 
-    void setUpWebPageTranslationQueue()
+    setUpWebPageTranslationQueue()
     void setUpDatabaseCleanup()
 
     setupLLMGenerateTextMessageHandlers()

@@ -17,11 +17,11 @@ describe("extension messaging", () => {
   })
 
   it("rethrows a handler error on the sending side", async () => {
-    const off = onMessage("clearAllTranslationRelatedCache", async () => {
+    const off = onMessage("getDetectedCode", async () => {
       throw new TypeError("storage is full")
     })
 
-    await expect(sendMessage("clearAllTranslationRelatedCache")).rejects.toMatchObject({ name: "TypeError", message: "storage is full" })
+    await expect(sendMessage("getDetectedCode", undefined)).rejects.toMatchObject({ name: "TypeError", message: "storage is full" })
     off()
   })
 

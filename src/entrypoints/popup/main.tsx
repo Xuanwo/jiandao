@@ -1,7 +1,6 @@
 import "@/utils/zod-config"
 import type { ActiveTabInfo } from "./atoms"
 import type { Config } from "@/types/config/config"
-import type { ThemeMode } from "@/types/config/theme"
 import type { TranslationProgress } from "@/types/translation-progress"
 import { Provider as JotaiProvider } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
@@ -11,12 +10,10 @@ import { ThemeProvider } from "@/components/providers/theme-provider"
 import { RecoveryBoundary } from "@/components/recovery/recovery-boundary"
 import { Toasts } from "@/components/toast"
 import { configAtom } from "@/utils/atoms/config"
-import { baseThemeModeAtom } from "@/utils/atoms/theme"
 import { getLocalConfig } from "@/utils/config/storage"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { sendMessage } from "@/utils/message"
 import { renderPersistentReactRoot } from "@/utils/react-root"
-import { getLocalThemeMode } from "@/utils/theme"
 import App from "./app"
 import { activeTabAtom, isTranslatableUrl, pageTranslationEnabledAtom, translationProgressAtom } from "./atoms"
 import "@/assets/styles/text-small.css"
@@ -28,7 +25,6 @@ function HydrateAtoms({
 }: {
   initialValues: [
     [typeof configAtom, Config],
-    [typeof baseThemeModeAtom, ThemeMode],
     [typeof activeTabAtom, ActiveTabInfo],
     [typeof pageTranslationEnabledAtom, boolean],
     [typeof translationProgressAtom, TranslationProgress | null],
@@ -43,9 +39,8 @@ async function initApp() {
   const root = document.getElementById("root")!
   root.className = "text-base antialiased w-[320px] bg-background text-foreground"
 
-  const [configValue, themeMode, [activeTab]] = await Promise.all([
+  const [configValue, [activeTab]] = await Promise.all([
     getLocalConfig(),
-    getLocalThemeMode(),
     browser.tabs.query({ active: true, currentWindow: true }),
   ])
   const config = configValue ?? DEFAULT_CONFIG
@@ -74,7 +69,6 @@ async function initApp() {
         <HydrateAtoms
           initialValues={[
             [configAtom, config],
-            [baseThemeModeAtom, themeMode],
             [activeTabAtom, tabInfo],
             [pageTranslationEnabledAtom, enabled],
             [translationProgressAtom, progress],

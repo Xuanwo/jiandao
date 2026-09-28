@@ -26,14 +26,8 @@ popup:
     missingKey: chưa có khóa
   setup:
     title: Chưa có dịch vụ dịch
-    description: Đưa hướng dẫn cho agent của bạn. Agent sẽ xác minh một cấu hình bằng khóa của bạn và đặt nó vào bộ nhớ tạm; hãy dán vào bên dưới.
-    copyInstructions: Sao chép hướng dẫn cho agent
-    copied: Đã sao chép
-    pasteLabel: Cấu hình từ agent của bạn
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: cấu hình không có API Key
-    apply: Áp dụng và dịch trang này
-    applyOnly: Áp dụng
+    description: Dán cấu hình do agent của bạn tạo vào trang cài đặt là có thể dịch.
+    openSettings: Thiết lập trong cài đặt
 errorRecovery:
   title: Đã xảy ra sự cố
   description: Chế độ khôi phục đang bật. Hãy tải lại trang hoặc đặt lại cài đặt rồi thử lại.
@@ -52,24 +46,36 @@ options:
   title: Cài đặt
   service:
     title: Dịch vụ dịch
-    status:
-      none: Không có dịch vụ
-      unconfigured: Chưa có khóa
-      configured: Chưa kiểm tra
-      testing: Đang kiểm tra…
-      ok: Đã kết nối
-      failed: Kết nối thất bại
-    testConnection: Kiểm tra kết nối
-    sendsTo: Văn bản trang được gửi đến $1
+    empty:
+      title: Chưa có dịch vụ dịch
+      description: Đưa hướng dẫn cho agent của bạn. Agent sẽ dùng khóa của bạn để kiểm tra cấu hình dịch vụ rồi đặt vào bộ nhớ tạm; hãy dán vào bên dưới.
     copyInstructions: Sao chép hướng dẫn cho agent
     copied: Đã sao chép
-    paste:
-      open: Dán cấu hình
-      label: Cấu hình từ agent của bạn
-      keyMissing: Cấu hình không có API Key.
-      cancel: Hủy
-      apply: Áp dụng
-      applying: Đang xác nhận…
+    edit: Sửa
+    test: Kiểm tra kết nối
+    testing: Đang kiểm tra…
+    status:
+      ok: Đã kết nối
+      failed: Kết nối thất bại
+      unchecked: Chưa kiểm tra
+    checkedAt: kiểm tra $1
+    sendsTo: Văn bản trang được gửi tới $1
+    key: Khóa $1
+    newKey: khóa mới
+    keptKey: giữ khóa đã lưu
+    keyMissing: Cấu hình không có khóa API
+    thinkingOff: đã tắt suy luận
+    label:
+      current: Hiện tại
+      after: Sau khi
+      connection: Kết nối
+    unchanged: "Giống dịch vụ hiện tại. Đã chọn toàn bộ: dán để thay thế, hoặc sửa một trường."
+    failedNotSaved: Thất bại, không lưu gì
+    editorLabel: Cấu hình dịch vụ dịch
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: Hủy
+    apply: Áp dụng
+    applying: Đang kiểm tra…
   reading:
     title: Đọc
     mode:
@@ -105,52 +111,24 @@ options:
         syntaxError: CSS có lỗi cú pháp
         tooLong: CSS quá dài
         allSaved: Đã lưu mọi thay đổi
-    range:
-      title: Phạm vi dịch
-      main: Nội dung chính
-      all: Toàn bộ trang
     shortcut:
       title: Phím tắt
   quality:
     title: Chất lượng bản dịch
     context:
-      title: Dùng ngữ cảnh trang
+      title: Dùng ngữ cảnh của trang
     prompt:
       title: Prompt
       default: Mặc định
-  advanced:
-    title: Nâng cao
-    rate: Số yêu cầu mỗi giây
-    capacity: Số yêu cầu chạy cùng lúc
-    maxCharactersPerBatch: Số ký tự mỗi yêu cầu
-    maxItemsPerBatch: Số đoạn mỗi yêu cầu
-    preloadMargin: Dịch trước phần ngoài vùng nhìn thấy (px)
-    preloadThreshold: Tỷ lệ hiển thị trước khi dịch
-    minCharacters: Bỏ qua đoạn ngắn hơn N ký tự
-    minWords: Bỏ qua đoạn ngắn hơn N từ
-    minError: Giá trị phải ít nhất là $1
-    rangeError: Giá trị phải từ $1 đến $2
-    cache:
-      title: Bộ nhớ đệm bản dịch
-      clear: Xóa
-      clearing: Đang xóa…
-      dialog:
-        title: Xóa bộ nhớ đệm bản dịch?
-        description: Mọi bản dịch và bản tóm tắt trang đã lưu sẽ bị xóa. Các trang sẽ được dịch lại khi cần.
-        confirm: Xóa
-        cancel: Hủy
-  appearance:
-    title: Giao diện
-    system: Hệ thống
-    light: Sáng
-    dark: Tối
-  reset:
-    title: Mọi cài đặt
-    dialog:
-      title: Đặt lại mọi cài đặt?
-      description: Mọi cài đặt, kể cả API Key và prompt, sẽ trở về giá trị mặc định.
-      confirm: Đặt lại
+      custom: Tùy chỉnh
+      edit: Sửa
+      system: Prompt hệ thống
+      template: Mẫu prompt
+      tokens: "Mẫu phải chứa {{input}}. Có thể dùng: {{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}"
+      missingInput: Mẫu thiếu {{input}}.
+      restore: Khôi phục mặc định
       cancel: Hủy
+      apply: Áp dụng
 translation:
   sameLanguage: Ngôn ngữ nguồn và đích phải khác nhau
   noApiKey: Hãy thêm API Key trước. Nhấp vào biểu tượng Jiandao trên thanh công cụ để cài đặt.
@@ -160,9 +138,9 @@ translation:
 agentInstructions:
   noConfiguration: (chưa có)
   text: |
-    Tôi dùng tiện ích trình duyệt Jiandao (简道翻译) để dịch trang web. Hãy thiết lập dịch vụ dịch của nó cho tôi.
-    Trước hết hãy đọc hướng dẫn: $1
-    Làm theo hướng dẫn: hỏi tôi muốn dùng dịch vụ nào, API Key của tôi ở đâu và tôi đọc bằng ngôn ngữ nào. Xác minh bằng khóa của tôi với mẫu yêu cầu trong hướng dẫn cho đến khi một yêu cầu thành công. Ghi JSON cấu hình vào bộ nhớ tạm của tôi. Sau đó bảo tôi dán nó vào cửa sổ bật lên của Jiandao và áp dụng.
+    Tôi dùng tiện ích trình duyệt Jiandao (简道翻译) để dịch trang web. Hãy thiết lập dịch vụ dịch cho tôi.
+    Đọc hướng dẫn trước: $1
+    Làm theo hướng dẫn: hỏi tôi muốn dùng dịch vụ nào và khóa API của tôi ở đâu. Dùng khóa của tôi và mẫu yêu cầu trong hướng dẫn để kiểm tra cho đến khi yêu cầu thành công. Ghi JSON cấu hình dịch vụ vào bộ nhớ tạm của tôi. Cuối cùng bảo tôi dán nó vào mục "Dịch vụ dịch" trên trang cài đặt Jiandao và áp dụng.
     Cấu hình hiện tại của tôi, khóa đã được che:
     $2
 shortcutKeySelector:

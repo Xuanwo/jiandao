@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import { after, afterEach, before, it } from "node:test"
-import { clickButton, launchBrowser, reportFailure } from "./browser.mjs"
+import { configureService, launchBrowser, reportFailure } from "./browser.mjs"
 import { setupDocumentFor, startFakeService } from "./fake-service.mjs"
 
 let service
@@ -34,15 +34,14 @@ function translationRequests() {
 
 /**
  * Starts the browser with the extension and applies a setup document for the
- * fake service in the popup. Returns the popup page and the extension ID.
+ * fake service on the settings page. Returns the popup page and the extension ID.
  */
 async function setUpService() {
   const launched = await launchBrowser()
   context = launched.context
   const { page: popup, extensionId } = launched
+  await configureService(popup, extensionId, setupDocumentFor(service.origin))
   await popup.goto(`chrome-extension://${extensionId}/popup.html`)
-  await popup.getByLabel("Configuration from your agent").fill(JSON.stringify(setupDocumentFor(service.origin)))
-  await clickButton(popup, "Apply")
   await popup.getByRole("button", { name: /Translate this page/ }).waitFor({ timeout: 10_000 })
   return { popup, extensionId }
 }

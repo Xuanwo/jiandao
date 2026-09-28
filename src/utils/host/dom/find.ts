@@ -1,5 +1,3 @@
-import { getLocalConfig } from "@/utils/config/storage"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { isDontWalkIntoAndDontTranslateAsChildElement, isHTMLElement, isShallowInlineHTMLElement, isTranslatedContentNode, isTranslatedWrapperNode } from "./filter"
 import { smashTruncationStyle } from "./style"
@@ -49,8 +47,7 @@ export function deepQueryTopLevelSelector(element: HTMLElement | ShadowRoot | Do
   return result
 }
 
-export async function unwrapDeepestOnlyHTMLChild(element: HTMLElement) {
-  const config = await getLocalConfig() ?? DEFAULT_CONFIG
+export function unwrapDeepestOnlyHTMLChild(element: HTMLElement) {
   let currentElement = element
   while (currentElement) {
     smashTruncationStyle(currentElement)
@@ -60,7 +57,7 @@ export async function unwrapDeepestOnlyHTMLChild(element: HTMLElement) {
         return false
       if (child.nodeType === Node.TEXT_NODE)
         return true
-      return isHTMLElement(child) && !isDontWalkIntoAndDontTranslateAsChildElement(child, config)
+      return isHTMLElement(child) && !isDontWalkIntoAndDontTranslateAsChildElement(child)
     }
 
     const effectiveChildNodes = [...currentElement.childNodes].filter(shouldKeepNode)

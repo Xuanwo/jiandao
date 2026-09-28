@@ -71,7 +71,7 @@ export async function translateNodesBilingualMode(
     const lastNode = transNodes.at(-1)!
     const targetNode
       = transNodes.length === 1 && isBlockTransNode(lastNode) && isHTMLElement(lastNode)
-        ? await unwrapDeepestOnlyHTMLChild(lastNode)
+        ? unwrapDeepestOnlyHTMLChild(lastNode)
         : lastNode
 
     const existedTranslatedWrapper = findPreviousTranslatedWrapperInside(targetNode, walkId)
@@ -91,7 +91,7 @@ export async function translateNodesBilingualMode(
     if (!textContent || isNumericContent(textContent))
       return
 
-    if (await shouldFilterSmallParagraph(textContent, config))
+    if (shouldFilterSmallParagraph(textContent))
       return
 
     const ownerDoc = getOwnerDocument(targetNode)
@@ -181,7 +181,7 @@ export async function translateNodeTranslationOnlyMode(
   let transNodes: TransNode[] = []
   let allChildNodes: ChildNode[] = []
   if (outerTransNodes.length === 1 && isHTMLElement(outerTransNodes[0])) {
-    const unwrappedHTMLChild = await unwrapDeepestOnlyHTMLChild(outerTransNodes[0])
+    const unwrappedHTMLChild = unwrapDeepestOnlyHTMLChild(outerTransNodes[0])
     allChildNodes = [...unwrappedHTMLChild.childNodes]
     transNodes = allChildNodes.filter(isTransNodeAndNotTranslatedWrapper)
   }
@@ -233,7 +233,7 @@ export async function translateNodeTranslationOnlyMode(
     if (!innerTextContent.trim() || isNumericContent(innerTextContent))
       return
 
-    if (await shouldFilterSmallParagraph(innerTextContent, config))
+    if (shouldFilterSmallParagraph(innerTextContent))
       return
 
     const cleanTextContent = (content: string): string => {

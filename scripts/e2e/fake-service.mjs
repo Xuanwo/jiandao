@@ -16,7 +16,8 @@ function article(description) {
  * `POST /v1/chat/completions` splits the last user message at the standalone
  * `%%` lines and answers each part with "【译】" and the first 24 characters
  * of the part's last line, keeping the batch separators Jiandao uses, so a
- * translated page is easy to recognize.
+ * translated page is easy to recognize. The model "rejected-model" gets a
+ * 400 answer, like a service that does not know the model.
  * Every request is recorded in `requests` for assertions.
  */
 export async function startFakeService() {
@@ -34,6 +35,12 @@ export async function startFakeService() {
     requests.push({ method: request.method, url: request.url, authorization: request.headers.authorization, body })
     if (request.method === "POST" && request.url === "/v1/chat/completions") {
       const json = JSON.parse(body)
+      if (json.model === "rejected-model") {
+        response.statusCode = 400
+        response.setHeader("Content-Type", "application/json")
+        response.end(JSON.stringify({ error: { message: "The model rejected-model does not exist" } }))
+        return
+      }
       const user = [...json.messages].reverse().find(message => message.role === "user")?.content ?? ""
       const translated = user
         .split(/\r?\n[ \t]*%%[ \t]*\r?\n/)
@@ -64,20 +71,14 @@ export async function startFakeService() {
   }
 }
 
-/** A setup document that points Jiandao at the fake service. */
+/** A setup document that points Jiandao at the fake service. It describes the service only. */
 export function setupDocumentFor(origin, overrides = {}) {
   return {
-    jiandao: 1,
-    provider: {
-      type: "openai-compatible",
-      name: "Local gateway",
-      apiKey: "local-secret-key",
-      model: "fake-model",
-      baseURL: `${origin}/v1/`,
-      ...overrides.provider,
-    },
-    targetLanguage: "cmn",
-    mode: "bilingual",
-    ...Object.fromEntries(Object.entries(overrides).filter(([key]) => key !== "provider")),
+    type: "openai-compatible",
+    name: "Local gateway",
+    apiKey: "local-secret-key",
+    model: "fake-model",
+    baseURL: `${origin}/v1/`,
+    ...overrides,
   }
 }

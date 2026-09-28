@@ -9,6 +9,15 @@ const jsonValueSchema: z.ZodType<unknown> = z.lazy(() =>
   z.union([z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)]),
 )
 
+export const connectionCheckSchema = z.strictObject({
+  ok: z.boolean(),
+  /** Milliseconds since the epoch. */
+  checkedAt: z.number(),
+  /** The service's error text, verbatim, when the check failed. */
+  error: z.string().optional(),
+})
+export type ConnectionCheck = z.infer<typeof connectionCheckSchema>
+
 /**
  * One translation service. The stored shape mirrors the setup document an
  * agent writes: what the agent verified with curl is what Jiandao sends.
@@ -31,6 +40,12 @@ export const providerConfigItemSchema = z.strictObject({
   headers: z.record(z.string(), z.string()).optional(),
   /** JSON merged into the request body after Jiandao's own fields, so it can add or override any of them. */
   body: z.record(z.string(), jsonValueSchema).optional(),
+  /**
+   * The last connection check: written when a configuration is applied and
+   * whenever the reader tests the connection, so the settings page can show
+   * it without sending a request.
+   */
+  connectionCheck: connectionCheckSchema.optional(),
 }).superRefine((provider, ctx) => {
   if (provider.provider === "openai-compatible" && !provider.baseURL) {
     ctx.addIssue({ code: "custom", path: ["baseURL"], message: "baseURL is required for an openai-compatible service" })

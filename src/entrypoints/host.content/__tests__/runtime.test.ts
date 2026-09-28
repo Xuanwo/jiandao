@@ -139,7 +139,7 @@ describe("bootstrapHostContent URL changes", () => {
     })
 
     const { ctx, invalidate } = createContentScriptContext()
-    await bootstrapHostContent(ctx, null)
+    await bootstrapHostContent(ctx)
     const manager = managerInstances[0]
 
     window.dispatchEvent(new CustomEvent("extension:URLChange", {
@@ -163,7 +163,7 @@ describe("bootstrapHostContent URL changes", () => {
 
   it("keeps inactive page translation inactive and only asks auto-translation on SPA navigation", async () => {
     const { ctx, invalidate } = createContentScriptContext()
-    await bootstrapHostContent(ctx, null)
+    await bootstrapHostContent(ctx)
     const manager = managerInstances[0]
 
     window.dispatchEvent(new CustomEvent("extension:URLChange", {
@@ -187,7 +187,7 @@ describe("bootstrapHostContent URL changes", () => {
 
   it("refreshes and reports detected language when background requests active-tab refresh", async () => {
     const { ctx, invalidate } = createContentScriptContext()
-    await bootstrapHostContent(ctx, null)
+    await bootstrapHostContent(ctx)
     await flushAsyncWork()
 
     mockSendMessage.mockClear()

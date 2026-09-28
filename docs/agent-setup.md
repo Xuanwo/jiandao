@@ -4,8 +4,8 @@ This guide is written for a coding agent (Claude Code, Codex, or similar)
 acting on behalf of a person who uses Jiandao. Jiandao has no settings form
 for the translation service. The service is configured by a small JSON
 document that you produce, verify against the real API, and place on the
-person's clipboard. The person pastes it into Jiandao, checks a preview and
-applies it.
+person's clipboard. The person pastes it into the settings page, checks a
+preview and applies it.
 
 Jiandao runs entirely in the browser. It has no server and no account. Page
 text goes straight from the browser to the service you configure here, in
@@ -15,9 +15,9 @@ prompt.
 
 ## What to do
 
-1. **Ask** the person three things: which service they want to use, where
+1. **Ask** the person two things: which service they want to use, and where
    their API key is (a file, an environment variable, or they paste it to
-   you), and which language they read in.
+   you).
 2. **Keep the key out of your output.** Read it into a shell variable and
    never print it. Every command below assumes `KEY` holds it:
 
@@ -34,69 +34,60 @@ prompt.
 
    ```bash
    jq -n --arg k "$KEY" '{
-     jiandao: 1,
-     provider: { type: "deepseek", apiKey: $k, model: "deepseek-flash",
-                 body: { thinking: { type: "disabled" } } },
-     targetLanguage: "cmn",
-     mode: "bilingual"
+     type: "deepseek", apiKey: $k, model: "deepseek-flash",
+     body: { thinking: { type: "disabled" } }
    }' | pbcopy          # macOS. Linux: wl-copy or xclip -selection clipboard. Windows: clip
    ```
 
-5. **Tell the person**: open the Jiandao popup (the toolbar icon), paste into
-   the box, click apply. Jiandao shows what will change, including the host
-   that page text will be sent to, sends one short request to confirm, and
-   clears the clipboard. If the confirmation fails, the person will paste the
-   error text back to you.
+5. **Tell the person**: open Jiandao's settings page, paste into the box in
+   the "Translation service" section (if a service is already set up, click
+   "Edit" there first), and click "Apply". Jiandao shows what will change,
+   including the host that page text will be sent to, sends one short request
+   to confirm, and saves the service only when that request works. Then it
+   clears the clipboard. If the confirmation fails, nothing is saved and the
+   person will paste the error text back to you.
 
 To change an existing configuration, ask the person to click “Copy
-instructions for your agent” in Jiandao’s settings and paste it to you; the
-text ends with the current document. The key in it is masked (`sk-…a9f2`).
-Return the document with the masked key unchanged and Jiandao keeps the
-stored key; only a new key needs the clipboard step above.
+instructions for your agent” in the "Translation service" section and paste
+it to you; the text ends with the current document. The key in it is masked
+(`sk-…a9f2`). Return the document with the masked key unchanged and Jiandao
+keeps the stored key; only a new key needs the clipboard step above.
 
 ## The document
 
-The JSON Schema is at [`schema/jiandao-setup.schema.json`](../schema/jiandao-setup.schema.json).
+The document describes the translation service and nothing else. The
+languages, the display mode and the translation prompt are the person's own
+settings in Jiandao. The JSON Schema is at
+[`schema/jiandao-setup.schema.json`](../schema/jiandao-setup.schema.json).
 Unknown fields are rejected, so the person sees the error instead of a
 silently ignored setting.
 
 ```json
 {
-  "jiandao": 1,
-  "provider": {
-    "type": "openai",
-    "apiKey": "sk-…",
-    "model": "gpt-6-luna",
-    "body": { "reasoning": { "effort": "none" } }
-  },
-  "targetLanguage": "cmn",
-  "sourceLanguage": "auto",
-  "mode": "bilingual"
+  "type": "openai",
+  "apiKey": "sk-…",
+  "model": "gpt-6-luna",
+  "body": { "reasoning": { "effort": "none" } }
 }
 ```
 
 | Field                  | Required                | Meaning                                                                                                                                                                                                                                                                                                                       |
 | ---------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `jiandao`              | yes                     | Format version. Always `1`.                                                                                                                                                                                                                                                                                                   |
-| `provider.type`        | yes                     | `openai`, `anthropic`, `gemini`, `deepseek`, or `openai-compatible` for any other endpoint that speaks the OpenAI chat completions API (Ollama, LM Studio, vLLM, OpenRouter, Groq, Mistral, Qwen, GLM, Moonshot, MiniMax, Doubao, gateways).                                                                                  |
-| `provider.api`         | no                      | Wire format: `openai-chat`, `openai-responses`, `anthropic` or `gemini`. Defaults from `type`: `openai` → `openai-responses`, `anthropic` → `anthropic`, `gemini` → `gemini`, `deepseek` and `openai-compatible` → `openai-chat`. Set `openai-responses` for a compatible service that speaks the Responses API, such as xAI. |
-| `provider.apiKey`      | for a new service       | The key. Endpoints without authentication still need a non-empty value such as `"local"`. A masked value from an export keeps the stored key.                                                                                                                                                                                 |
-| `provider.model`       | yes                     | Model ID exactly as the service expects it.                                                                                                                                                                                                                                                                                   |
-| `provider.baseURL`     | for `openai-compatible` | Base URL up to and including the version path, e.g. `http://localhost:11434/v1`. Omit for an official API.                                                                                                                                                                                                                    |
-| `provider.name`        | no                      | Display name. Defaults to the service name.                                                                                                                                                                                                                                                                                   |
-| `provider.headers`     | no                      | Extra HTTP headers for every request.                                                                                                                                                                                                                                                                                         |
-| `provider.body`        | no                      | JSON merged into every request body, exactly as the API documents it. Objects merge key by key; anything else replaces Jiandao's value. See the recipes.                                                                                                                                                                      |
-| `provider.temperature` | no                      | Sampling temperature. Sent only when set. Anthropic's current models accept only `1`.                                                                                                                                                                                                                                         |
-| `prompt`               | no                      | The translation prompt: `{ "name", "systemPrompt", "prompt" }`. `prompt` must contain `{{input}}` and may use `{{targetLanguage}}`, `{{webTitle}}`, `{{webDescription}}`, `{{webContent}}`, `{{webSummary}}`. `null` restores Jiandao's built-in prompt. Omit to keep the current one.                                        |
-| `targetLanguage`       | no                      | ISO 639-3 code the person reads in: `cmn` Simplified Chinese, `cmn-Hant` Traditional Chinese, `yue` Cantonese, `eng`, `jpn`, `kor`, `fra`, `deu`, `spa`, … The full list is the `LANG_CODE_ISO6393_OPTIONS` in [`src/definitions/index.ts`](../src/definitions/index.ts).                                                     |
-| `sourceLanguage`       | no                      | ISO 639-3 code of the pages, or `auto`.                                                                                                                                                                                                                                                                                       |
-| `mode`                 | no                      | `bilingual` (translation under each paragraph) or `translationOnly`.                                                                                                                                                                                                                                                          |
+| `type`        | yes                     | `openai`, `anthropic`, `gemini`, `deepseek`, or `openai-compatible` for any other endpoint that speaks the OpenAI chat completions API (Ollama, LM Studio, vLLM, OpenRouter, Groq, Mistral, Qwen, GLM, Moonshot, MiniMax, Doubao, gateways).                                                                                  |
+| `api`         | no                      | Wire format: `openai-chat`, `openai-responses`, `anthropic` or `gemini`. Defaults from `type`: `openai` → `openai-responses`, `anthropic` → `anthropic`, `gemini` → `gemini`, `deepseek` and `openai-compatible` → `openai-chat`. Set `openai-responses` for a compatible service that speaks the Responses API, such as xAI. |
+| `apiKey`      | for a new service       | The key. Endpoints without authentication still need a non-empty value such as `"local"`. A masked value from an export keeps the stored key.                                                                                                                                                                                 |
+| `model`       | yes                     | Model ID exactly as the service expects it.                                                                                                                                                                                                                                                                                   |
+| `baseURL`     | for `openai-compatible` | Base URL up to and including the version path, e.g. `http://localhost:11434/v1`. Omit for an official API.                                                                                                                                                                                                                    |
+| `name`        | no                      | Display name. Defaults to the service name.                                                                                                                                                                                                                                                                                   |
+| `headers`     | no                      | Extra HTTP headers for every request.                                                                                                                                                                                                                                                                                         |
+| `body`        | no                      | JSON merged into every request body, exactly as the API documents it. Objects merge key by key; anything else replaces Jiandao's value. See the recipes.                                                                                                                                                                      |
+| `temperature` | no                      | Sampling temperature. Sent only when set. Anthropic's current models accept only `1`.                                                                                                                                                                                                                                         |
 
 A document replaces the stored service with the same `type` and `baseURL`,
 or adds a new one. Other services and every other setting stay as they are.
-Jiandao has no editor for prompts or models: when the person wants a
-different prompt, model or option, they hand you the current configuration
-and you return the changed document.
+When the person wants a different model or option, they hand you the current
+configuration and you return the changed document; they may also edit a
+field in place on the settings page.
 
 ## Recipes
 
@@ -160,7 +151,8 @@ A `200` with a non-empty answer means the configuration works. A `400` or
 
 ## Opening Jiandao
 
-The popup is the toolbar icon. The settings page also has an import box:
-`chrome-extension://bjfjdmmojplcohcbmkoogopanjbojmok/options.html#import` in
+The popup is the toolbar icon; while no service is set up it links to the
+settings page. The "Translation service" section is at
+`chrome-extension://bjfjdmmojplcohcbmkoogopanjbojmok/options.html#service` in
 Chrome with the store build. Do not put the document into a URL: browsers
 keep full URLs, including the fragment, in history.

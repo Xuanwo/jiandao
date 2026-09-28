@@ -1,17 +1,18 @@
-import type { Theme, ThemeMode } from "@/types/config/theme"
-import { useAtom } from "jotai"
-import { createContext, use, useLayoutEffect, useMemo, useSyncExternalStore } from "react"
-import { themeModeAtom } from "@/utils/atoms/theme"
-import { applyTheme } from "@/utils/theme"
+import type { Theme } from "@/utils/theme"
+import { useLayoutEffect, useSyncExternalStore } from "react"
+import { applyTheme, getSystemTheme } from "@/utils/theme"
 
-interface ThemeContextI {
-  theme: Theme
-  themeMode: ThemeMode
-  setThemeMode: (mode: ThemeMode) => void
+const DARK_QUERY = "(prefers-color-scheme: dark)"
+
+function subscribeToSystemTheme(onChange: () => void) {
+  const query = window?.matchMedia?.(DARK_QUERY)
+  if (!query)
+    return () => {}
+  query.addEventListener("change", onChange)
+  return () => query.removeEventListener("change", onChange)
 }
 
-export const ThemeContext = createContext<ThemeContextI | undefined>(undefined)
-
+/** Applies the system appearance to the document, or to a shadow root container, and follows its changes. */
 export function ThemeProvider({
   children,
   container,
@@ -19,47 +20,11 @@ export function ThemeProvider({
   children: React.ReactNode
   container?: HTMLElement
 }) {
-  const [themeMode, setThemeMode] = useAtom(themeModeAtom)
+  const theme: Theme = useSyncExternalStore(subscribeToSystemTheme, getSystemTheme)
 
-  const prefersDark = useSyncExternalStore(
-    (cb) => {
-      const mq = window?.matchMedia?.("(prefers-color-scheme: dark)")
-      if (!mq) {
-        return () => {}
-      }
-
-      mq.addEventListener("change", cb)
-      return () => mq.removeEventListener("change", cb)
-    },
-    () => !!window?.matchMedia?.("(prefers-color-scheme: dark)")?.matches,
-  )
-
-  const theme: Theme = themeMode === "system"
-    ? (prefersDark ? "dark" : "light")
-    : themeMode
-
-  // Apply theme to document or shadow root container
   useLayoutEffect(() => {
-    const target = container ?? document.documentElement
-    applyTheme(target, theme)
+    applyTheme(container ?? document.documentElement, theme)
   }, [theme, container])
 
-  const contextValue = useMemo(
-    () => ({ theme, themeMode, setThemeMode }),
-    [theme, themeMode, setThemeMode],
-  )
-
-  return (
-    <ThemeContext value={contextValue}>
-      {children}
-    </ThemeContext>
-  )
-}
-
-export function useTheme(): ThemeContextI {
-  const context = use(ThemeContext)
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider")
-  }
-  return context
+  return children
 }

@@ -26,14 +26,8 @@ popup:
     missingKey: anahtar yok
   setup:
     title: Henüz çeviri hizmeti yok
-    description: Talimatları ajanınıza verin. Ajan anahtarınızla bir yapılandırmayı doğrular ve panoya koyar; aşağıya yapıştırın.
-    copyInstructions: Ajanınız için talimatları kopyala
-    copied: Kopyalandı
-    pasteLabel: Ajanınızdan gelen yapılandırma
-    placeholder: '{ "jiandao": 1, "provider": { … } }'
-    keyMissing: yapılandırmada API anahtarı yok
-    apply: Uygula ve bu sayfayı çevir
-    applyOnly: Uygula
+    description: Ajanınızın oluşturduğu yapılandırmayı ayarlar sayfasına yapıştırın, çeviriye başlayın.
+    openSettings: Ayarlarda yapılandır
 errorRecovery:
   title: Bir sorun oluştu
   description: Kurtarma modu etkin. Sayfayı yenileyin veya ayarları sıfırlayıp tekrar deneyin.
@@ -52,24 +46,36 @@ options:
   title: Ayarlar
   service:
     title: Çeviri hizmeti
-    status:
-      none: Hizmet yok
-      unconfigured: Anahtar yok
-      configured: Test edilmedi
-      testing: Test ediliyor…
-      ok: Bağlandı
-      failed: Bağlantı başarısız
-    testConnection: Bağlantıyı test et
-    sendsTo: Sayfa metni $1 hizmetine gider
-    copyInstructions: Ajanınız için talimatları kopyala
+    empty:
+      title: Henüz çeviri hizmeti yok
+      description: Talimatları ajanınıza verin. Ajan, hizmet yapılandırmasını anahtarınızla doğrulayıp panoya koyar; aşağıya yapıştırın.
+    copyInstructions: Ajan için talimatları kopyala
     copied: Kopyalandı
-    paste:
-      open: Yapılandırmayı yapıştır
-      label: Ajanınızdan gelen yapılandırma
-      keyMissing: Yapılandırmada API anahtarı yok.
-      cancel: İptal
-      apply: Uygula
-      applying: Onaylanıyor…
+    edit: Düzenle
+    test: Bağlantıyı test et
+    testing: Test ediliyor…
+    status:
+      ok: Bağlı
+      failed: Bağlantı başarısız
+      unchecked: Kontrol edilmedi
+    checkedAt: $1 kontrol edildi
+    sendsTo: "Sayfa metni şuraya gider: $1"
+    key: Anahtar $1
+    newKey: yeni anahtar
+    keptKey: kayıtlı anahtar korunur
+    keyMissing: Yapılandırmada API anahtarı yok
+    thinkingOff: düşünme kapalı
+    label:
+      current: Şu an
+      after: Sonra
+      connection: Bağlantı
+    unchanged: "Mevcut hizmetle aynı. Tümü seçili: değiştirmek için yapıştırın ya da tek bir alanı düzenleyin."
+    failedNotSaved: Başarısız, hiçbir şey kaydedilmedi
+    editorLabel: Çeviri hizmeti yapılandırması
+    placeholder: '{ "type": "deepseek", "apiKey": "…", "model": "…" }'
+    cancel: İptal
+    apply: Uygula
+    applying: Kontrol ediliyor…
   reading:
     title: Okuma
     mode:
@@ -105,10 +111,6 @@ options:
         syntaxError: CSS sözdizimi hataları içeriyor
         tooLong: CSS çok uzun
         allSaved: Tüm değişiklikler kaydedildi
-    range:
-      title: Çevir
-      main: Ana içerik
-      all: Tüm sayfa
     shortcut:
       title: Kısayol
   quality:
@@ -118,39 +120,15 @@ options:
     prompt:
       title: Prompt
       default: Varsayılan
-  advanced:
-    title: Gelişmiş
-    rate: Saniye başına istek
-    capacity: Aynı anda gönderilen istek
-    maxCharactersPerBatch: İstek başına karakter
-    maxItemsPerBatch: İstek başına paragraf
-    preloadMargin: Görünür alanın ötesini önceden çevir (px)
-    preloadThreshold: Çeviriden önce görünür oran
-    minCharacters: N karakterden kısa paragrafları atla
-    minWords: N kelimeden kısa paragrafları atla
-    minError: Değer en az $1 olmalıdır
-    rangeError: Değer $1 ile $2 arasında olmalıdır
-    cache:
-      title: Çeviri önbelleği
-      clear: Temizle
-      clearing: Temizleniyor…
-      dialog:
-        title: Çeviri önbelleği temizlensin mi?
-        description: Önbellekteki tüm çeviriler ve sayfa özetleri silinir. Sayfalar gerektiğinde yeniden çevrilir.
-        confirm: Temizle
-        cancel: İptal
-  appearance:
-    title: Görünüm
-    system: Sistem
-    light: Açık
-    dark: Koyu
-  reset:
-    title: Tüm ayarlar
-    dialog:
-      title: Tüm ayarlar sıfırlansın mı?
-      description: API anahtarları ve promptlar dahil tüm ayarlar varsayılan değerlerine döner.
-      confirm: Sıfırla
+      custom: Özel
+      edit: Düzenle
+      system: Sistem promptu
+      template: Prompt şablonu
+      tokens: "Şablon {{input}} içermelidir. Kullanılabilir: {{targetLanguage}} {{webTitle}} {{webDescription}} {{webContent}} {{webSummary}}"
+      missingInput: Şablonda {{input}} yok.
+      restore: Varsayılana döndür
       cancel: İptal
+      apply: Uygula
 translation:
   sameLanguage: Kaynak ve hedef diller farklı olmalıdır
   noApiKey: Önce bir API anahtarı ekleyin. Ayarlamak için araç çubuğundaki Jiandao simgesine tıklayın.
@@ -160,10 +138,10 @@ translation:
 agentInstructions:
   noConfiguration: (henüz yok)
   text: |
-    Web sayfalarını çevirmek için Jiandao (简道翻译) tarayıcı uzantısını kullanıyorum. Lütfen çeviri hizmetini benim için ayarla.
+    Web sayfalarını Jiandao (简道翻译) tarayıcı eklentisiyle çeviriyorum. Lütfen çeviri hizmetini benim için ayarla.
     Önce kılavuzu oku: $1
-    Kılavuzu izle: hangi hizmeti istediğimi, API anahtarımın nerede olduğunu ve hangi dilde okuduğumu bana sor. Kılavuzdaki istek şablonuyla anahtarımı kullanarak bir istek başarılı olana kadar doğrula. Yapılandırma JSON'unu panoma yaz. Sonra bana bunu Jiandao açılır penceresine yapıştırıp uygulamamı söyle.
-    Anahtarı gizlenmiş geçerli yapılandırmam:
+    Kılavuzu izle: hangi hizmeti kullanmak istediğimi ve API anahtarımın nerede olduğunu bana sor. Kılavuzdaki istek şablonuyla anahtarımı kullanarak bir istek başarılı olana kadar doğrula. Hizmet yapılandırması JSON'unu panoma yaz. Son olarak bana bunu Jiandao ayarlar sayfasındaki "Çeviri hizmeti" bölümüne yapıştırıp uygulamamı söyle.
+    Mevcut yapılandırmam, anahtar gizlenmiş:
     $2
 shortcutKeySelector:
   placeholder: Bir kısayola basın

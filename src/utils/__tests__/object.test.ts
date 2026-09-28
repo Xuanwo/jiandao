@@ -24,15 +24,15 @@ describe("deepMerge", () => {
           promptId: null,
           patterns: [{ id: "new", name: "New", systemPrompt: "", prompt: "new" }],
         },
-        page: { preload: { margin: 1000, threshold: 0.25 } },
+        page: { shortcut: "Alt+T" },
         mode: "translationOnly",
       },
     })
 
     expect(result.language).toEqual({ ...DEFAULT_CONFIG.language, targetCode: "jpn" })
     expect(result.translate.customPromptsConfig.patterns).toEqual([{ id: "new", name: "New", systemPrompt: "", prompt: "new" }])
-    expect(result.translate.page.preload).toEqual({ margin: 1000, threshold: 0.25 })
-    expect(result.translate.page.range).toBe(DEFAULT_CONFIG.translate.page.range)
+    expect(result.translate.page).toEqual({ shortcut: "Alt+T" })
+    expect(result.translate.enableAIContentAware).toBe(DEFAULT_CONFIG.translate.enableAIContentAware)
     expect(result.translate.mode).toBe("translationOnly")
 
     // Neither input is modified.

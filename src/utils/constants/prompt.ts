@@ -73,13 +73,6 @@ Single paragraph content
 Direct translation without separators
 `
 
-/**
- * UI sentinel value for default prompt selection
- * NOTE: This is NOT stored in config - it's only used in UI components
- * Config stores `null` for default, this string is just for Select/UI compatibility
- */
-export const DEFAULT_TRANSLATE_PROMPT_ID = "__default__"
-
 export const DEFAULT_TRANSLATE_PROMPTS_CONFIG = {
   promptId: null,
   patterns: [],
