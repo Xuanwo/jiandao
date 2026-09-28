@@ -103,6 +103,33 @@ it("user changes the display mode: Given a translated article in bilingual mode,
   assert.equal(service.completions().length, requestsBefore, "the translations came from the cache")
 })
 
+it("user changes the display mode while the page is translating: Given a slow service and an article translating in bilingual mode, When the popup changes to Translation only before the translations arrive, Then the article shows only the translations", async () => {
+  const { popup } = await setUpService()
+  const article = await context.newPage()
+  await article.goto(`${service.origin}/article`)
+  const releaseAnswers = service.holdAnswers()
+  try {
+    await article.bringToFront()
+    await article.locator("body").click()
+    await article.keyboard.press("Alt+E")
+    await article.locator(".jiandao-spinner").first().waitFor({ timeout: 10_000 })
+
+    await popup.getByRole("button", { name: "Translation only", exact: true }).click()
+    await popup.getByRole("button", { name: "Translation only", pressed: true }).waitFor()
+    // The page translation restarts: each paragraph waits again for its translation in the new mode.
+    await article.locator(".jiandao-translated-content-wrapper[data-jiandao-translation-mode=\"translationOnly\"]").first().waitFor({ timeout: 10_000 })
+  }
+  finally {
+    releaseAnswers()
+  }
+
+  await article.waitForFunction(() => [...document.querySelectorAll("h1, p")].every(element => element.textContent.trim().startsWith("【译】")), undefined, { timeout: 10_000 })
+    .catch(async (error) => {
+      const paragraphs = await article.locator("h1, p").allInnerTexts()
+      throw new Error(`not every paragraph shows only its translation: ${paragraphs.join(" | ")}`, { cause: error })
+    })
+})
+
 it("user translates a copy of an article: Given page context is on and the built-in prompt, When the article is translated and then a copy with another description, Then the copy gets its translations from the cache without a new request", async () => {
   const { popup, extensionId } = await setUpService()
   await popup.goto(`chrome-extension://${extensionId}/options.html`)

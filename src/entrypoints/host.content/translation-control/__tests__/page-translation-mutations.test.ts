@@ -240,7 +240,7 @@ describe("pageTranslationManager mutation re-walk", () => {
     await observer.triggerIntersect(panel)
     await flushDomUpdates()
 
-    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG)
+    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG, false, expect.any(AbortSignal))
 
     manager.stop()
   })
@@ -270,7 +270,7 @@ describe("pageTranslationManager mutation re-walk", () => {
     await observer.triggerIntersect(panel)
     await flushDomUpdates()
 
-    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG)
+    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG, false, expect.any(AbortSignal))
 
     manager.stop()
   })
@@ -300,7 +300,7 @@ describe("pageTranslationManager mutation re-walk", () => {
     await observer.triggerIntersect(panel)
     await flushDomUpdates()
 
-    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG)
+    expect(mockTranslateWalkedElement).toHaveBeenCalledWith(panel, "walk-id", DEFAULT_CONFIG, false, expect.any(AbortSignal))
 
     manager.stop()
   })
