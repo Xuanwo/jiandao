@@ -1,7 +1,7 @@
 /**
- * The translation and summary caches in IndexedDB. The database name and
- * version match what Plainly 1.0 created through Dexie (which stores its
- * schema version times ten), so existing caches open as they are.
+ * The translation and summary caches in IndexedDB. The version continues
+ * the one Plainly 1.0 created through Dexie (which stores its schema version
+ * times ten).
  */
 
 export interface TranslationCacheRecord {
@@ -16,7 +16,7 @@ export interface ArticleSummaryCacheRecord {
   createdAt: Date
 }
 
-const DB_NAME = "PlainlyDB"
+const DB_NAME = "JiandaoDB"
 const DB_VERSION = 50
 const STORES = ["translationCache", "articleSummaryCache"] as const
 type StoreName = typeof STORES[number]

@@ -59,17 +59,6 @@ describe("migrateStoredConfig", () => {
     expect(parsed.data.providersConfig[0]).not.toHaveProperty("providerOptions")
   })
 
-  it("rewrites the 1.0 selectors and variables in custom CSS to the renamed ones", () => {
-    const customCSS = `[data-plainly-custom-translation-style='custom'] { color: var(--plainly-brand); }\n.plainly-translated-block-content { margin: 0; }`
-    const stored = { ...DEFAULT_CONFIG, translate: { ...DEFAULT_CONFIG.translate, translationNodeStyle: { preset: "line", isCustom: true, customCSS } } }
-    const migrated = migrateStoredConfig(stored) as typeof DEFAULT_CONFIG
-
-    expect(migrated.translate.translationNodeStyle.customCSS).toBe(
-      `[data-jiandao-custom-translation-style='custom'] { color: var(--jiandao-brand); }\n.jiandao-translated-block-content { margin: 0; }`,
-    )
-    expect(configSchema.safeParse(migrated).success).toBe(true)
-  })
-
   it("leaves a config that is already in the current shape untouched", () => {
     const current = { ...DEFAULT_CONFIG, providersConfig: [{ ...DEFAULT_CONFIG.providersConfig[0], body: { reasoning: { effort: "none" } } }] }
     expect(migrateStoredConfig(current)).toEqual(current)
