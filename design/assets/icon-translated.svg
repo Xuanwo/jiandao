@@ -1,0 +1,2 @@
+<!-- Small-size Jiandao icon; see design/Icon.dc.html. Rendered to public/icon/*.png. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect x="2.5" y="3.5" width="27" height="25" rx="5" fill="#FFFFFF" stroke="#0B2A94" stroke-width="3"/><path d="M7.5 3.5h17a5 5 0 0 1 5 5v2h-27v-2a5 5 0 0 1 5-5z" fill="#0B2A94"/><rect x="7" y="14" width="18" height="2.5" rx="1.25" fill="#0B2A94"/><rect x="5.5" y="19.5" width="21" height="6" rx="1.5" fill="#F24A2C"/></svg>
