@@ -1,5 +1,6 @@
 import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { isDontWalkIntoAndDontTranslateAsChildElement, isHTMLElement, isShallowInlineHTMLElement, isTranslatedContentNode, isTranslatedWrapperNode } from "./filter"
+import { isOwnedPresentationElement } from "./owned-presentation"
 import { smashTruncationStyle } from "./style"
 
 export function findNearestAncestorBlockNodeFor(element: Element) {
@@ -69,6 +70,11 @@ export function unwrapDeepestOnlyHTMLChild(element: HTMLElement) {
 
     const onlyChildElement = effectiveChildren[0]
     if (!isHTMLElement(onlyChildElement))
+      break
+
+    // The extension removes its presentation elements when the reader turns off the emphasis.
+    // Keep the translation and its snapshot in the page element.
+    if (isOwnedPresentationElement(onlyChildElement))
       break
 
     currentElement = onlyChildElement

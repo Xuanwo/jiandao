@@ -16,6 +16,10 @@ const languageSchema = z.object({
 export const configSchema = z.object({
   language: languageSchema,
   providersConfig: providersConfigSchema,
+  // A stored config without this section gets the default of each field.
+  reading: z.object({
+    wordPrefixEmphasis: z.boolean().default(false),
+  }).prefault({}),
   translate: translateConfigSchema,
 }).superRefine((data, ctx) => {
   const providerIdsSet = new Set(data.providersConfig.map(p => p.id))

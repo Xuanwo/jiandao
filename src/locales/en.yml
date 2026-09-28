@@ -82,6 +82,8 @@ options:
       title: Display
       bilingual: Bilingual
       translationOnly: Translation only
+    wordPrefixEmphasis:
+      title: Word-prefix emphasis
     style:
       title: Translation style
       custom: Custom CSS

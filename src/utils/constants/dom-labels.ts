@@ -18,3 +18,9 @@ export const NOTRANSLATE_CLASS = "notranslate"
 export const REACT_SHADOW_HOST_CLASS = "jiandao-react-shadow-host"
 
 export const TRANSLATION_ERROR_CONTAINER_CLASS = "jiandao-translation-error-container"
+
+// Word-prefix emphasis wraps page text in these inline custom elements. Page rules for span, b or strong do not match them.
+export const WORD_PREFIX_TEXT_TAG = "jiandao-prefix-text"
+export const WORD_PREFIX_TAG = "jiandao-prefix"
+// Translation requests and the snapshots that restore the original text must not contain these elements.
+export const OWNED_PRESENTATION_SELECTOR = `${WORD_PREFIX_TEXT_TAG}, ${WORD_PREFIX_TAG}`

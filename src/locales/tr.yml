@@ -82,6 +82,8 @@ options:
       title: Görünüm
       bilingual: İki dilli
       translationOnly: Yalnızca çeviri
+    wordPrefixEmphasis:
+      title: Kelime başlarını vurgula
     style:
       title: Çeviri stili
       custom: Özel CSS

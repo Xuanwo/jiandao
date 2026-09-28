@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { after, afterEach, before, it } from "node:test"
-import { configureService, launchBrowser, reportFailure } from "./browser.mjs"
-import { setupDocumentFor, startFakeService } from "./fake-service.mjs"
+import { configureService, launchBrowser, pressTranslateShortcut, reportFailure } from "./browser.mjs"
+import { OTHER_REQUEST_PREFIXES, setupDocumentFor, startFakeService } from "./fake-service.mjs"
 
 let service
 let context
@@ -13,24 +13,6 @@ before(async () => {
 after(async () => {
   await service.close()
 })
-
-/** The messages of each request to the service, oldest first. */
-function requestMessages() {
-  return service.completions().map(({ body }) => JSON.parse(body).messages)
-}
-
-/**
- * How the first message starts in the other requests to the service: the
- * language detection prompt (src/utils/prompts/language-detection.ts) and the
- * summary prompt (src/utils/content/summary.ts).
- */
-const OTHER_REQUEST_PREFIXES = { languageDetection: "You are a language detection assistant", summary: "Summarize" }
-
-/** The messages of each translation request. */
-function translationRequests() {
-  const prefixes = Object.values(OTHER_REQUEST_PREFIXES)
-  return requestMessages().filter(([message]) => !prefixes.some(prefix => message.content.startsWith(prefix)))
-}
 
 /**
  * Starts the browser with the extension and applies a setup document for the
@@ -54,9 +36,7 @@ async function setUpService() {
 async function translateArticle(path = "/article") {
   const article = await context.newPage()
   await article.goto(`${service.origin}${path}`)
-  await article.bringToFront()
-  await article.locator("body").click()
-  await article.keyboard.press("Alt+E")
+  await pressTranslateShortcut(article)
   const blocks = article.locator(".jiandao-translated-block-content")
   await blocks.nth(4).waitFor({ timeout: 20_000 })
   return { article, translations: await blocks.allTextContents() }
@@ -109,14 +89,14 @@ it("user translates a copy of an article: Given page context is on and the built
   await popup.getByRole("switch", { name: "Use page context" }).click()
   await popup.getByRole("switch", { name: "Use page context", checked: true }).waitFor()
 
-  const requestsBefore = translationRequests().length
+  const requestsBefore = service.translationRequests().length
   const { translations: first } = await translateArticle("/article?description=First")
-  const requestsAfterFirst = translationRequests().length
+  const requestsAfterFirst = service.translationRequests().length
   assert.ok(requestsAfterFirst > requestsBefore, "the article reached the service")
-  assert.ok(requestMessages().some(([message]) => message.content.startsWith(OTHER_REQUEST_PREFIXES.summary)), "page context is on: the summary request reached the service")
+  assert.ok(service.messages().some(([message]) => message.content.startsWith(OTHER_REQUEST_PREFIXES.summary)), "page context is on: the summary request reached the service")
 
   // The built-in prompt sends the page title and summary, not the description, so the model request is the same.
   const { translations: copy } = await translateArticle("/article?description=Second")
   assert.deepEqual(copy, first)
-  assert.equal(translationRequests().length, requestsAfterFirst, "the copy sent no new translation request")
+  assert.equal(service.translationRequests().length, requestsAfterFirst, "the copy sent no new translation request")
 })

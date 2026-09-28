@@ -1,18 +1,8 @@
 // @vitest-environment jsdom
-import type { Config } from "@/types/config/config"
 import { beforeEach, expect, it, vi } from "vitest"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
-import { nextAnimationFrame, setUpHostContentTests, storeConfig } from "./host-content-harness"
+import { configWithMode, nextAnimationFrame, setUpHostContentTests, storeConfig } from "./host-content-harness"
 
 const hostContent = setUpHostContentTests()
-
-function configWithMode(mode: Config["translate"]["mode"]): Config {
-  return {
-    ...DEFAULT_CONFIG,
-    providersConfig: DEFAULT_CONFIG.providersConfig.map(provider => ({ ...provider, apiKey: "test-key" })),
-    translate: { ...DEFAULT_CONFIG.translate, mode },
-  }
-}
 
 function shownMode() {
   return document.querySelector("#passage [data-jiandao-translation-mode]")?.getAttribute("data-jiandao-translation-mode")

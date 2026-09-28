@@ -82,6 +82,8 @@ options:
       title: 表示
       bilingual: バイリンガル
       translationOnly: 翻訳のみ
+    wordPrefixEmphasis:
+      title: 単語の先頭を強調
     style:
       title: 翻訳のスタイル
       custom: カスタム CSS

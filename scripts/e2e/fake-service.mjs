@@ -11,6 +11,13 @@ function article(description) {
 }
 
 /**
+ * How the first message starts in the other requests to the service: the
+ * language detection prompt (src/utils/prompts/language-detection.ts) and the
+ * summary prompt (src/utils/content/summary.ts).
+ */
+export const OTHER_REQUEST_PREFIXES = { languageDetection: "You are a language detection assistant", summary: "Summarize" }
+
+/**
  * A local stand-in for an OpenAI-compatible service, plus an English article
  * to translate at `/article` (`?description=` adds a meta description).
  * `POST /v1/chat/completions` splits the last user message at the standalone
@@ -18,7 +25,8 @@ function article(description) {
  * of the part's last line, keeping the batch separators Jiandao uses, so a
  * translated page is easy to recognize. The model "rejected-model" gets a
  * 400 answer, like a service that does not know the model.
- * Every request is recorded in `requests` for assertions.
+ * Every request is recorded in `requests` for assertions; `messages()` and
+ * `translationRequests()` give the messages of the recorded requests.
  */
 export async function startFakeService() {
   const requests = []
@@ -63,10 +71,15 @@ export async function startFakeService() {
   // Port 0 asks the OS for a free port; Chromium refuses a few well-known ports, which the OS never hands out here.
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve))
   const origin = `http://127.0.0.1:${server.address().port}`
+  const completions = () => requests.filter(request => request.url === "/v1/chat/completions")
+  const messages = () => completions().map(({ body }) => JSON.parse(body).messages)
+  const otherPrefixes = Object.values(OTHER_REQUEST_PREFIXES)
   return {
     origin,
     requests,
-    completions: () => requests.filter(request => request.url === "/v1/chat/completions"),
+    completions,
+    messages,
+    translationRequests: () => messages().filter(([message]) => !otherPrefixes.some(prefix => message.content.startsWith(prefix))),
     close: () => new Promise(resolve => server.close(resolve)),
   }
 }

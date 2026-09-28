@@ -82,6 +82,8 @@ options:
       title: Отображение
       bilingual: Двуязычный
       translationOnly: Только перевод
+    wordPrefixEmphasis:
+      title: Выделение начала слов
     style:
       title: Стиль перевода
       custom: Свой CSS

@@ -3,6 +3,7 @@ import { useId } from "react"
 import { i18n } from "#imports"
 import { SegmentedControl } from "@/components/segmented-control"
 import { ShortcutKeyRecorder } from "@/components/shortcut-key-recorder"
+import { Switch } from "@/components/ui/switch"
 import { TRANSLATION_MODES } from "@/types/config/translate"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { DEFAULT_AUTO_TRANSLATE_SHORTCUT_KEY } from "@/utils/constants/translate"
@@ -16,7 +17,9 @@ const MODE_LABEL_KEY = {
 
 export function ReadingSection() {
   const [translateConfig, setTranslateConfig] = useAtom(configFieldsAtomMap.translate)
+  const [readingConfig, setReadingConfig] = useAtom(configFieldsAtomMap.reading)
   const shortcutId = useId()
+  const emphasisId = useId()
 
   return (
     <SettingsSection id="reading" title={i18n.t("options.reading.title")}>
@@ -34,6 +37,17 @@ export function ReadingSection() {
           )}
         />
         <StyleSetting />
+        <SettingsRow
+          label={i18n.t("options.reading.wordPrefixEmphasis.title")}
+          htmlFor={emphasisId}
+          control={(
+            <Switch
+              id={emphasisId}
+              checked={readingConfig.wordPrefixEmphasis}
+              onCheckedChange={wordPrefixEmphasis => void setReadingConfig({ wordPrefixEmphasis })}
+            />
+          )}
+        />
         <SettingsRow
           label={i18n.t("options.reading.shortcut.title")}
           htmlFor={shortcutId}

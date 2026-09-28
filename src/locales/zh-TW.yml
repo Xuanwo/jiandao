@@ -82,6 +82,8 @@ options:
       title: 顯示方式
       bilingual: 雙語對照
       translationOnly: 僅顯示譯文
+    wordPrefixEmphasis:
+      title: 詞首強調
     style:
       title: 譯文樣式
       custom: 自訂 CSS

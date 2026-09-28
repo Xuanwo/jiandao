@@ -82,6 +82,8 @@ options:
       title: 표시
       bilingual: 이중 언어
       translationOnly: 번역만
+    wordPrefixEmphasis:
+      title: 단어 앞부분 강조
     style:
       title: 번역 스타일
       custom: 사용자 지정 CSS

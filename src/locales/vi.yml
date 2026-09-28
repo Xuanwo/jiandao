@@ -82,6 +82,8 @@ options:
       title: Hiển thị
       bilingual: Song ngữ
       translationOnly: Chỉ bản dịch
+    wordPrefixEmphasis:
+      title: Nhấn mạnh đầu từ
     style:
       title: Kiểu bản dịch
       custom: CSS tùy chỉnh

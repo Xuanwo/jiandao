@@ -82,6 +82,8 @@ options:
       title: Visualización
       bilingual: Bilingüe
       translationOnly: Solo traducción
+    wordPrefixEmphasis:
+      title: Resaltar el inicio de las palabras
     style:
       title: Estilo de la traducción
       custom: CSS personalizado

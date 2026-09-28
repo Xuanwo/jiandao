@@ -121,6 +121,13 @@ export async function reportFailure(test, context) {
   test.diagnostic(`stored config: ${JSON.stringify(config, (key, value) => SECRET_KEY.test(key) ? "(hidden)" : value)}`)
 }
 
+/** Focuses the page and presses the page translation shortcut, which turns page translation on or off. */
+export async function pressTranslateShortcut(page) {
+  await page.bringToFront()
+  await page.locator("h1").click()
+  await page.keyboard.press("Alt+E")
+}
+
 /** Clicks the button whose accessible name is exactly `name`. */
 export async function clickButton(page, name) {
   await page.getByRole("button", { name, exact: true }).click()

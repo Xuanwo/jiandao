@@ -16,6 +16,9 @@ export const DEFAULT_CONFIG: Config = {
     level: "intermediate",
   },
   providersConfig: DEFAULT_PROVIDER_CONFIG_LIST,
+  reading: {
+    wordPrefixEmphasis: false,
+  },
   translate: {
     providerId: "openai-default",
     mode: "bilingual",

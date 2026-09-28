@@ -35,3 +35,26 @@ export function watchLocalConfig(callback: (newConfig: Config | null, oldConfig:
     callback(parseStoredConfig(newValue), parseStoredConfig(oldValue))
   })
 }
+
+/**
+ * Gives onConfig the stored config one time after the watch starts, and then
+ * each new config. Returns the function that stops the watch.
+ */
+export function subscribeLocalConfig(onConfig: (config: Config | null) => void): () => void {
+  let changed = false
+  let stopped = false
+  const unwatch = watchLocalConfig((newConfig) => {
+    changed = true
+    onConfig(newConfig)
+  })
+  // A change before the watch starts sends no event. Thus read the stored config after the watch starts.
+  // A change event that comes first has a newer config than this read.
+  void getLocalConfig().then((config) => {
+    if (!changed && !stopped)
+      onConfig(config)
+  })
+  return () => {
+    stopped = true
+    unwatch()
+  }
+}
