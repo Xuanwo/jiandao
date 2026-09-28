@@ -27,8 +27,8 @@ vi.mock("@/utils/content/summary", () => ({
   generateArticleSummary: generateArticleSummaryMock,
 }))
 
-vi.mock("@/utils/db/dexie/db", () => ({
-  db: {
+vi.mock("@/utils/db/cache-db", () => ({
+  cacheDb: {
     articleSummaryCache: {
       get: articleSummaryCacheGetMock,
       put: articleSummaryCachePutMock,

@@ -7,7 +7,7 @@ import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { BATCH_SEPARATOR, BATCH_SEPARATOR_LINE_PATTERN } from "@/utils/constants/prompt"
 import { generateArticleSummary } from "@/utils/content/summary"
 import { cleanText } from "@/utils/content/utils"
-import { db } from "@/utils/db/dexie/db"
+import { cacheDb } from "@/utils/db/cache-db"
 import { sha256Hex, stringHash } from "@/utils/hash"
 import { executeTranslate } from "@/utils/host/translate/execute-translate"
 import { normalizePromptContextValue } from "@/utils/host/translate/translate-text"
@@ -48,14 +48,14 @@ async function getOrGenerateWebPageSummary(
   const textHash = await sha256Hex(preparedText)
   const cacheKey = await sha256Hex(webTitle, textHash, JSON.stringify(providerConfig))
 
-  const cached = await db.articleSummaryCache.get(cacheKey)
+  const cached = await cacheDb.articleSummaryCache.get(cacheKey)
   if (cached) {
     logger.info("Using cached summary")
     return cached.summary
   }
 
   const thunk = async () => {
-    const cachedAgain = await db.articleSummaryCache.get(cacheKey)
+    const cachedAgain = await cacheDb.articleSummaryCache.get(cacheKey)
     if (cachedAgain) {
       return cachedAgain.summary
     }
@@ -65,7 +65,7 @@ async function getOrGenerateWebPageSummary(
       return ""
     }
 
-    await db.articleSummaryCache.put({
+    await cacheDb.articleSummaryCache.put({
       key: cacheKey,
       summary,
       createdAt: new Date(),
@@ -171,7 +171,7 @@ export async function setUpWebPageTranslationQueue() {
 
     // Check cache first
     if (hash) {
-      const cached = await db.translationCache.get(hash)
+      const cached = await cacheDb.translationCache.get(hash)
       if (cached) {
         return cached.translation
       }
@@ -190,7 +190,7 @@ export async function setUpWebPageTranslationQueue() {
 
     // Cache the translation result if successful
     if (result && hash) {
-      await db.translationCache.put({
+      await cacheDb.translationCache.put({
         key: hash,
         translation: result,
         createdAt: new Date(),

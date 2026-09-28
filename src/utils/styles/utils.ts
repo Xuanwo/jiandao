@@ -1,15 +1,6 @@
-import type { ClassValue } from "clsx"
-import { clsx } from "clsx"
-import { extendTailwindMerge } from "tailwind-merge"
+export type ClassValue = string | false | null | undefined
 
-const mergeTailwindClasses = extendTailwindMerge({
-  extend: {
-    theme: {
-      shadow: ["floating"],
-    },
-  },
-})
-
-export function cn(...inputs: ClassValue[]) {
-  return mergeTailwindClasses(clsx(inputs))
+/** Joins class names, dropping falsy entries. Callers keep their own classes free of conflicts. */
+export function cn(...inputs: ClassValue[]): string {
+  return inputs.filter(Boolean).join(" ")
 }

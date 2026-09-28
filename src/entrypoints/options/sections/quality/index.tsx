@@ -1,7 +1,7 @@
 import { useAtom } from "jotai"
 import { useId } from "react"
 import { i18n } from "#imports"
-import { Switch } from "@/components/ui/base-ui/switch"
+import { Switch } from "@/components/ui/switch"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { deepMerge } from "@/utils/object"
 import { SettingsGroup, SettingsRow, SettingsSection } from "../../components/settings-section"

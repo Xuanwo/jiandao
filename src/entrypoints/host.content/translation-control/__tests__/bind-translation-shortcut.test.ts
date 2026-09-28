@@ -1,29 +1,11 @@
+// @vitest-environment jsdom
 import type { PageTranslationManager } from "../page-translation"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { bindTranslationShortcutKey } from "../bind-translation-shortcut"
 
-const {
-  mockGetLocalConfig,
-  mockRegister,
-  mockUnregister,
-} = vi.hoisted(() => ({
+const { mockGetLocalConfig } = vi.hoisted(() => ({
   mockGetLocalConfig: vi.fn(),
-  mockRegister: vi.fn(),
-  mockUnregister: vi.fn(),
 }))
-
-vi.mock("@tanstack/hotkeys", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/hotkeys")>()
-
-  return {
-    ...actual,
-    HotkeyManager: {
-      getInstance: () => ({
-        register: mockRegister,
-      }),
-    },
-  }
-})
 
 vi.mock("@/utils/config/storage", () => ({
   getLocalConfig: mockGetLocalConfig,
@@ -37,87 +19,64 @@ function createManager(isActive = false): PageTranslationManager {
   } as unknown as PageTranslationManager
 }
 
+function press(target: EventTarget, init: KeyboardEventInit) {
+  const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init })
+  target.dispatchEvent(event)
+  return event
+}
+
 describe("bindTranslationShortcutKey", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockRegister.mockReturnValue({
-      unregister: mockUnregister,
-    })
+    mockGetLocalConfig.mockResolvedValue({ translate: { page: { shortcut: "Alt+E" } } })
+    document.body.innerHTML = ""
   })
 
-  it("registers the page shortcut with the TanStack manager options", async () => {
-    mockGetLocalConfig.mockResolvedValue({
-      translate: {
-        page: {
-          shortcut: "Mod+E",
-        },
-      },
-    })
-
+  it("starts translation on the shortcut and swallows the key press", async () => {
     const manager = createManager(false)
     const cleanup = await bindTranslationShortcutKey(manager)
 
-    expect(mockRegister).toHaveBeenCalledWith(
-      "Mod+E",
-      expect.any(Function),
-      expect.objectContaining({
-        ignoreInputs: true,
-        preventDefault: true,
-        stopPropagation: true,
-      }),
-    )
+    const event = press(document.body, { key: "e", altKey: true })
+
+    expect(manager.start).toHaveBeenCalledTimes(1)
+    expect(event.defaultPrevented).toBe(true)
 
     cleanup()
-    expect(mockUnregister).toHaveBeenCalled()
+    press(document.body, { key: "e", altKey: true })
+    expect(manager.start).toHaveBeenCalledTimes(1)
   })
 
-  it("toggles page translation through the registered callback", async () => {
-    mockGetLocalConfig.mockResolvedValue({
-      translate: {
-        page: {
-          shortcut: "Mod+E",
-        },
-      },
-    })
+  it("stops translation when it is active", async () => {
+    const manager = createManager(true)
+    await bindTranslationShortcutKey(manager)
 
-    const inactiveManager = createManager(false)
-    await bindTranslationShortcutKey(inactiveManager)
-    const startCallback = mockRegister.mock.calls[0]?.[1]
-    startCallback?.({} as KeyboardEvent, { hotkey: "Mod+E" })
-    expect(inactiveManager.start).toHaveBeenCalledTimes(1)
+    press(document.body, { key: "E", altKey: true })
 
-    vi.clearAllMocks()
-    mockRegister.mockReturnValue({
-      unregister: mockUnregister,
-    })
-    mockGetLocalConfig.mockResolvedValue({
-      translate: {
-        page: {
-          shortcut: "Mod+E",
-        },
-      },
-    })
-
-    const activeManager = createManager(true)
-    await bindTranslationShortcutKey(activeManager)
-    const stopCallback = mockRegister.mock.calls[0]?.[1]
-    stopCallback?.({} as KeyboardEvent, { hotkey: "Mod+E" })
-    expect(activeManager.stop).toHaveBeenCalledTimes(1)
+    expect(manager.stop).toHaveBeenCalledTimes(1)
+    expect(manager.start).not.toHaveBeenCalled()
   })
 
-  it("skips registration when the shortcut is empty", async () => {
-    mockGetLocalConfig.mockResolvedValue({
-      translate: {
-        page: {
-          shortcut: "",
-        },
-      },
-    })
+  it("ignores other keys, extra modifiers and presses inside inputs", async () => {
+    const manager = createManager(false)
+    await bindTranslationShortcutKey(manager)
+    const input = document.createElement("input")
+    document.body.append(input)
 
-    const cleanup = await bindTranslationShortcutKey(createManager(false))
+    press(document.body, { key: "e" })
+    press(document.body, { key: "e", altKey: true, shiftKey: true })
+    press(input, { key: "e", altKey: true })
 
-    expect(mockRegister).not.toHaveBeenCalled()
+    expect(manager.start).not.toHaveBeenCalled()
+  })
+
+  it("does nothing when the shortcut is empty", async () => {
+    mockGetLocalConfig.mockResolvedValue({ translate: { page: { shortcut: "" } } })
+    const manager = createManager(false)
+    const cleanup = await bindTranslationShortcutKey(manager)
+
+    press(document.body, { key: "e", altKey: true })
+
+    expect(manager.start).not.toHaveBeenCalled()
     cleanup()
-    expect(mockUnregister).not.toHaveBeenCalled()
   })
 })

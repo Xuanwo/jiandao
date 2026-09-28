@@ -4,7 +4,6 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { ThemeProvider } from "@/components/providers/theme-provider"
-import { TooltipProvider } from "@/components/ui/base-ui/tooltip"
 import { configAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import App from "../app"
@@ -25,9 +24,7 @@ function renderPopup({ config = DEFAULT_CONFIG, enabled = false, translatable = 
   return render(
     <Provider store={store}>
       <ThemeProvider>
-        <TooltipProvider>
-          <App />
-        </TooltipProvider>
+        <App />
       </ThemeProvider>
     </Provider>,
   )

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -9,6 +8,17 @@
 @custom-variant data-checked (&:where([data-checked]:not([data-checked="false"])));
 @custom-variant data-unchecked (&:where([data-unchecked]:not([data-unchecked="false"])));
 @custom-variant data-disabled (&:where([data-disabled]:not([data-disabled="false"])));
+
+@keyframes plainly-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
 @utility no-scrollbar {
   -ms-overflow-style: none;

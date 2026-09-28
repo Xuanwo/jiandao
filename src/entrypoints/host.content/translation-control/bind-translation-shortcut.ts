@@ -1,14 +1,13 @@
-import type { Hotkey } from "@tanstack/hotkeys"
 import type { PageTranslationManager } from "./page-translation"
-import { HotkeyManager } from "@tanstack/hotkeys"
 import { getLocalConfig } from "@/utils/config/storage"
+import { eventMatchesHotkey, isEditableTarget } from "@/utils/hotkeys"
 import { isPageTranslationShortcutEmpty, isValidConfiguredPageTranslationShortcut } from "@/utils/page-translation-shortcut"
 
 /**
- * Binds page translation shortcut key from the given config.
- * Uses sync cached config inside the hotkey callback to avoid async overhead.
+ * Toggles page translation on the configured shortcut. Typing into a field
+ * never triggers it, and a matched press does not reach the page.
  */
-export async function bindTranslationShortcutKey(pageTranslationManager: PageTranslationManager) {
+export async function bindTranslationShortcutKey(pageTranslationManager: PageTranslationManager, target: Document = document) {
   const config = await getLocalConfig()
   if (!config || isPageTranslationShortcutEmpty(config.translate.page.shortcut)) {
     return () => {}
@@ -19,24 +18,21 @@ export async function bindTranslationShortcutKey(pageTranslationManager: PageTra
     return () => {}
   }
 
-  const registration = HotkeyManager.getInstance().register(
-    shortcut as Hotkey,
-    () => {
-      if (pageTranslationManager.isActive) {
-        pageTranslationManager.stop()
-      }
-      else {
-        void pageTranslationManager.start()
-      }
-    },
-    {
-      ignoreInputs: true,
-      preventDefault: true,
-      stopPropagation: true,
-    },
-  )
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || event.repeat || isEditableTarget(event.target) || !eventMatchesHotkey(event, shortcut))
+      return
+    event.preventDefault()
+    event.stopPropagation()
+    if (pageTranslationManager.isActive) {
+      pageTranslationManager.stop()
+    }
+    else {
+      void pageTranslationManager.start()
+    }
+  }
 
+  target.addEventListener("keydown", onKeyDown, true)
   return () => {
-    registration.unregister()
+    target.removeEventListener("keydown", onKeyDown, true)
   }
 }

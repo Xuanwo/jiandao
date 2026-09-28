@@ -1,5 +1,5 @@
-import { toast } from "sonner"
 import { i18n } from "#imports"
+import { toast } from "@/components/toast"
 
 interface NumberSettingProps {
   id: string

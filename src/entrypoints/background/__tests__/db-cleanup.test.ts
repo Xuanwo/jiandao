@@ -4,11 +4,9 @@ const alarmsGetMock = vi.fn()
 const alarmsCreateMock = vi.fn()
 const alarmsAddListenerMock = vi.fn()
 
-const translationDeleteMock = vi.fn()
-const translationWhereMock = vi.fn()
+const translationDeleteOlderThanMock = vi.fn()
 
-const summaryDeleteMock = vi.fn()
-const summaryWhereMock = vi.fn()
+const summaryDeleteOlderThanMock = vi.fn()
 
 const loggerInfoMock = vi.fn()
 const loggerErrorMock = vi.fn()
@@ -37,14 +35,14 @@ vi.mock("wxt/browser", () => ({
   },
 }))
 
-vi.mock("@/utils/db/dexie/db", () => ({
-  db: {
+vi.mock("@/utils/db/cache-db", () => ({
+  cacheDb: {
     translationCache: {
-      where: translationWhereMock,
+      deleteOlderThan: translationDeleteOlderThanMock,
       clear: vi.fn(),
     },
     articleSummaryCache: {
-      where: summaryWhereMock,
+      deleteOlderThan: summaryDeleteOlderThanMock,
       clear: vi.fn(),
     },
   },
@@ -65,19 +63,8 @@ describe("setUpDatabaseCleanup", () => {
     alarmsGetMock.mockResolvedValue(null)
     alarmsCreateMock.mockResolvedValue(undefined)
 
-    translationDeleteMock.mockResolvedValue(0)
-    translationWhereMock.mockReturnValue({
-      below: () => ({
-        delete: translationDeleteMock,
-      }),
-    })
-
-    summaryDeleteMock.mockResolvedValue(0)
-    summaryWhereMock.mockReturnValue({
-      below: () => ({
-        delete: summaryDeleteMock,
-      }),
-    })
+    translationDeleteOlderThanMock.mockResolvedValue(0)
+    summaryDeleteOlderThanMock.mockResolvedValue(0)
   })
 
   it("does not run cleanup immediately on setup", async () => {
@@ -87,8 +74,8 @@ describe("setUpDatabaseCleanup", () => {
     expect(alarmsCreateMock).toHaveBeenCalledTimes(2)
     expect(alarmsAddListenerMock).toHaveBeenCalledTimes(1)
 
-    expect(translationWhereMock).not.toHaveBeenCalled()
-    expect(summaryWhereMock).not.toHaveBeenCalled()
+    expect(translationDeleteOlderThanMock).not.toHaveBeenCalled()
+    expect(summaryDeleteOlderThanMock).not.toHaveBeenCalled()
   })
 
   it("does not recreate alarms when they already exist", async () => {
@@ -120,10 +107,10 @@ describe("setUpDatabaseCleanup", () => {
     }
 
     await alarmListener({ name: TRANSLATION_CACHE_CLEANUP_ALARM })
-    expect(translationWhereMock).toHaveBeenCalledTimes(1)
-    expect(summaryWhereMock).not.toHaveBeenCalled()
+    expect(translationDeleteOlderThanMock).toHaveBeenCalledTimes(1)
+    expect(summaryDeleteOlderThanMock).not.toHaveBeenCalled()
 
     await alarmListener({ name: SUMMARY_CACHE_CLEANUP_ALARM })
-    expect(summaryWhereMock).toHaveBeenCalledTimes(1)
+    expect(summaryDeleteOlderThanMock).toHaveBeenCalledTimes(1)
   })
 })

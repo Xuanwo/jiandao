@@ -1,8 +1,8 @@
-import { isModifierKey } from "@tanstack/hotkeys"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { i18n } from "#imports"
-import { Input } from "@/components/ui/base-ui/input"
+import { isModifierKey } from "@/utils/hotkeys"
 import { formatPageTranslationShortcut, isValidConfiguredPageTranslationShortcut, keyboardEventToPageTranslationShortcut } from "@/utils/page-translation-shortcut"
+import { cn } from "@/utils/styles/utils"
 
 const CLEAR_KEYS = new Set(["Backspace", "Delete"])
 
@@ -111,10 +111,10 @@ export function ShortcutKeyRecorder(
     : initialShortcutKey
 
   return (
-    <Input
+    <input
       ref={inputRef}
       id={id}
-      className={className}
+      className={cn("h-8 w-full min-w-0 rounded-md border border-input bg-transparent px-2.5 py-1 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50", className)}
       onFocus={startRecord}
       onBlur={handleBlur}
       value={formatPageTranslationShortcut(inRecording ? draftShortcut : shortcutKey)}

@@ -1,101 +1,55 @@
-/**
- * CSS Linter for CodeMirror
- *
- * Provides real-time CSS syntax validation in the editor.
- * Can also be used standalone for validation outside the editor.
- */
-
-import type { Diagnostic } from "@codemirror/lint"
-import type { EditorView } from "@codemirror/view"
-import { linter } from "@codemirror/lint"
-import * as csstree from "css-tree"
-
-export interface CSSLintError {
-  message: string
-  line: number
-  column: number
-  severity: "error" | "warning"
-}
-
 export interface CSSLintResult {
   valid: boolean
-  errors: CSSLintError[]
+  errors: string[]
+}
+
+/** Counts top-level `{ … }` blocks, i.e. the rules the author wrote, ignoring braces inside strings and comments. */
+function countAuthoredRules(css: string): { rules: number, balanced: boolean } {
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, "\"\"")
+  let depth = 0
+  let rules = 0
+  for (const char of source) {
+    if (char === "{") {
+      if (depth === 0)
+        rules += 1
+      depth += 1
+    }
+    else if (char === "}") {
+      depth -= 1
+      if (depth < 0)
+        return { rules, balanced: false }
+    }
+  }
+  return { rules, balanced: depth === 0 }
 }
 
 /**
- * Lint CSS and return errors
- * Can be used standalone without CodeMirror
+ * Checks custom CSS the way the page will read it: the browser's own parser
+ * drops what it cannot understand, so a rule that disappears between the
+ * text and the parsed sheet is an error worth showing before saving.
  */
 export function lintCSS(css: string): CSSLintResult {
-  const errors: CSSLintError[] = []
-
-  if (!css.trim()) {
+  if (!css.trim())
     return { valid: true, errors: [] }
-  }
 
+  const { rules, balanced } = countAuthoredRules(css)
+  if (!balanced)
+    return { valid: false, errors: ["Unbalanced braces"] }
+  if (rules === 0)
+    return { valid: false, errors: ["No CSS rule found; declarations belong inside a selector { … } block"] }
+
+  if (typeof CSSStyleSheet === "undefined" || !("replaceSync" in CSSStyleSheet.prototype))
+    return { valid: true, errors: [] }
+
+  const sheet = new CSSStyleSheet()
   try {
-    // Parse CSS with strict mode to catch all errors
-    csstree.parse(css, {
-      parseAtrulePrelude: true,
-      parseRulePrelude: true,
-      parseValue: true,
-      parseCustomProperty: true,
-      onParseError: (error) => {
-        const err = error as any
-        errors.push({
-          message: error.message,
-          line: err.line || 1,
-          column: err.column || 1,
-          severity: "error",
-        })
-      },
-    })
-
-    // If parsing succeeded but there were errors in onParseError, the CSS is invalid
-    // css-tree can recover from some errors, but we want to report them all
+    sheet.replaceSync(css)
   }
   catch (error) {
-    // Catch fatal parsing errors (e.g., completely broken CSS)
-    const err = error as any
-    errors.push({
-      message: err.message || `Failed to parse CSS: ${(error as Error).message}`,
-      line: err.line || 1,
-      column: err.column || 1,
-      severity: "error",
-    })
+    return { valid: false, errors: [error instanceof Error ? error.message : String(error)] }
   }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  }
-}
-
-/**
- * CodeMirror linter extension
- * Shows syntax errors with red squiggly lines in the editor
- */
-export function cssLinter() {
-  return linter((view: EditorView) => {
-    const diagnostics: Diagnostic[] = []
-    const css = view.state.doc.toString()
-
-    const result = lintCSS(css)
-
-    for (const error of result.errors) {
-      // Convert line/column to document position
-      const line = view.state.doc.line(error.line)
-      const from = line.from + error.column - 1
-      const to = Math.min(from + 10, line.to) // Highlight ~10 chars or until end of line
-
-      diagnostics.push({
-        from,
-        to,
-        severity: error.severity,
-        message: error.message,
-      })
-    }
-
-    return diagnostics
-  })
+  const parsed = sheet.cssRules.length
+  if (parsed < rules)
+    return { valid: false, errors: [`${rules - parsed} of ${rules} rules could not be parsed`] }
+  return { valid: true, errors: [] }
 }

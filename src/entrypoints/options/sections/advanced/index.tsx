@@ -1,9 +1,9 @@
-import { IconChevronDown } from "@tabler/icons-react"
 import { useAtom, useSetAtom } from "jotai"
 import { useState } from "react"
 import { i18n } from "#imports"
+import { ConfirmAction } from "@/components/confirm-action"
+import { IconChevronDown } from "@/components/icons"
 import { SegmentedControl } from "@/components/segmented-control"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/base-ui/collapsible"
 import { pageTranslateRangeSchema } from "@/types/config/translate"
 import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
@@ -24,7 +24,6 @@ import {
 import { sendMessage } from "@/utils/message"
 import { deepMerge } from "@/utils/object"
 import { cn } from "@/utils/styles/utils"
-import { ConfirmAction } from "../../components/confirm-action"
 import { NumberSetting } from "../../components/number-setting"
 
 const RANGE_LABEL_KEY = {
@@ -55,12 +54,12 @@ export function AdvancedSection() {
 
   return (
     <section id="advanced" className="flex scroll-mt-8 flex-col gap-3">
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="flex cursor-pointer items-center gap-1.5 text-left">
-          <IconChevronDown className={cn("size-3.5 text-muted-foreground transition-transform", !open && "-rotate-90")} aria-hidden="true" />
-          <h2 className="text-[15px] font-semibold">{i18n.t("options.advanced.title")}</h2>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
+      <button type="button" aria-expanded={open} aria-controls="advanced-settings" onClick={() => setOpen(current => !current)} className="flex cursor-pointer items-center gap-1.5 text-left">
+        <IconChevronDown className={cn("size-3.5 text-muted-foreground transition-transform", !open && "-rotate-90")} aria-hidden="true" />
+        <h2 className="text-[15px] font-semibold">{i18n.t("options.advanced.title")}</h2>
+      </button>
+      {open && (
+        <div id="advanced-settings">
           <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2">
             <div className="col-span-full flex items-center justify-between gap-3">
               <span className="text-[13px]">{i18n.t("options.reading.range.title")}</span>
@@ -150,7 +149,7 @@ export function AdvancedSection() {
               <span className="text-[13px]">{i18n.t("options.advanced.cache.title")}</span>
               <ConfirmAction
                 disabled={clearing}
-                trigger={<button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs hover:bg-muted">{clearing ? i18n.t("options.advanced.cache.clearing") : i18n.t("options.advanced.cache.clear")}</button>}
+                trigger={props => <button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs hover:bg-muted" {...props}>{clearing ? i18n.t("options.advanced.cache.clearing") : i18n.t("options.advanced.cache.clear")}</button>}
                 title={i18n.t("options.advanced.cache.dialog.title")}
                 description={i18n.t("options.advanced.cache.dialog.description")}
                 confirmLabel={i18n.t("options.advanced.cache.dialog.confirm")}
@@ -161,7 +160,7 @@ export function AdvancedSection() {
             <DangerRow>
               <span className="text-[13px]">{i18n.t("options.reset.title")}</span>
               <ConfirmAction
-                trigger={<button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs text-destructive hover:bg-muted">{i18n.t("options.reset.dialog.confirm")}</button>}
+                trigger={props => <button type="button" className="rounded-md border border-border bg-card px-2.5 py-1 text-xs text-destructive hover:bg-muted" {...props}>{i18n.t("options.reset.dialog.confirm")}</button>}
                 title={i18n.t("options.reset.dialog.title")}
                 description={i18n.t("options.reset.dialog.description")}
                 confirmLabel={i18n.t("options.reset.dialog.confirm")}
@@ -170,8 +169,8 @@ export function AdvancedSection() {
               />
             </DangerRow>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+      )}
     </section>
   )
 }

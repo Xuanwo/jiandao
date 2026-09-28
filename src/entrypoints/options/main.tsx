@@ -4,10 +4,9 @@ import type { ThemeMode } from "@/types/config/theme"
 import { Provider as JotaiProvider } from "jotai"
 import { useHydrateAtoms } from "jotai/utils"
 import * as React from "react"
-import AppToast from "@/components/app-toast"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { RecoveryBoundary } from "@/components/recovery/recovery-boundary"
-import { TooltipProvider } from "@/components/ui/base-ui/tooltip"
+import { Toasts } from "@/components/toast"
 import { configAtom } from "@/utils/atoms/config"
 import { baseThemeModeAtom } from "@/utils/atoms/theme"
 import { getLocalConfig } from "@/utils/config/storage"
@@ -49,12 +48,10 @@ async function initApp() {
       <JotaiProvider>
         <HydrateAtoms initialValues={[[configAtom, config], [baseThemeModeAtom, themeMode]]}>
           <ThemeProvider>
-            <TooltipProvider>
-              <AppToast />
-              <RecoveryBoundary>
-                <App />
-              </RecoveryBoundary>
-            </TooltipProvider>
+            <Toasts />
+            <RecoveryBoundary>
+              <App />
+            </RecoveryBoundary>
           </ThemeProvider>
         </HydrateAtoms>
       </JotaiProvider>

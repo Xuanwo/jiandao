@@ -1,23 +1,12 @@
-import { IconAlertCircle } from "@tabler/icons-react"
 import { useSetAtom } from "jotai"
 import { useState } from "react"
-import { toast } from "sonner"
 import { i18n } from "#imports"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/base-ui/alert-dialog"
-import { Button } from "@/components/ui/base-ui/button"
+import { ConfirmAction } from "@/components/confirm-action"
+import { IconAlertCircle } from "@/components/icons"
+import { toast } from "@/components/toast"
+import { Button } from "@/components/ui/button"
 import { writeConfigAtom } from "@/utils/atoms/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
-import { Alert, AlertDescription, AlertTitle } from "../ui/base-ui/alert"
 
 interface RecoveryFallbackProps {
   error: Error | null
@@ -52,11 +41,11 @@ export function RecoveryFallback({ error, onRecovered }: RecoveryFallbackProps) 
         </div>
 
         {error?.message && (
-          <Alert variant="destructive">
-            <IconAlertCircle />
-            <AlertTitle>{i18n.t("errorRecovery.errorDetails")}</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
-          </Alert>
+          <div role="alert" className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5 rounded-lg border border-destructive bg-destructive/5 px-4 py-3 text-left text-sm text-destructive">
+            <IconAlertCircle className="row-span-2 size-4 translate-y-0.5" />
+            <div className="font-medium">{i18n.t("errorRecovery.errorDetails")}</div>
+            <div className="min-w-0 break-words text-card-foreground [overflow-wrap:anywhere]">{error.message}</div>
+          </div>
         )}
 
         <div className="flex flex-col gap-2">
@@ -64,29 +53,15 @@ export function RecoveryFallback({ error, onRecovered }: RecoveryFallbackProps) 
           <Button onClick={() => window.location.reload()}>
             {i18n.t("errorRecovery.refreshPage")}
           </Button>
-          <AlertDialog>
-            <AlertDialogTrigger render={<Button variant="destructive" disabled={isResetting} />}>
-              {i18n.t("errorRecovery.resetAction")}
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{i18n.t("errorRecovery.resetDialog.title")}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {i18n.t("errorRecovery.resetDialog.description")}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{i18n.t("errorRecovery.resetDialog.cancel")}</AlertDialogCancel>
-                <AlertDialogAction
-                  variant="destructive"
-                  onClick={handleResetConfig}
-                  disabled={isResetting}
-                >
-                  {i18n.t("errorRecovery.resetDialog.confirm")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <ConfirmAction
+            disabled={isResetting}
+            trigger={props => <Button variant="destructive" {...props}>{i18n.t("errorRecovery.resetAction")}</Button>}
+            title={i18n.t("errorRecovery.resetDialog.title")}
+            description={i18n.t("errorRecovery.resetDialog.description")}
+            confirmLabel={i18n.t("errorRecovery.resetDialog.confirm")}
+            cancelLabel={i18n.t("errorRecovery.resetDialog.cancel")}
+            onConfirm={handleResetConfig}
+          />
         </div>
       </div>
     </div>

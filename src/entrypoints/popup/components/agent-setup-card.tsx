@@ -1,7 +1,7 @@
-import { IconCheck, IconCopy } from "@tabler/icons-react"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useId, useMemo, useState } from "react"
 import { i18n } from "#imports"
+import { IconCheck, IconCopy } from "@/components/icons"
 import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
 import { clearClipboard, copyText } from "@/utils/clipboard"
 import { buildAgentInstructions } from "@/utils/setup-agent-instructions"

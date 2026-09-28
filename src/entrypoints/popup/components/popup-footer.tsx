@@ -1,7 +1,7 @@
 import type { ProviderConfig } from "@/types/config/provider"
-import { IconSettings } from "@tabler/icons-react"
 import { useAtomValue } from "jotai"
 import { i18n } from "#imports"
+import { IconSettings } from "@/components/icons"
 import { featureProviderConfigAtom } from "@/utils/atoms/provider"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { openOptionsPage } from "@/utils/navigation"

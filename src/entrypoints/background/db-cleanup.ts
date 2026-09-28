@@ -1,5 +1,5 @@
 import { browser } from "#imports"
-import { db } from "@/utils/db/dexie/db"
+import { cacheDb } from "@/utils/db/cache-db"
 import { logger } from "@/utils/logger"
 
 export const CHECK_INTERVAL_MINUTES = 24 * 60
@@ -45,10 +45,7 @@ async function cleanupOldTranslationCache() {
     cutoffDate.setTime(cutoffDate.getTime() - TRANSLATION_CACHE_MAX_AGE_MINUTES * 60 * 1000)
 
     // Delete all cache entries older than the cutoff date
-    const deletedCount = await db.translationCache
-      .where("createdAt")
-      .below(cutoffDate)
-      .delete()
+    const deletedCount = await cacheDb.translationCache.deleteOlderThan(cutoffDate)
 
     if (deletedCount > 0) {
       logger.info(`Cache cleanup: Deleted ${deletedCount} old translation cache entries`)
@@ -62,7 +59,7 @@ async function cleanupOldTranslationCache() {
 export async function cleanupAllTranslationCache() {
   try {
     // Delete all translation cache entries
-    await db.translationCache.clear()
+    await cacheDb.translationCache.clear()
 
     logger.info(`Cache cleanup: Deleted all translation cache entries`)
   }
@@ -78,10 +75,7 @@ async function cleanupOldSummaryCache() {
     cutoffDate.setTime(cutoffDate.getTime() - SUMMARY_CACHE_MAX_AGE_MINUTES * 60 * 1000)
 
     // Delete all summary cache entries older than the cutoff date
-    const deletedCount = await db.articleSummaryCache
-      .where("createdAt")
-      .below(cutoffDate)
-      .delete()
+    const deletedCount = await cacheDb.articleSummaryCache.deleteOlderThan(cutoffDate)
 
     if (deletedCount > 0) {
       logger.info(`Summary cache cleanup: Deleted ${deletedCount} old article summary cache entries`)
@@ -95,7 +89,7 @@ async function cleanupOldSummaryCache() {
 export async function cleanupAllSummaryCache() {
   try {
     // Delete all article summary cache entries
-    await db.articleSummaryCache.clear()
+    await cacheDb.articleSummaryCache.clear()
 
     logger.info(`Summary cache cleanup: Deleted all article summary cache entries`)
   }
