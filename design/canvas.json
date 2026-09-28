@@ -127,6 +127,20 @@
       "w": 1040,
       "x": 2160,
       "y": 780
+    },
+    "Page-Emphasis.dc.html": {
+      "h": 600,
+      "title": "页面内 · 词首强调（未翻译）：拉丁词的前一半加粗，标题不变",
+      "w": 880,
+      "x": 3280,
+      "y": 780
+    },
+    "Page-Emphasis-Translated.dc.html": {
+      "h": 680,
+      "title": "页面内 · 词首强调（双语对照）：原文拉丁词的前一半加粗，译文按同一规则，中文和标题不变",
+      "w": 880,
+      "x": 4240,
+      "y": 780
     }
   },
   "createdOnFiles": {
@@ -195,6 +209,8 @@
     "Page.dc.html",
     "Icon.dc.html",
     "Palette.dc.html",
+    "Page-Emphasis.dc.html",
+    "Page-Emphasis-Translated.dc.html",
     "Settings.dc.html",
     "Adaptive.dc.html",
     "Service-States.dc.html",
