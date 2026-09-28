@@ -3,16 +3,12 @@
 <head>
 <meta charset="utf-8">
 <title>Agent 配置流程</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 880px; height: 700px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column; gap: 22px;">
   <div style="display: flex; flex-direction: column; gap: 4px;">
     <h2 style="margin: 0; font-size: 15px; font-weight: 600;">agent 拿着 Key 对真实接口验证到通过，再把配置放进剪贴板</h2>
@@ -54,11 +50,5 @@ a{color:#2B45B8}a:hover{color:#1B2455}
     <div style="font-size: 12px; color: #626978;">所以只有首次配置和换 Key 时，剪贴板里才会出现明文 Key。</div>
   </div>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":700}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

@@ -15,7 +15,7 @@ function useScrollToHashSection() {
 /**
  * One page, ordered by how often a setting is touched: the service you
  * translate with, how translations read, and what the model is told.
- * Everything else adapts on its own; see design/Adaptive.dc.html.
+ * Everything else adapts on its own; see design/Adaptive.html.
  */
 export default function App() {
   useScrollToHashSection()

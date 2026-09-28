@@ -25,7 +25,7 @@ const MONO = "font-mono text-xs text-muted-foreground"
  * otherwise after "Edit". Its text is the service part of a setup document;
  * applying it first checks the connection and saves only when that works,
  * so a failed attempt never replaces the service in use. See
- * design/Service-States.dc.html.
+ * design/Service-States.html.
  */
 export function ServiceSection() {
   const config = useAtomValue(configAtom)

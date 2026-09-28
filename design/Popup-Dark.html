@@ -3,17 +3,13 @@
 <head>
 <meta charset="utf-8">
 <title>弹窗 · 深色</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#13151C}
 a{color:#9FB0FF}a:hover{color:#C4CEFF}
 button{font-family:inherit;cursor:pointer}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 320px; height: 300px; box-sizing: border-box; background: #13151C; color: #ECEEF4; font-size: 13px; display: flex; flex-direction: column; justify-content: space-between;">
   <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
     <div style="display: flex; align-items: center; gap: 8px;">
@@ -46,11 +42,5 @@ button{font-family:inherit;cursor:pointer}
     </button>
   </div>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":320,"height":300}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>

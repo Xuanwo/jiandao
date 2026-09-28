@@ -4,7 +4,7 @@ import { logger } from "@/utils/logger"
 /*
  * The toolbar icon is a page with two lines of text; on a tab that is
  * translated, the lower line becomes the vermilion translation strip
- * (design/Icon.dc.html, sources in design/assets/icon*.svg).
+ * (design/Icon.html, sources in design/assets/icon*.svg).
  */
 const IDLE_ICON = { 16: "/icon/16.png", 32: "/icon/32.png" }
 const TRANSLATED_ICON = { 16: "/icon/translated-16.png", 32: "/icon/translated-32.png" }

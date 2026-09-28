@@ -3,18 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>翻译服务 · 待应用</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
 <style>
 body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
 a{color:#2B45B8}a:hover{color:#1B2455}
 button,textarea{font-family:inherit}
 button{cursor:pointer}
 </style>
-</helmet>
+</head>
+<body>
 <div style="width: 720px; height: 440px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column;">
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务</h2>
@@ -26,11 +22,5 @@ button{cursor:pointer}
 }</textarea><div style="display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; align-items: baseline;"><span style="font-size: 12px; color: #626978;">应用后</span><div style="min-width: 0; display: flex; flex-direction: column; gap: 3px;"><div><span style="font-size: 13px; font-weight: 600; color: #151A2D;">OpenAI</span><span style="margin-left: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #626978;">gpt-6-luna</span></div><span style="font-size: 12px; color: #626978;">网页文本发往 api.openai.com<span style="color: #A3A9B5;"> · </span>新 Key<span style="color: #A3A9B5;"> · </span>已关闭思考</span></div></div><div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;"><div style="flex-grow: 1;"><button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; color: #626978;">复制给 agent 的说明</button></div><button type="button" style="height: 32px; padding: 0 14px; border: 1px solid #D5D9E1; border-radius: 8px; background: #FFFFFF; color: #151A2D; font-size: 13px;">取消</button><button type="button" style="height: 32px; padding: 0 16px; border: none; border-radius: 8px; background: #1B2455; color: #FFFFFF; font-size: 13px; font-weight: 600;">应用</button></div></div>
     </section>
 </div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":440}}'>
-class Component extends DCLogic {
-  renderVals() { return {}; }
-}
-</script>
 </body>
 </html>
