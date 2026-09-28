@@ -2,26 +2,22 @@
 minimumReleaseAge: 10080
 minimumReleaseAgeExcludePrune: true
 
-shellEmulator: true
-
 trustPolicy: no-downgrade
 trustPolicyExclude:
   # Manual re-release of 1.1.3 after an accidental breaking release of 1.1.4.
   # https://github.com/aklinker1/webext-core/issues/154
   - "@webext-core/isolated-element@1.1.5"
-  # v6 maintenance release published after v7 adopted provenance.
-  # https://github.com/npm/node-semver/releases/tag/v6.3.1
-  - semver@6.3.1
 
 # pnpm and Renovate both read the registry from this file.
 registry: https://npm.flatt.tech/
-# Keep dependency scripts disabled; native tools use their platform packages.
-allowBuilds:
-  esbuild: false
-  msw: false
-  spawn-sync: false
+shellEmulator: true
 
 # Pins the 3.x line to 3.2.1 for the coming vitest 5.0.2 update, because
 # 3.2.2 has no provenance.
 overrides:
   why-is-node-running@3: 3.2.1
+
+# Keep dependency scripts disabled; native tools use their platform packages.
+allowBuilds:
+  esbuild: false
+  msw: false

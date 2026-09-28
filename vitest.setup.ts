@@ -1,5 +1,5 @@
 import { vi } from "vitest"
-import "@testing-library/jest-dom"
+import "@testing-library/jest-dom/vitest"
 
 // Keep test output quiet by default. Individual tests can still spy on these
 // methods when they need to assert logging behavior.
@@ -60,8 +60,8 @@ vi.mock("#i18n", () => ({
 
 // Mock the fakeBrowser's i18n.getMessage method which is not implemented in fake-browser
 // This is used when WxtVitest plugin replaces browser imports with fake-browser
-vi.mock("wxt/testing", async () => {
-  const actual = await vi.importActual<any>("wxt/testing")
+vi.mock("wxt/testing/fake-browser", async () => {
+  const actual = await vi.importActual<typeof import("wxt/testing/fake-browser")>("wxt/testing/fake-browser")
   return {
     ...actual,
     fakeBrowser: {
@@ -96,7 +96,7 @@ class ESBuildAndJSDOMCompatibleTextEncoder extends TextEncoder {
     super()
   }
 
-  encode(input: string) {
+  override encode(input: string) {
     if (typeof input !== "string") {
       throw new TypeError("`input` must be a string")
     }
