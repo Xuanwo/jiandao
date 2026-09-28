@@ -3,43 +3,43 @@
   "attachments": {},
   "boards": {
     "Main.dc.html": {
-      "h": 400,
+      "h": 300,
       "title": "弹窗 · 就绪",
       "w": 320,
-      "x": 800,
+      "x": 400,
       "y": 0
     },
     "Page.dc.html": {
       "h": 600,
-      "title": "页面内 · 双语对照 + 工具栏状态点",
+      "title": "页面内 · 朱红译文细线 + 工具栏图标状态",
       "w": 880,
       "x": 0,
       "y": 780
     },
     "Popup-Dark.dc.html": {
-      "h": 400,
-      "title": "弹窗 · 深色",
-      "w": 320,
-      "x": 1600,
-      "y": 0
-    },
-    "Popup-Translating.dc.html": {
-      "h": 400,
-      "title": "弹窗 · 翻译中",
+      "h": 300,
+      "title": "弹窗 · 深色（跟随系统）",
       "w": 320,
       "x": 1200,
       "y": 0
     },
+    "Popup-Translating.dc.html": {
+      "h": 300,
+      "title": "弹窗 · 翻译中",
+      "w": 320,
+      "x": 800,
+      "y": 0
+    },
     "Settings.dc.html": {
-      "h": 1480,
-      "title": "设置 · 单页（高级展开）",
+      "h": 980,
+      "title": "设置 · 单页（翻译服务、阅读、译文质量；无高级、无外观）",
       "w": 1120,
       "x": 0,
       "y": 1760
     },
     "Popup-Setup-Agent.dc.html": {
-      "h": 440,
-      "title": "弹窗 · 首次配置（未粘贴）",
+      "h": 300,
+      "title": "弹窗 · 未配置（引导去设置页）",
       "w": 320,
       "x": 0,
       "y": 0
@@ -49,28 +49,84 @@
       "title": "流程 · 用户 → agent → 粘贴 → 预览 → 应用",
       "w": 880,
       "x": 1600,
-      "y": 3700
+      "y": 4020
     },
     "Settings-Agent.dc.html": {
-      "h": 580,
-      "title": "设置 · 翻译服务 · 粘贴配置后预览",
+      "h": 400,
+      "title": "翻译服务 · 未配置：直接显示输入框",
       "w": 720,
       "x": 0,
-      "y": 3700
-    },
-    "Popup-Setup-Pasted.dc.html": {
-      "h": 470,
-      "title": "弹窗 · 首次配置（已粘贴，一行预览）",
-      "w": 320,
-      "x": 400,
-      "y": 0
+      "y": 5060
     },
     "Settings-Failed.dc.html": {
-      "h": 580,
-      "title": "设置 · 翻译服务 · 应用后连接失败",
+      "h": 500,
+      "title": "翻译服务 · 应用失败：多一行连接结果，不保存",
+      "w": 720,
+      "x": 4000,
+      "y": 5060
+    },
+    "Settings-Edited.dc.html": {
+      "h": 440,
+      "title": "翻译服务 · 待应用：当前 / 应用后上下对照",
+      "w": 720,
+      "x": 3200,
+      "y": 5060
+    },
+    "Service-States.dc.html": {
+      "h": 620,
+      "title": "翻译服务 · 状态关系",
+      "w": 1520,
+      "x": 0,
+      "y": 4020
+    },
+    "Settings-Editing.dc.html": {
+      "h": 420,
+      "title": "翻译服务 · 修改中：当前一行 + 编辑框（已全选）",
+      "w": 720,
+      "x": 2400,
+      "y": 5060
+    },
+    "Settings-Idle.dc.html": {
+      "h": 240,
+      "title": "翻译服务 · 平时：预览 + 上次检查结果",
       "w": 720,
       "x": 800,
-      "y": 3700
+      "y": 5060
+    },
+    "Settings-Idle-Failed.dc.html": {
+      "h": 260,
+      "title": "翻译服务 · 平时：上次检查失败",
+      "w": 720,
+      "x": 1600,
+      "y": 5060
+    },
+    "Quality-Prompt-Editing.dc.html": {
+      "h": 740,
+      "title": "译文质量 · 修改提示词：原地展开两段文本",
+      "w": 720,
+      "x": 0,
+      "y": 5900
+    },
+    "Adaptive.dc.html": {
+      "h": 780,
+      "title": "去掉高级和外观：各项改由什么自动决定",
+      "w": 1040,
+      "x": 1200,
+      "y": 1760
+    },
+    "Icon.dc.html": {
+      "h": 640,
+      "title": "图标 · 16 / 32 / 48 / 128 与工具栏两种状态",
+      "w": 1120,
+      "x": 960,
+      "y": 780
+    },
+    "Palette.dc.html": {
+      "h": 640,
+      "title": "配色 · 浅色 / 深色",
+      "w": 1040,
+      "x": 2160,
+      "y": 780
     }
   },
   "createdOnFiles": {
@@ -84,15 +140,15 @@
   "notes": {
     "t-page": {
       "kind": "title1",
-      "maxW": 1520,
-      "text": "页面内：只留下译文、一根细线和一个状态点",
+      "maxW": 3200,
+      "text": "页面内、图标和配色：藏青是原文和操作，朱红只标译文",
       "w": 240,
       "x": 0,
       "y": 520
     },
     "t-popup": {
       "kind": "title1",
-      "maxW": 1920,
+      "maxW": 1520,
       "text": "弹窗：一句话式的顺序，从哪种语言 → 译成什么 → 怎么显示 → 翻译",
       "w": 240,
       "x": 0,
@@ -100,8 +156,8 @@
     },
     "t-settings": {
       "kind": "title1",
-      "maxW": 1520,
-      "text": "设置：一页到底，按使用频率排序，专家参数折叠",
+      "maxW": 2240,
+      "text": "设置：一页到底，按使用频率排序，没有需要用户调的参数",
       "w": 240,
       "x": 0,
       "y": 1500
@@ -109,23 +165,47 @@
     "t-agent": {
       "kind": "title1",
       "maxW": 2480,
-      "text": "Agent 配置：agent 产出一份 JSON，用户粘贴一次；简道翻译只负责预览和应用",
+      "text": "翻译服务：平时只显示预览，需要时原地出现编辑框；配置只含服务本身",
       "w": 240,
       "x": 0,
-      "y": 3440
+      "y": 3760
+    },
+    "t-service-states": {
+      "kind": "title1",
+      "maxW": 4720,
+      "text": "翻译服务一节的各个状态",
+      "w": 240,
+      "x": 0,
+      "y": 4800
+    },
+    "t-prompt": {
+      "kind": "title1",
+      "maxW": 1520,
+      "text": "译文质量：提示词平时只显示名称，需要时原地展开",
+      "w": 240,
+      "x": 0,
+      "y": 5640
     }
   },
   "order": [
     "Popup-Setup-Agent.dc.html",
-    "Popup-Setup-Pasted.dc.html",
     "Main.dc.html",
     "Popup-Translating.dc.html",
     "Popup-Dark.dc.html",
     "Page.dc.html",
+    "Icon.dc.html",
+    "Palette.dc.html",
     "Settings.dc.html",
+    "Adaptive.dc.html",
+    "Service-States.dc.html",
+    "Agent-Flow.dc.html",
     "Settings-Agent.dc.html",
+    "Settings-Idle.dc.html",
+    "Settings-Idle-Failed.dc.html",
+    "Settings-Editing.dc.html",
+    "Settings-Edited.dc.html",
     "Settings-Failed.dc.html",
-    "Agent-Flow.dc.html"
+    "Quality-Prompt-Editing.dc.html"
   ],
   "pages": [],
   "title": "Jiandao UI Redesign"

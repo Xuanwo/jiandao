@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>翻译服务 · 状态</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
+a{color:#2B45B8}a:hover{color:#1B2455}
+</style>
+</helmet>
+<div style="width: 1520px; height: 620px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务一节：平时只有预览，需要时才原地出现编辑框</h2>
+    <p style="margin: 0; font-size: 12px; color: #626978;">编辑框里只有翻译服务本身的字段（type、apiKey、model、baseURL、headers、body）。语言、显示方式和提示词不在这里。</p>
+  </div>
+  <svg width="1440" height="470" viewBox="0 0 1440 470" role="img" aria-label="翻译服务一节的状态关系">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0L10 5L0 10z" fill="#626978"></path>
+      </marker>
+    </defs>
+    <g font-size="13" fill="#151A2D">
+      <rect x="20" y="180" width="220" height="76" rx="12" fill="#FFFFFF" stroke="#C7863C" stroke-width="1.5"></rect>
+      <text x="40" y="210" font-weight="600">未配置</text>
+      <text x="40" y="234" font-size="12" fill="#626978">直接显示输入框和复制说明</text>
+
+      <rect x="500" y="180" width="260" height="76" rx="12" fill="#FFFFFF" stroke="#1B2455" stroke-width="1.5"></rect>
+      <text x="520" y="210" font-weight="600">待应用</text>
+      <text x="520" y="234" font-size="12" fill="#626978">当前 / 编辑框 / 应用后，上下对照</text>
+
+      <rect x="1020" y="20" width="300" height="76" rx="12" fill="#FFFFFF" stroke="#3F8F5A" stroke-width="1.5"></rect>
+      <text x="1040" y="50" font-weight="600">已配置（平时）</text>
+      <text x="1040" y="74" font-size="12" fill="#626978">预览 + 上次检查结果；测试连接、修改</text>
+
+      <rect x="1020" y="360" width="300" height="76" rx="12" fill="#FFFFFF" stroke="#D5D9E1" stroke-width="1.5"></rect>
+      <text x="1040" y="390" font-weight="600">编辑中</text>
+      <text x="1040" y="414" font-size="12" fill="#626978">预览收成一行“当前”，配置已全选</text>
+
+      <rect x="500" y="360" width="260" height="76" rx="12" fill="#FFFFFF" stroke="#B42318" stroke-width="1.5"></rect>
+      <text x="520" y="390" font-weight="600">应用失败</text>
+      <text x="520" y="414" font-size="12" fill="#626978">多一行“连接：失败，没有保存”</text>
+    </g>
+    <g fill="none" stroke="#626978" stroke-width="1.5" marker-end="url(#arrow)">
+      <path d="M240 218H496"></path>
+      <path d="M760 200C880 200 900 58 1016 58"></path>
+      <path d="M1140 96V356"></path>
+      <path d="M1200 360V100"></path>
+      <path d="M1020 398C900 398 880 240 764 240"></path>
+      <path d="M600 256V356"></path>
+      <path d="M660 360V260"></path>
+    </g>
+    <g font-size="12" fill="#626978">
+      <text x="300" y="208">粘贴或输入</text>
+      <text x="840" y="118">应用，连接成功</text>
+      <text x="1072" y="232">修改</text>
+      <text x="1212" y="232">取消</text>
+      <text x="850" y="300">内容与已存配置不同</text>
+      <text x="590" y="312" text-anchor="end">应用，连接失败</text>
+      <text x="672" y="312">改内容</text>
+    </g>
+  </svg>
+  <p style="margin: 0; font-size: 12px; line-height: 18px; color: #626978;">在“待应用”或“应用失败”时点“取消”，回到进入编辑前的状态（未配置或已配置）。应用时先测试连接，通过才保存，所以失败不会替换正在用的服务。<br>连接结果和检查时间随服务一起保存：应用成功时写入，“测试连接”随时重测并覆盖。打开设置页不发请求，只显示上次结果；从未检查过的服务显示“未检查”。</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":620}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

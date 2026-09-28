@@ -9,155 +9,68 @@
 <x-dc>
 <helmet>
 <style>
-body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FBFAF7}
-a{color:#8A6A1F}a:hover{color:#6B5218}
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
+a{color:#2B45B8}a:hover{color:#1B2455}
 button,input{font-family:inherit}
 button{cursor:pointer}
 </style>
 </helmet>
-<div style="width: 1120px; height: 1480px; box-sizing: border-box; background: #FBFAF7; color: #1C1B18; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
+<div style="width: 1120px; height: 980px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; display: flex; justify-content: center; padding: 48px 0 0 0;">
   <main style="width: 640px; display: flex; flex-direction: column; gap: 40px;">
 
     <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em;">设置</h1>
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务</h2>
-      <div style="display: flex; flex-direction: column; border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-        <div style="display: flex; align-items: center; gap: 16px; padding: 14px 16px;">
-          <div style="flex-grow: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            <span style="font-weight: 600;">DeepSeek</span>
-            <span style="margin-left: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #6B665C;">deepseek-flash</span>
-            <span style="margin-left: 8px; font-size: 12px; color: #6B665C;">· api.deepseek.com</span>
-          </div>
-          <button type="button" title="测试连接" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; border: none; background: transparent; padding: 0; font-size: 12px; color: #6B665C;">
-            <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #C9C4B9; display: inline-block;"></span>
-            <span>未测试</span>
-          </button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 20px; padding: 12px 16px; border-top: 1px solid #E7E3DB;">
-          <button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; color: #6B665C;">复制给 agent 的说明</button>
-          <button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; font-weight: 500; color: #8A6A1F;">粘贴配置</button>
-        </div>
-      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px 18px; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF;"><div style="display: flex; align-items: flex-start; gap: 16px;"><div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;"><div><span style="font-size: 14px; font-weight: 600; color: #151A2D;">DeepSeek</span><span style="margin-left: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #626978;">deepseek-flash</span></div><span style="font-size: 12px; color: #626978;">网页文本发往 api.deepseek.com<span style="color: #A3A9B5;"> · </span>Key sk-…a9f2<span style="color: #A3A9B5;"> · </span>已关闭思考</span><div style="display: flex; align-items: center; gap: 6px; font-size: 12px;"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #3F8F5A; display: inline-block; flex-shrink: 0;"></span><span style="color: #3F8F5A;">已连接</span><span style="color: #A3A9B5;">·</span><span style="color: #626978;">2 小时前检查</span></div></div><div style="display: flex; gap: 8px; flex-shrink: 0;"><button type="button" style="height: 32px; padding: 0 14px; border: 1px solid #D5D9E1; border-radius: 8px; background: #FFFFFF; color: #151A2D; font-size: 13px;">测试连接</button><button type="button" style="height: 32px; padding: 0 14px; border: 1px solid #D5D9E1; border-radius: 8px; background: #FFFFFF; color: #151A2D; font-size: 13px;">修改</button></div></div></div>
     </section>
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">阅读</h2>
-      <div style="display: flex; flex-direction: column; border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E7E3DB;">
+      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
           <div style="font-size: 13px; font-weight: 500;">显示方式</div>
-          <div role="group" aria-label="显示方式" style="display: flex; background: #F0EDE6; border-radius: 8px; padding: 2px; gap: 2px;">
-            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E7E3DB; border-radius: 6px; background: #FFFFFF; color: #1C1B18; font-size: 12px; font-weight: 500;">双语对照</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #6B665C; font-size: 12px; font-weight: 500;">仅译文</button>
+          <div role="group" aria-label="显示方式" style="display: flex; background: #EEF0F4; border-radius: 8px; padding: 2px; gap: 2px;">
+            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E3E6EC; border-radius: 6px; background: #FFFFFF; color: #151A2D; font-size: 12px; font-weight: 500;">双语对照</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #626978; font-size: 12px; font-weight: 500;">仅译文</button>
           </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #E7E3DB;">
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;">
           <div style="font-size: 13px; font-weight: 500;">译文样式</div>
           <div role="group" aria-label="译文样式" style="display: flex; flex-wrap: wrap; gap: 6px;">
-            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 12px; border: 1px solid #1C1B18; border-radius: 14px; background: #1C1B18; color: #FBFAF7; font-size: 12px;">左侧细线</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E7E3DB; border-radius: 14px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">无</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E7E3DB; border-radius: 14px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">淡化</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E7E3DB; border-radius: 14px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">着色</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E7E3DB; border-radius: 14px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">底色</button>
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E7E3DB; border-radius: 14px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">自定义 CSS</button>
+            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 12px; border: 1px solid #1B2455; border-radius: 14px; background: #1B2455; color: #FFFFFF; font-size: 12px;">左侧细线</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">无</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">淡化</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">着色</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">底色</button>
+            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 12px; border: 1px solid #E3E6EC; border-radius: 14px; background: #FFFFFF; color: #151A2D; font-size: 12px;">自定义 CSS</button>
           </div>
-          <div style="border-radius: 8px; background: #F5F3EE; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6;">
-            <div style="font-family: Georgia, 'Songti SC', serif; color: #1C1B18;">Reading and experience train your model of the world.</div>
-            <div style="border-left: 2px solid rgba(184, 137, 46, 0.55); padding-left: 10px; font-size: 13px;">阅读和经历训练的是你对世界的模型。</div>
+          <div style="border-radius: 8px; background: #F1F3F6; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6;">
+            <div style="font-family: Georgia, 'Songti SC', serif; color: #151A2D;">Reading and experience train your model of the world.</div>
+            <div style="border-left: 2px solid rgba(242, 74, 44, 0.75); padding-left: 10px; font-size: 13px;">阅读和经历训练的是你对世界的模型。</div>
           </div>
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
           <label for="shortcut" style="font-size: 13px; font-weight: 500;">快捷键</label>
-          <input id="shortcut" type="text" readonly value="⌥E" style="width: 112px; height: 32px; box-sizing: border-box; text-align: center; border: 1px solid #D9D4CA; border-radius: 8px; font-size: 13px; background: #FBFAF7; color: #1C1B18;">
+          <input id="shortcut" type="text" readonly value="⌥E" style="width: 112px; height: 32px; box-sizing: border-box; text-align: center; border: 1px solid #D5D9E1; border-radius: 8px; font-size: 13px; background: #F7F8FA; color: #151A2D;">
         </div>
       </div>
     </section>
 
     <section style="display: flex; flex-direction: column; gap: 12px;">
       <h2 style="margin: 0; font-size: 15px; font-weight: 600;">译文质量</h2>
-      <div style="display: flex; flex-direction: column; border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E7E3DB;">
-          <label for="context" style="font-size: 13px; font-weight: 500;">结合全文上下文</label>
-          <button type="button" id="context" role="switch" aria-checked="false" aria-label="结合全文上下文" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D9D4CA; position: relative; flex-shrink: 0;">
-            <span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span>
-          </button>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;">
-          <div style="font-size: 13px; font-weight: 500;">提示词</div>
-          <span style="font-size: 13px; color: #6B665C;">默认</span>
-        </div>
+      <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #E3E6EC;"><label for="context" style="font-size: 13px; font-weight: 500;">结合全文上下文</label><button type="button" id="context" role="switch" aria-checked="false" aria-label="结合全文上下文" style="width: 40px; height: 24px; border-radius: 12px; border: none; background: #D5D9E1; position: relative; flex-shrink: 0;"><span aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF;"></span></button></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px;"><div style="display: flex; align-items: baseline; gap: 10px; min-width: 0;"><span style="font-size: 13px; font-weight: 500;">提示词</span><span style="font-size: 13px; color: #626978;">默认</span></div><button type="button" style="height: 32px; padding: 0 14px; border: 1px solid #D5D9E1; border-radius: 8px; background: #FFFFFF; color: #151A2D; font-size: 13px;">修改</button></div>
       </div>
     </section>
 
-    <section style="display: flex; flex-direction: column; gap: 12px;">
-      <button type="button" aria-expanded="true" style="display: flex; align-items: center; gap: 6px; border: none; background: transparent; padding: 0; text-align: left; color: #1C1B18;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B665C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-        <h2 style="margin: 0; font-size: 15px; font-weight: 600;">高级</h2>
-      </button>
-      <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; padding: 16px;">
-        <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <span style="font-size: 13px;">翻译范围</span>
-          <div role="group" aria-label="翻译范围" style="display: flex; background: #F0EDE6; border-radius: 8px; padding: 2px; gap: 2px;">
-            <button type="button" aria-pressed="false" style="height: 28px; padding: 0 14px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #6B665C; font-size: 12px; font-weight: 500;">正文</button>
-            <button type="button" aria-pressed="true" style="height: 28px; padding: 0 14px; border: 1px solid #E7E3DB; border-radius: 6px; background: #FFFFFF; color: #1C1B18; font-size: 12px; font-weight: 500;">整页</button>
-          </div>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-rate" style="font-size: 13px;">每秒请求数</label>
-          <input id="adv-rate" type="number" value="8" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-capacity" style="font-size: 13px;">同时进行的请求上限</label>
-          <input id="adv-capacity" type="number" value="60" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-chars" style="font-size: 13px;">每次请求最多字符</label>
-          <input id="adv-chars" type="number" value="1000" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-items" style="font-size: 13px;">每次请求最多段落</label>
-          <input id="adv-items" type="number" value="4" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-margin" style="font-size: 13px;">提前翻译视口下方（px）</label>
-          <input id="adv-margin" type="number" value="1000" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-threshold" style="font-size: 13px;">可见比例达到多少才翻译</label>
-          <input id="adv-threshold" type="number" value="0" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-min-chars" style="font-size: 13px;">跳过少于 N 个字符的段落</label>
-          <input id="adv-min-chars" type="number" value="0" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-          <label for="adv-min-words" style="font-size: 13px;">跳过少于 N 个词的段落</label>
-          <input id="adv-min-words" type="number" value="0" style="width: 96px; height: 32px; box-sizing: border-box; border: 1px solid #D9D4CA; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #FBFAF7; text-align: right;">
-        </div>
-        <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid #E7E3DB;">
-          <span style="font-size: 13px;">译文缓存</span>
-          <button type="button" style="border: 1px solid #E7E3DB; background: #FFFFFF; color: #1C1B18; border-radius: 6px; font-size: 12px; padding: 4px 10px;">清除</button>
-        </div>
-        <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid #E7E3DB;">
-          <span style="font-size: 13px;">全部设置</span>
-          <button type="button" style="border: 1px solid #E7E3DB; background: #FFFFFF; color: #B4432F; border-radius: 6px; font-size: 12px; padding: 4px 10px;">重置</button>
-        </div>
-      </div>
-    </section>
 
-    <div style="display: flex; align-items: center; gap: 12px; border-top: 1px solid #E7E3DB; padding-top: 20px;">
-      <span style="font-size: 12px; color: #6B665C;">外观</span>
-      <div role="group" aria-label="外观" style="display: flex; background: #F0EDE6; border-radius: 8px; padding: 2px; gap: 2px;">
-        <button type="button" aria-pressed="true" style="height: 26px; padding: 0 10px; border: 1px solid #E7E3DB; border-radius: 6px; background: #FFFFFF; color: #1C1B18; font-size: 12px;">跟随系统</button>
-        <button type="button" aria-pressed="false" style="height: 26px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #6B665C; font-size: 12px;">浅色</button>
-        <button type="button" aria-pressed="false" style="height: 26px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #6B665C; font-size: 12px;">深色</button>
-      </div>
-    </div>
 
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1480}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":980}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>去掉高级设置</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
+a{color:#2B45B8}a:hover{color:#1B2455}
+</style>
+</helmet>
+<div style="width: 1040px; height: 780px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600;">设置页没有“高级”和“外观”。这些由简道翻译根据实际使用和系统自己决定</h2>
+    <p style="margin: 0; font-size: 12px; color: #626978;">已存配置里的旧值不再读取，也不迁移。</p>
+  </div>
+  <div style="display: flex; flex-direction: column; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 10px 16px; border-bottom: 1px solid #E3E6EC; background: #F1F3F6; font-size: 12px; color: #626978;"><div>原来的高级设置</div><div>以后由什么决定</div><div>现有基础</div></div>
+    <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">翻译范围（正文 / 整页）</div><div style="font-size: 13px; line-height: 19px;">能识别出正文（文章页）时只翻正文，识别不出就翻整页。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">已有正文提取启发式，目前默认整页。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">每秒请求数、同时进行的请求上限</div><div style="font-size: 13px; line-height: 19px;">从保守值起步。服务返回 429 或超时就减速，连续成功再逐步加回。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">已有 429 / 超时重试，但速率本身固定。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">每次请求最多字符、最多段落</div><div style="font-size: 13px; line-height: 19px;">默认值起步。某批因过长失败或译文段数对不上时，拆小重试，并在这个服务上沿用较小的批次。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">批次大小固定。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">提前翻译视口下方、可见比例</div><div style="font-size: 13px; line-height: 19px;">固定为内置值，不再暴露。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">当前默认值：1000 px、0。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">跳过少于 N 个字符 / 词的段落</div><div style="font-size: 13px; line-height: 19px;">内置规则：跳过纯数字、符号、代码和极短的界面文字。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">当前默认 0，即不跳过。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">译文缓存 · 清除</div><div style="font-size: 13px; line-height: 19px;">自动管理：过期清理；换模型或提示词后旧缓存自然不再命中。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">已有 7 天过期清理；缓存键已按模型请求生成。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; border-bottom: 1px solid #E3E6EC;"><div style="font-size: 13px; font-weight: 500;">外观（跟随系统 / 浅色 / 深色）</div><div style="font-size: 13px; line-height: 19px;">去掉。弹窗和设置页始终跟随系统主题；网页里的译文本来就跟着网页走。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">只影响弹窗和设置页，默认跟随系统。</div></div><div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) 220px; gap: 20px; padding: 12px 16px; "><div style="font-size: 13px; font-weight: 500;">全部设置 · 重置</div><div style="font-size: 13px; line-height: 19px;">去掉。翻译服务可以重新粘贴，提示词有“恢复默认”，其余设置都是一键可改的开关。</div><div style="font-size: 12px; line-height: 18px; color: #626978;">—</div></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1040,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

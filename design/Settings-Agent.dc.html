@@ -2,67 +2,27 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>设置 · 翻译服务 · 粘贴配置</title>
+<title>翻译服务 · 未配置</title>
 <script src="./support.js"></script>
 </head>
 <body>
 <x-dc>
 <helmet>
 <style>
-body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#FBFAF7}
-a{color:#8A6A1F}a:hover{color:#6B5218}
+body{margin:0;font-family:-apple-system,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;background:#F7F8FA}
+a{color:#2B45B8}a:hover{color:#1B2455}
 button,textarea{font-family:inherit}
 button{cursor:pointer}
 </style>
 </helmet>
-<div style="width: 720px; height: 580px; box-sizing: border-box; background: #FBFAF7; color: #1C1B18; font-size: 13px; padding: 40px; display: flex; flex-direction: column;">
-  <section style="display: flex; flex-direction: column; gap: 12px;">
-    <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务</h2>
-    <div style="display: flex; flex-direction: column; border: 1px solid #E7E3DB; border-radius: 12px; background: #FFFFFF; overflow: hidden;">
-      <div style="display: flex; align-items: center; gap: 16px; padding: 14px 16px;">
-        <div style="flex-grow: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          <span style="font-weight: 600;">OpenAI</span>
-          <span style="margin-left: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #6B665C;">gpt-6-luna</span>
-          <span style="margin-left: 8px; font-size: 12px; color: #6B665C;">· api.openai.com</span>
-        </div>
-        <span style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B665C;">
-          <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #C7863C; display: inline-block;"></span>
-          <span>未填密钥</span>
-        </span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 20px; padding: 12px 16px; border-top: 1px solid #E7E3DB;">
-        <button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; color: #6B665C;">复制给 agent 的说明</button>
-        <button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; font-weight: 500; color: #8A6A1F;">粘贴配置</button>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 12px; padding: 14px 16px; border-top: 1px solid #E7E3DB;">
-        <textarea aria-label="agent 生成的配置" spellcheck="false" style="height: 200px; box-sizing: border-box; resize: vertical; border: 1px solid #D9D4CA; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 18px; background: #FBFAF7; color: #1C1B18; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">{
-  "jiandao": 1,
-  "provider": {
-    "type": "deepseek",
-    "apiKey": "[YOUR KEY]",
-    "model": "deepseek-flash",
-    "body": { "thinking": { "type": "disabled" } }
-  },
-  "targetLanguage": "cmn",
-  "mode": "bilingual"
-}</textarea>
-        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 13px;">
-          <div>
-            <span style="font-weight: 600;">DeepSeek</span>
-            <span style="margin-left: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #6B665C;">deepseek-flash</span>
-          </div>
-          <div style="font-size: 12px; color: #6B665C;">网页文本发往 api.deepseek.com</div>
-        </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px;">
-          <button type="button" style="height: 32px; padding: 0 12px; border: 1px solid #D9D4CA; border-radius: 8px; background: #FFFFFF; color: #1C1B18; font-size: 13px;">取消</button>
-          <button type="button" style="height: 32px; padding: 0 14px; border: none; border-radius: 8px; background: #1C1B18; color: #FBFAF7; font-size: 13px; font-weight: 600;">应用</button>
-        </div>
-      </div>
-    </div>
-  </section>
+<div style="width: 720px; height: 400px; box-sizing: border-box; background: #F7F8FA; color: #151A2D; font-size: 13px; padding: 40px; display: flex; flex-direction: column;">
+    <section style="display: flex; flex-direction: column; gap: 12px;">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600;">翻译服务</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px 18px; border: 1px solid #E3E6EC; border-radius: 12px; background: #FFFFFF;"><div style="display: flex; flex-direction: column; gap: 4px;"><div style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600;"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #C7863C; display: inline-block; flex-shrink: 0;"></span><span>还没有翻译服务</span></div><div style="font-size: 12px; line-height: 18px; color: #626978;">把说明交给你的 agent。它用你的密钥验证好翻译服务的配置，放进剪贴板，你贴到下面。</div></div><textarea aria-label="翻译服务配置" spellcheck="false" placeholder="{ &quot;type&quot;: &quot;deepseek&quot;, &quot;apiKey&quot;: &quot;…&quot;, &quot;model&quot;: &quot;…&quot; }" style="width: 100%; height: 114px; box-sizing: border-box; resize: vertical; border: 1px solid #2B45B8; box-shadow: 0 0 0 3px rgba(43, 69, 184, 0.16); border-radius: 8px; padding: 11px 12px; font-size: 12px; line-height: 18px; background: #FFFFFF; color: #151A2D; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; outline: none;"></textarea><div style="display: flex; align-items: center; gap: 8px; padding-top: 4px;"><div style="flex-grow: 1;"><button type="button" style="border: none; background: transparent; padding: 0; font-size: 13px; color: #626978;">复制给 agent 的说明</button></div><button type="button" disabled style="height: 32px; padding: 0 16px; border: none; border-radius: 8px; background: #1B2455; color: #FFFFFF; font-size: 13px; font-weight: 600; opacity: 0.4; cursor: not-allowed;">应用</button></div></div>
+    </section>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":580}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":720,"height":400}}'>
 class Component extends DCLogic {
   renderVals() { return {}; }
 }
