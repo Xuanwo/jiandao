@@ -75,8 +75,8 @@ importers:
         specifier: ^7.1.5
         version: 7.1.5
       defuddle:
-        specifier: ^0.18.1
-        version: 0.18.1
+        specifier: ^0.19.1
+        version: 0.19.4
       dequal:
         specifier: ^2.0.3
         version: 2.0.3
@@ -2270,9 +2270,9 @@ packages:
   '@wxt-dev/storage@1.2.8':
     resolution: {integrity: sha512-GWCFKgF5+d7eslOxUDFC70ypA9njupmJb1nQM8uZoX0J3sWT2BO5xJLzb1sYahWAfID9p2BMtnUBN1lkWxPsbQ==}
 
-  '@xmldom/xmldom@0.8.13':
-    resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
-    engines: {node: '>=10.0.0'}
+  '@xmldom/xmldom@0.9.12':
+    resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
+    engines: {node: '>=14.6'}
 
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
@@ -2894,8 +2894,8 @@ packages:
   defu@6.1.7:
     resolution: {integrity: sha512-7z22QmUWiQ/2d0KkdYmANbRUVABpZ9SNYyH5vx6PZ+nE5bcC0l7uFvEfHlyld/HcGBFTL536ClDt3DEcSlEJAQ==}
 
-  defuddle@0.18.1:
-    resolution: {integrity: sha512-AvFPFOsoDjt5xUOA1QxzafSSzJ5dqEIC63yO72tHYtSjj1DYY/XM0XTPUCsHkm5A2f1X9ulBvoSVFJrd4s2ckA==}
+  defuddle@0.19.4:
+    resolution: {integrity: sha512-Jz98aWlyEeuWcg9u2AavCEKknviI9GijMkrGFPk0wi1Lkfr1DDDw6XM+ak44Ol8kBDmDJsvU9Su2eUY09Fvh3Q==}
     hasBin: true
 
   delayed-stream@1.0.0:
@@ -4316,8 +4316,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mathml-to-latex@1.5.0:
-    resolution: {integrity: sha512-rrWn0eEvcEcdMM4xfHcSGIy+i01DX9byOdXTLWg+w1iJ6O6ohP5UXY1dVzNUZLhzfl3EGcRekWLhY7JT5Omaew==}
+  mathml-to-latex@1.8.0:
+    resolution: {integrity: sha512-gQ0uK3zqB8HwlfaXJkEL5rgaZNbKUiBMmBP/B/W+b+t6KcseLSuYb1b0BjLgS9ZiQa24ePkqTX8/6FaQuDL7wQ==}
 
   mdast-util-find-and-replace@3.0.2:
     resolution: {integrity: sha512-Tmd1Vg/m3Xz43afeNxDIhWRtFZgM2VLyaf4vSTYwudTyeuTneoL3qtWMA5jeLyz/O1vDJmmV4QuScFCA2tBPwg==}
@@ -5450,8 +5450,8 @@ packages:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
 
-  temml@0.13.2:
-    resolution: {integrity: sha512-n8fDRSsLscq9nh9j6z+FgkCvFMT0IJm6GCgwfzh+7AHT3Sfb4jFTQlsA6hVcF2dYYr3b66oDBVES95RfoukyrA==}
+  temml@0.13.5:
+    resolution: {integrity: sha512-aPkDDgunanpLNL0ql32HbolqLep+w8DRcVXRql7rWrMt/PhczdLgL4UBYYVU3BYjCNjkGq4EqwIicu/zWr1iOg==}
     engines: {node: '>=18.13.0'}
 
   thread-stream@3.1.0:
@@ -8055,8 +8055,7 @@ snapshots:
       async-mutex: 0.5.0
       dequal: 2.0.3
 
-  '@xmldom/xmldom@0.8.13':
-    optional: true
+  '@xmldom/xmldom@0.9.12': {}
 
   '@yarnpkg/lockfile@1.1.0': {}
 
@@ -8610,13 +8609,13 @@ snapshots:
 
   defu@6.1.7: {}
 
-  defuddle@0.18.1:
+  defuddle@0.19.4:
     dependencies:
       commander: 12.1.0
+      mathml-to-latex: 1.8.0
     optionalDependencies:
       linkedom: 0.18.12
-      mathml-to-latex: 1.5.0
-      temml: 0.13.2
+      temml: 0.13.5
       turndown: 7.2.4
     transitivePeerDependencies:
       - canvas
@@ -10063,10 +10062,9 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mathml-to-latex@1.5.0:
+  mathml-to-latex@1.8.0:
     dependencies:
-      '@xmldom/xmldom': 0.8.13
-    optional: true
+      '@xmldom/xmldom': 0.9.12
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
@@ -11510,7 +11508,7 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  temml@0.13.2:
+  temml@0.13.5:
     optional: true
 
   thread-stream@3.1.0:
