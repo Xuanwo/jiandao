@@ -50,23 +50,11 @@
   --color-accent: var(--rf-accent);
   --color-accent-foreground: var(--rf-accent-foreground);
   --color-destructive: var(--rf-destructive);
-  --color-destructive-foreground: var(--rf-destructive-foreground);
   --color-border: var(--rf-border);
   --color-input: var(--rf-input);
   --color-ring: var(--rf-ring);
-  --color-chart-1: var(--rf-chart-1);
-  --color-chart-2: var(--rf-chart-2);
-  --color-chart-3: var(--rf-chart-3);
-  --color-chart-4: var(--rf-chart-4);
-  --color-chart-5: var(--rf-chart-5);
-  --color-sidebar: var(--rf-sidebar);
-  --color-sidebar-foreground: var(--rf-sidebar-foreground);
-  --color-sidebar-primary: var(--rf-sidebar-primary);
-  --color-sidebar-primary-foreground: var(--rf-sidebar-primary-foreground);
-  --color-sidebar-accent: var(--rf-sidebar-accent);
-  --color-sidebar-accent-foreground: var(--rf-sidebar-accent-foreground);
-  --color-sidebar-border: var(--rf-sidebar-border);
-  --color-sidebar-ring: var(--rf-sidebar-ring);
+  --color-success: var(--rf-success);
+  --color-attention: var(--rf-attention);
   --radius-sm: calc(var(--rf-radius) - 4px);
   --radius-md: calc(var(--rf-radius) - 2px);
   --radius-lg: var(--rf-radius);
@@ -74,11 +62,7 @@
   --radius-2xl: calc(var(--rf-radius) + 8px);
   --radius-3xl: calc(var(--rf-radius) + 12px);
   --radius-4xl: calc(var(--rf-radius) + 16px);
-  /* Additional theme variables */
-  --color-warning: var(--rf-warning);
-  --color-warning-foreground: var(--rf-warning-foreground);
   --color-link: var(--rf-link);
-  --shadow-floating: var(--rf-elevation-floating);
 }
 
 :root {
@@ -86,85 +70,61 @@
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Segoe UI",
     system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --rf-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  /* Warm neutral ground: paper white, near-black ink, one gold accent. */
-  --rf-background: oklch(0.985 0.004 90);
-  --rf-foreground: oklch(0.19 0.006 80);
-  --rf-card: oklch(1 0 0);
-  --rf-card-foreground: oklch(0.19 0.006 80);
-  --rf-popover: oklch(1 0 0);
-  --rf-popover-foreground: oklch(0.19 0.006 80);
-  --rf-primary: oklch(0.19 0.006 80);
-  --rf-primary-foreground: oklch(0.985 0.004 90);
-  --rf-brand: oklch(76.034% 0.12361 82.191);
-  --rf-brand-foreground: oklch(0.19 0.006 80);
-  --rf-secondary: oklch(0.955 0.006 85);
-  --rf-secondary-foreground: oklch(0.47 0.01 80);
-  --rf-muted: oklch(0.945 0.007 85);
-  --rf-muted-foreground: oklch(0.5 0.012 80);
-  --rf-accent: oklch(0.945 0.007 85);
-  --rf-accent-foreground: oklch(0.21 0.006 80);
-  --rf-destructive: oklch(0.55 0.19 30);
-  --rf-border: oklch(0.905 0.008 85);
-  --rf-input: oklch(0.86 0.01 85);
-  --rf-ring: oklch(0.7 0.02 82);
-  --rf-chart-1: oklch(89.215% 0.05562 82.191);
-  --rf-chart-2: oklch(82.026% 0.09271 82.191);
-  --rf-chart-3: oklch(76.034% 0.12361 82.191);
-  --rf-chart-4: oklch(57.026% 0.09271 82.191);
-  --rf-chart-5: oklch(38.017% 0.06181 82.191);
+  /*
+   * The logo's palette (design/Palette.dc.html): cool neutrals, a deep ink
+   * navy for filled controls, the logo navy for links and focus, and
+   * vermilion only for what marks a translation.
+   */
+  --rf-background: #f7f8fa;
+  --rf-foreground: #151a2d;
+  --rf-card: #ffffff;
+  --rf-card-foreground: #151a2d;
+  --rf-popover: #ffffff;
+  --rf-popover-foreground: #151a2d;
+  --rf-primary: #1b2455;
+  --rf-primary-foreground: #ffffff;
+  --rf-brand: #f24a2c;
+  --rf-brand-foreground: #ffffff;
+  --rf-secondary: #eef0f4;
+  --rf-secondary-foreground: #626978;
+  --rf-muted: #f1f3f6;
+  --rf-muted-foreground: #626978;
+  --rf-accent: #eef0f4;
+  --rf-accent-foreground: #151a2d;
+  --rf-destructive: #b42318;
+  --rf-success: #3f8f5a;
+  --rf-attention: #c7863c;
+  --rf-border: #e3e6ec;
+  --rf-input: #d5d9e1;
+  --rf-ring: #2b45b8;
+  --rf-link: #2b45b8;
   --rf-radius: 0.625rem;
-  --rf-sidebar: oklch(0.985 0.004 90);
-  --rf-sidebar-foreground: oklch(0.19 0.006 80);
-  --rf-sidebar-primary: oklch(0.19 0.006 80);
-  --rf-sidebar-primary-foreground: oklch(0.985 0.004 90);
-  --rf-sidebar-accent: oklch(0.945 0.007 85);
-  --rf-sidebar-accent-foreground: oklch(0.21 0.006 80);
-  --rf-sidebar-border: oklch(0.905 0.008 85);
-  --rf-sidebar-ring: oklch(0.7 0.02 82);
-  /* Additional theme variables */
-  --rf-warning: oklch(97.3% 0.071 103.193);
-  --rf-link: oklch(0.5 0.1 75);
-  --rf-elevation-floating: 0 8px 40px 0 rgb(0 0 0 / 0.08), 0 0 1px 0 rgb(0 0 0 / 0.08);
 }
 
 .dark {
-  --rf-background: oklch(0.18 0.005 80);
-  --rf-foreground: oklch(0.95 0.005 90);
-  --rf-card: oklch(0.215 0.005 80);
-  --rf-card-foreground: oklch(0.95 0.005 90);
-  --rf-popover: oklch(0.215 0.005 80);
-  --rf-popover-foreground: oklch(0.95 0.005 90);
-  --rf-primary: oklch(0.95 0.005 90);
-  --rf-primary-foreground: oklch(0.18 0.005 80);
-  --rf-brand: oklch(76.034% 0.12361 82.191);
-  --rf-brand-foreground: oklch(0.18 0.005 80);
-  --rf-secondary: oklch(0.27 0.006 80);
-  --rf-secondary-foreground: oklch(0.78 0.006 90);
-  --rf-muted: oklch(0.265 0.006 80);
-  --rf-muted-foreground: oklch(0.7 0.01 85);
-  --rf-accent: oklch(0.265 0.006 80);
-  --rf-accent-foreground: oklch(0.95 0.005 90);
-  --rf-destructive: oklch(0.7 0.17 30);
-  --rf-border: oklch(1 0 0 / 10%);
-  --rf-input: oklch(1 0 0 / 16%);
-  --rf-ring: oklch(0.55 0.02 82);
-  --rf-chart-1: oklch(38.017% 0.06181 82.191);
-  --rf-chart-2: oklch(57.026% 0.09271 82.191);
-  --rf-chart-3: oklch(76.034% 0.12361 82.191);
-  --rf-chart-4: oklch(82.026% 0.09271 82.191);
-  --rf-chart-5: oklch(89.215% 0.05562 82.191);
-  --rf-sidebar: oklch(0.215 0.005 80);
-  --rf-sidebar-foreground: oklch(0.95 0.005 90);
-  --rf-sidebar-primary: oklch(0.95 0.005 90);
-  --rf-sidebar-primary-foreground: oklch(0.18 0.005 80);
-  --rf-sidebar-accent: oklch(0.265 0.006 80);
-  --rf-sidebar-accent-foreground: oklch(0.95 0.005 90);
-  --rf-sidebar-border: oklch(1 0 0 / 10%);
-  --rf-sidebar-ring: oklch(0.55 0.02 82);
-  /* Additional theme variables */
-  --rf-warning: oklch(42.1% 0.095 57.708);
-  --rf-link: oklch(0.8 0.1 82);
-  --rf-elevation-floating: 0 8px 40px 0 rgb(0 0 0 / 0.28), 0 0 1px 0 rgb(0 0 0 / 0.28);
+  --rf-background: #13151c;
+  --rf-foreground: #eceef4;
+  --rf-card: #1b1e27;
+  --rf-card-foreground: #eceef4;
+  --rf-popover: #1b1e27;
+  --rf-popover-foreground: #eceef4;
+  --rf-primary: #eceef4;
+  --rf-primary-foreground: #13151c;
+  --rf-brand: #ff6e52;
+  --rf-brand-foreground: #13151c;
+  --rf-secondary: #262a36;
+  --rf-secondary-foreground: #9097a6;
+  --rf-muted: #20232e;
+  --rf-muted-foreground: #9097a6;
+  --rf-accent: #262a36;
+  --rf-accent-foreground: #eceef4;
+  --rf-destructive: #f97066;
+  --rf-success: #5db57a;
+  --rf-attention: #d9a05c;
+  --rf-border: #2a2e3a;
+  --rf-input: #333846;
+  --rf-ring: #9fb0ff;
+  --rf-link: #9fb0ff;
 }
 
 @layer base {

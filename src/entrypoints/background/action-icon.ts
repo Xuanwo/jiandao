@@ -1,60 +1,13 @@
 import { browser } from "#imports"
 import { logger } from "@/utils/logger"
 
-const ICON_SIZES = [16, 32] as const
-const ACTIVE_DOT_COLOR = "#B8892E"
-const ACTIVE_DOT_RING_COLOR = "#FFFFFF"
-
-type IconSize = (typeof ICON_SIZES)[number]
-
-const baseIconPromises = new Map<IconSize, Promise<ImageBitmap>>()
-const renderedIcons = new Map<string, Promise<ImageData>>()
-
-function loadBaseIcon(size: IconSize): Promise<ImageBitmap> {
-  let promise = baseIconPromises.get(size)
-  if (!promise) {
-    promise = fetch(browser.runtime.getURL(`/icon/${size}.png`))
-      .then(response => response.blob())
-      .then(blob => createImageBitmap(blob))
-    baseIconPromises.set(size, promise)
-  }
-  return promise
-}
-
-async function renderIcon(size: IconSize, active: boolean): Promise<ImageData> {
-  const key = `${size}:${active}`
-  let promise = renderedIcons.get(key)
-  if (!promise) {
-    promise = (async () => {
-      const bitmap = await loadBaseIcon(size)
-      const canvas = new OffscreenCanvas(size, size)
-      const context = canvas.getContext("2d")
-      if (!context)
-        throw new Error("OffscreenCanvas 2d context unavailable")
-
-      context.drawImage(bitmap, 0, 0, size, size)
-
-      if (active) {
-        // Small dot in the top-right corner marks "translation on for this tab".
-        const radius = Math.max(2, size * 0.16)
-        const cx = size - radius - 1
-        const cy = radius + 1
-        context.beginPath()
-        context.arc(cx, cy, radius + 1.5, 0, Math.PI * 2)
-        context.fillStyle = ACTIVE_DOT_RING_COLOR
-        context.fill()
-        context.beginPath()
-        context.arc(cx, cy, radius, 0, Math.PI * 2)
-        context.fillStyle = ACTIVE_DOT_COLOR
-        context.fill()
-      }
-
-      return context.getImageData(0, 0, size, size)
-    })()
-    renderedIcons.set(key, promise)
-  }
-  return promise
-}
+/*
+ * The toolbar icon is a page with two lines of text; on a tab that is
+ * translated, the lower line becomes the vermilion translation strip
+ * (design/Icon.dc.html, sources in design/assets/icon*.svg).
+ */
+const IDLE_ICON = { 16: "/icon/16.png", 32: "/icon/32.png" }
+const TRANSLATED_ICON = { 16: "/icon/translated-16.png", 32: "/icon/translated-32.png" }
 
 /**
  * Reflects a tab's page translation state on the toolbar icon so the reader
@@ -62,14 +15,10 @@ async function renderIcon(size: IconSize, active: boolean): Promise<ImageData> {
  */
 export async function updateActionIcon(tabId: number, active: boolean): Promise<void> {
   try {
-    const imageData: Record<number, ImageData> = {}
-    for (const size of ICON_SIZES) {
-      imageData[size] = await renderIcon(size, active)
-    }
-    await browser.action.setIcon({ tabId, imageData })
+    await browser.action.setIcon({ tabId, path: active ? TRANSLATED_ICON : IDLE_ICON })
   }
   catch (error) {
-    // The tab may already be gone, or the platform may lack OffscreenCanvas.
+    // The tab may already be gone.
     logger.warn("Failed to update action icon", error)
   }
 }

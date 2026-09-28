@@ -25,7 +25,7 @@ export function PopupFooter() {
   return (
     <div className="flex items-center justify-between border-t border-border py-2 pr-2.5 pl-4">
       <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-        <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", ready ? "bg-emerald-600" : "bg-amber-600")} />
+        <span aria-hidden="true" className={cn("size-1.5 shrink-0 rounded-full", ready ? "bg-success" : "bg-attention")} />
         <span className="truncate">
           {current
             ? ready ? describeProvider(current) : `${current.name} · ${i18n.t("popup.provider.missingKey")}`

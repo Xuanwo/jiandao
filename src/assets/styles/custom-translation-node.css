@@ -1,7 +1,7 @@
 @import "@/assets/styles/host-theme.css";
 
 .jiandao-translated-block-content[data-jiandao-custom-translation-style="line"] {
-  border-left: 2px solid color-mix(in srgb, var(--jiandao-brand) 55%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--jiandao-brand) 75%, transparent);
   padding-left: 12px;
 }
 

@@ -1,19 +1,20 @@
+/* Colors injected into host pages. Vermilion marks translations; see design/Palette.dc.html. */
 :root {
-  --jiandao-primary: oklch(0.205 0 0);
-  --jiandao-brand: oklch(76.034% 0.12361 82.191);
-  --jiandao-brand-strong: oklch(58% 0.11 82.191);
-  --jiandao-foreground: oklch(0.985 0 0);
-  --jiandao-muted: oklch(0.97 0 0);
-  --jiandao-muted-foreground: oklch(0.556 0 0);
+  --jiandao-primary: #1b2455;
+  --jiandao-brand: #f24a2c;
+  --jiandao-brand-strong: #c2331a;
+  --jiandao-foreground: #ffffff;
+  --jiandao-muted: #f1f3f6;
+  --jiandao-muted-foreground: #626978;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --jiandao-primary: oklch(0.922 0 0);
-    --jiandao-brand: oklch(76.034% 0.12361 82.191);
-    --jiandao-brand-strong: oklch(80% 0.12 82.191);
-    --jiandao-foreground: oklch(0.205 0 0);
-    --jiandao-muted: oklch(0.269 0 0);
-    --jiandao-muted-foreground: oklch(0.708 0 0);
+    --jiandao-primary: #eceef4;
+    --jiandao-brand: #ff6e52;
+    --jiandao-brand-strong: #ff8a73;
+    --jiandao-foreground: #13151c;
+    --jiandao-muted: #20232e;
+    --jiandao-muted-foreground: #9097a6;
   }
 }
