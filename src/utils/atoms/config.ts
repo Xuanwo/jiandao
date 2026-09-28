@@ -71,7 +71,7 @@ export const writeConfigAtom = atom(
         }
       }
       catch (error) {
-        console.error("Failed to set config to storage:", nextToPersist, error)
+        console.error("Failed to set config to storage:", error)
 
         // Roll back to storage value on error, but only if we're still the latest write.
         if (currentWriteVersion === writeVersion) {
@@ -98,22 +98,24 @@ export const writeConfigAtom = atom(
  * 3. Tab reactivation: Reload when tab becomes visible (inactive tabs may miss watch events)
  */
 configAtom.onMount = (setAtom: (newValue: Config) => void) => {
-  // Flag to avoid race condition: if watch fires before initial get() resolves,
-  // don't overwrite the fresher watch value with the stale get() result.
-  let didReceiveStorageUpdate = false
+  const syncFromStorage = () => {
+    const currentWriteVersion = writeVersion
+    // A watch event can contain the value of an older local write.
+    // Do not apply the value of the event. Read storage after the queued writes.
+    // A newer local write makes this read stale, because its optimistic value is newer.
+    void writeQueue.then(async () => {
+      const value = await storageAdapter.get<Config>(CONFIG_STORAGE_KEY, DEFAULT_CONFIG, configSchema)
+      if (currentWriteVersion === writeVersion) {
+        setAtom(value)
+      }
+    })
+  }
 
   // Initial load from storage
-  void storageAdapter.get<Config>(CONFIG_STORAGE_KEY, DEFAULT_CONFIG, configSchema).then((value) => {
-    if (!didReceiveStorageUpdate) {
-      setAtom(value)
-    }
-  })
+  syncFromStorage()
 
   // Watch for changes from other extension contexts (popup, options page, other tabs)
-  const unwatch = storageAdapter.watch<Config>(CONFIG_STORAGE_KEY, (value) => {
-    didReceiveStorageUpdate = true
-    setAtom(value)
-  })
+  const unwatch = storageAdapter.watch<Config>(CONFIG_STORAGE_KEY, syncFromStorage)
 
   // Handle tab reactivation - inactive tabs may miss storage watch events,
   // so we reload from storage when the tab becomes visible again.
@@ -121,7 +123,7 @@ configAtom.onMount = (setAtom: (newValue: Config) => void) => {
   const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
       logger.info("configAtom onMount handleVisibilityChange when: ", new Date())
-      void storageAdapter.get<Config>(CONFIG_STORAGE_KEY, DEFAULT_CONFIG, configSchema).then(setAtom)
+      syncFromStorage()
     }
   }
   document.addEventListener("visibilitychange", handleVisibilityChange)

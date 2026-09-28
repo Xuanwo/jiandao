@@ -4,8 +4,6 @@ import { getLocalConfig } from "@/utils/config/storage"
 import { DEFAULT_CONFIG } from "../constants/config"
 import {
   DEFAULT_BATCH_TRANSLATE_PROMPT,
-  DEFAULT_TRANSLATE_PROMPT,
-  DEFAULT_TRANSLATE_SYSTEM_PROMPT,
   getTokenCellText,
   INPUT,
   TARGET_LANGUAGE,
@@ -14,6 +12,7 @@ import {
   WEB_SUMMARY,
   WEB_TITLE,
 } from "../constants/prompt"
+import { renderBuiltinTranslatePrompt } from "./builtin-prompt"
 
 export interface TranslatePromptOptions<TContext = unknown> {
   isBatch?: boolean
@@ -21,7 +20,8 @@ export interface TranslatePromptOptions<TContext = unknown> {
 }
 
 export interface TranslatePromptResult {
-  systemPrompt: string
+  /** Undefined when the prompt has no system prompt, so that the request has no system message. */
+  systemPrompt?: string
   prompt: string
 }
 
@@ -38,28 +38,22 @@ export function getTranslatePromptFromConfig(
   const customPromptsConfig = translateConfig.customPromptsConfig
   const { patterns = [], promptId } = customPromptsConfig
 
-  // Resolve system prompt and user prompt
-  let systemPrompt: string
-  let prompt: string
-
-  if (!promptId) {
-    // Use default prompts from constants
-    systemPrompt = DEFAULT_TRANSLATE_SYSTEM_PROMPT
-    prompt = DEFAULT_TRANSLATE_PROMPT
-  }
-  else {
-    // Find custom prompt, fallback to default
-    const customPrompt = patterns.find(pattern => pattern.id === promptId)
-    systemPrompt = customPrompt?.systemPrompt ?? DEFAULT_TRANSLATE_SYSTEM_PROMPT
-    prompt = customPrompt?.prompt ?? DEFAULT_TRANSLATE_PROMPT
+  const customPrompt = patterns.find(pattern => pattern.id === promptId)
+  if (!customPrompt) {
+    // The built-in prompt has no system prompt.
+    return {
+      prompt: renderBuiltinTranslatePrompt({
+        targetLang,
+        input,
+        webTitle: options?.context?.webTitle,
+        webSummary: options?.context?.webSummary,
+        isBatch: options?.isBatch,
+      }),
+    }
   }
 
-  // For batch mode, append batch rules to system prompt
-  if (options?.isBatch) {
-    systemPrompt = `${systemPrompt}
-
-${DEFAULT_BATCH_TRANSLATE_PROMPT}`
-  }
+  // Custom prompts use the English language name and the English batch rules.
+  const systemPrompt = [customPrompt.systemPrompt, options?.isBatch && DEFAULT_BATCH_TRANSLATE_PROMPT].filter(Boolean).join("\n\n")
 
   // Build title and summary replacement values
   const title = resolvePromptReplacementValue(options?.context?.webTitle, "No title available")
@@ -78,8 +72,9 @@ ${DEFAULT_BATCH_TRANSLATE_PROMPT}`
       .replaceAll(getTokenCellText(WEB_SUMMARY), summary)
 
   return {
-    systemPrompt: replaceTokens(systemPrompt),
-    prompt: replaceTokens(prompt),
+    // An empty system prompt gives no system message.
+    ...(systemPrompt && { systemPrompt: replaceTokens(systemPrompt) }),
+    prompt: replaceTokens(customPrompt.prompt),
   }
 }
 
