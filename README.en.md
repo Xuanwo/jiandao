@@ -89,14 +89,11 @@ In this repository's [issues](https://github.com/Xuanwo/jiandao/issues), not in 
 
 ```bash
 pnpm install
-pnpm exec prek install  # once per clone; installs the Git hooks
 pnpm dev         # development mode; opens Chrome with the extension loaded
 pnpm test        # unit tests
 pnpm type-check
 pnpm build
 ```
-
-[prek](https://github.com/j178/prek) runs the checks in [`prek.toml`](./prek.toml) before each commit: file hygiene, actionlint, zizmor and typos. The hooks also block a direct commit to `master` or `main`. `pnpm install` does not install the hooks, so run `pnpm exec prek install` yourself. If `git config --get core.hooksPath` shows `.husky/_` from an earlier Husky setup, run `git config --local --unset core.hooksPath` first. Otherwise prek writes the hook into that directory. To run the same checks as CI, use `pnpm exec prek run --all-files --stage manual`.
 
 `pnpm test:e2e` builds the extension and opens it in headless Chromium through [Playwright](https://playwright.dev/), a development dependency. Before the first run, run `pnpm exec playwright-core install --no-shell chromium` to download Chromium. On Linux, add `--with-deps` to also install the system libraries. When a test fails, its report shows the browser logs, the open pages and the stored config. Set `E2E_ARTIFACTS` to a directory to also save a screenshot of each page. CI runs the same tests.
 
