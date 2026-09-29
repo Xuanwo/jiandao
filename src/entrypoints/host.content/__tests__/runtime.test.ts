@@ -168,6 +168,33 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
     expect(messageHandlers.has("refreshDetectedPageLanguage")).toBe(true)
   })
 
+  it("a failing URL listener setup still finishes bootstrap and cleans up message handlers", async () => {
+    mockSetupUrlChangeListener.mockImplementation(() => {
+      throw new Error("history methods are read-only")
+    })
+    const cleanups: Array<ReturnType<typeof vi.fn>> = []
+    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
+      messageHandlers.set(name, handler)
+      const cleanup = vi.fn(() => messageHandlers.delete(name))
+      cleanups.push(cleanup)
+      return cleanup
+    })
+    const { ctx, invalidate } = createContentScriptContext()
+
+    await bootstrapHostContent(ctx)
+    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+    expect(mockBindTranslationShortcutKey).toHaveBeenCalledOnce()
+    expect(mockSendMessage).toHaveBeenCalledWith("reportDetectedPageLanguage", {
+      url: window.location.href,
+      detectedCodeOrUnd: "fra",
+    })
+
+    invalidate()
+    expect(messageHandlers.size).toBe(0)
+    for (const cleanup of cleanups)
+      expect(cleanup).toHaveBeenCalledOnce()
+  })
+
   it("a failing style injection leaves the toggle handler registered", async () => {
     mockEnsurePresetStyles.mockImplementation(() => {
       throw new Error("no document")

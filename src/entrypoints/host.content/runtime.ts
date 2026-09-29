@@ -77,7 +77,13 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
     logger.error("Failed to inject the preset styles", error)
   }
 
-  const cleanupUrlListener = setupUrlChangeListener()
+  let cleanupUrlListener = () => {}
+  try {
+    cleanupUrlListener = setupUrlChangeListener()
+  }
+  catch (error) {
+    logger.error("Failed to set up URL change detection", error)
+  }
 
   const removeHostToast = window === window.top
     ? (() => {
