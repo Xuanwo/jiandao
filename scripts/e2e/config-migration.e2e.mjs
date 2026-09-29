@@ -122,8 +122,16 @@ it("user updates from a build whose config cannot be migrated: Given the 1.0 con
   await page.locator("#service").getByText("Set up your translation service again").waitFor()
 
   await configureService(page, extensionId, setupDocumentFor(service.origin))
-  const meta = await worker.evaluate(async () => (await chrome.storage.local.get("config$")).config$)
-  assert.equal(meta?.resetAt, undefined, "applying a service ends the notice")
+  // The Connected preview is optimistic; wait for the later metadata write.
+  await worker.evaluate(async () => {
+    for (let i = 0; i < 100; i++) {
+      const meta = (await chrome.storage.local.get("config$")).config$
+      if (meta?.resetAt === undefined)
+        return
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    throw new Error("applying a service did not clear the reset notice")
+  })
 
   await page.goto(`chrome-extension://${extensionId}/popup.html`)
   await page.getByRole("button", { name: "Translate this page" }).waitFor()
