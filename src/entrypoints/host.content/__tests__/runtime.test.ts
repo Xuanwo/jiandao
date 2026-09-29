@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { ContentScriptContext } from "#imports"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { bootstrapHostContent } from "../runtime"
 
 const {
@@ -91,8 +91,38 @@ vi.mock("../translation-control/page-translation", () => ({
   },
 }))
 
+const contextCleanups: Array<() => void> = []
+
+beforeEach(() => {
+  vi.resetAllMocks()
+  messageHandlers.clear()
+  managerInstances.length = 0
+
+  mockSetupUrlChangeListener.mockReturnValue(vi.fn())
+  mockMountHostToast.mockReturnValue(vi.fn())
+  mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
+  mockWatchConfigChanges.mockReturnValue(vi.fn())
+  mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
+    messageHandlers.set(name, handler)
+    return vi.fn()
+  })
+  mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
+  mockSendMessage.mockImplementation((name: string) =>
+    Promise.resolve(name === "getEnablePageTranslationFromContentScript" ? false : undefined))
+})
+
+afterEach(() => {
+  for (const cleanup of contextCleanups.splice(0))
+    cleanup()
+})
+
 function createContentScriptContext() {
   const invalidationCallbacks: Array<() => void> = []
+  const invalidate = () => {
+    for (const callback of invalidationCallbacks.splice(0))
+      callback()
+  }
+  contextCleanups.push(invalidate)
 
   return {
     ctx: {
@@ -100,11 +130,7 @@ function createContentScriptContext() {
         invalidationCallbacks.push(callback)
       },
     } as ContentScriptContext,
-    invalidate: () => {
-      for (const callback of invalidationCallbacks) {
-        callback()
-      }
-    },
+    invalidate,
   }
 }
 
@@ -115,24 +141,6 @@ async function flushAsyncWork(): Promise<void> {
 }
 
 describe("bootstrapHostContent keeps the toggle handler whatever else fails", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    messageHandlers.clear()
-    managerInstances.length = 0
-
-    mockSetupUrlChangeListener.mockReturnValue(vi.fn())
-    mockMountHostToast.mockReturnValue(vi.fn())
-    mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
-    mockWatchConfigChanges.mockReturnValue(vi.fn())
-    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
-      messageHandlers.set(name, handler)
-      return vi.fn()
-    })
-    mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
-    mockSendMessage.mockImplementation((name: string) =>
-      Promise.resolve(name === "getEnablePageTranslationFromContentScript" ? false : undefined))
-  })
-
   /**
    * Reading the shortcut is a storage read, and storage throws in an invalidated
    * extension context. The popup's translate button talks to a handler
@@ -160,6 +168,33 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
     expect(messageHandlers.has("refreshDetectedPageLanguage")).toBe(true)
   })
 
+  it("a failing URL listener setup still finishes bootstrap and cleans up message handlers", async () => {
+    mockSetupUrlChangeListener.mockImplementation(() => {
+      throw new Error("history methods are read-only")
+    })
+    const cleanups: Array<ReturnType<typeof vi.fn>> = []
+    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
+      messageHandlers.set(name, handler)
+      const cleanup = vi.fn(() => messageHandlers.delete(name))
+      cleanups.push(cleanup)
+      return cleanup
+    })
+    const { ctx, invalidate } = createContentScriptContext()
+
+    await bootstrapHostContent(ctx)
+    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+    expect(mockBindTranslationShortcutKey).toHaveBeenCalledOnce()
+    expect(mockSendMessage).toHaveBeenCalledWith("reportDetectedPageLanguage", {
+      url: window.location.href,
+      detectedCodeOrUnd: "fra",
+    })
+
+    invalidate()
+    expect(messageHandlers.size).toBe(0)
+    for (const cleanup of cleanups)
+      expect(cleanup).toHaveBeenCalledOnce()
+  })
+
   it("a failing style injection leaves the toggle handler registered", async () => {
     mockEnsurePresetStyles.mockImplementation(() => {
       throw new Error("no document")
@@ -173,28 +208,6 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
 })
 
 describe("bootstrapHostContent URL changes", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    messageHandlers.clear()
-    managerInstances.length = 0
-
-    mockSetupUrlChangeListener.mockReturnValue(vi.fn())
-    mockMountHostToast.mockReturnValue(vi.fn())
-    mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
-    mockWatchConfigChanges.mockReturnValue(vi.fn())
-    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
-      messageHandlers.set(name, handler)
-      return vi.fn()
-    })
-    mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
-    mockSendMessage.mockImplementation((name: string) => {
-      if (name === "getEnablePageTranslationFromContentScript")
-        return Promise.resolve(false)
-
-      return Promise.resolve(undefined)
-    })
-  })
-
   it("refreshes active page translation on same-origin SPA navigation without disabling the session", async () => {
     mockSendMessage.mockImplementation((name: string) => {
       if (name === "getEnablePageTranslationFromContentScript")
@@ -239,6 +252,7 @@ describe("bootstrapHostContent URL changes", () => {
     }))
     await flushAsyncWork()
 
+    expect(mockSendMessage.mock.calls.filter(([name]) => name === "reportDetectedPageLanguage")).toHaveLength(2)
     expect(manager.start).not.toHaveBeenCalled()
     expect(manager.restart).not.toHaveBeenCalled()
     expect(manager.stop).not.toHaveBeenCalled()
