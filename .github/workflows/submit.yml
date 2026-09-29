@@ -1,6 +1,33 @@
 name: Submit to Stores
 
+# Runs after every tagged release (called from release.yml). Dispatch it by
+# hand to retry a failed submission or to check the store credentials with a
+# dry run.
 on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      dryRun:
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      CHROME_EXTENSION_ID:
+        required: true
+      CHROME_CLIENT_ID:
+        required: true
+      CHROME_CLIENT_SECRET:
+        required: true
+      CHROME_REFRESH_TOKEN:
+        required: true
+      EDGE_PRODUCT_ID:
+        required: false
+      EDGE_CLIENT_ID:
+        required: false
+      EDGE_API_KEY:
+        required: false
   workflow_dispatch:
     inputs:
       tag:

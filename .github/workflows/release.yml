@@ -1,7 +1,8 @@
 name: Release Extension
 
 # Bump "version" in package.json, merge it, then push a matching tag
-# (e.g. v1.35.0). Store submission runs separately via submit.yml.
+# (e.g. v1.35.0). A pushed tag also submits the release to the stores through
+# submit.yml; rebuilding assets for an existing tag does not.
 on:
   push:
     tags:
@@ -70,3 +71,21 @@ jobs:
         run: gh release upload "$TAG" .output/*-chrome.zip .output/*-edge.zip .output/*-firefox.zip .output/*-sources.zip --clobber
         env:
           GH_TOKEN: ${{ github.token }}
+
+  submit:
+    name: Submit to Stores
+    needs: release
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/submit.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets:
+      CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+      CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+      CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+      CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+      EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+      EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+      EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
