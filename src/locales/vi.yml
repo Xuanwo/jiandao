@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: Cài đặt
   service:
+    add: Thêm dịch vụ
+    active: Dịch vụ hiện tại
+    select: Chọn
+    delete: Xóa
+    deleteTitle: Xóa dịch vụ dịch?
+    deleteDescription: Xóa «$1» và khóa đã lưu. Không thể hoàn tác thao tác này.
+    deleteActive: Chọn dịch vụ khác trước khi xóa dịch vụ hiện tại.
+    savedOnly: Lưu không thay đổi dịch vụ hiện tại.
+    switchHint: Bản dịch hiện có được giữ nguyên. Yêu cầu mới dùng dịch vụ đã chọn.
+    stale: Dịch vụ đã thay đổi. Mở lại trình chỉnh sửa và thử lại.
+    saveFailed: Không lưu được dịch vụ. Hãy thử lại.
     title: Dịch vụ dịch
     empty:
       title: Chưa có dịch vụ dịch

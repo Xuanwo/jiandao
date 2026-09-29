@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: 設定
   service:
+    add: 新增服務
+    active: 目前使用
+    select: 選用
+    delete: 刪除
+    deleteTitle: 刪除翻譯服務？
+    deleteDescription: 刪除「$1」及其儲存的金鑰。此操作無法復原。
+    deleteActive: 請先選用其他服務，再刪除目前的服務。
+    savedOnly: 儲存後不會切換目前的服務。
+    switchHint: 切換後保留既有譯文，後續請求使用選定服務。
+    stale: 服務設定已變更，請重新開啟編輯器後再試。
+    saveFailed: 無法儲存服務設定，請重試。
     title: 翻譯服務
     empty:
       title: 還沒有翻譯服務

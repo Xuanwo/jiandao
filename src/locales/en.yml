@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: Settings
   service:
+    add: Add service
+    active: Current service
+    select: Select
+    delete: Delete
+    deleteTitle: Delete translation service?
+    deleteDescription: "Delete \"$1\" and its saved key. This cannot be undone."
+    deleteActive: Select another service before you delete the current service.
+    savedOnly: Save does not change the current service.
+    switchHint: Existing translations stay. New requests use the selected service.
+    stale: The service changed. Reopen the editor and try again.
+    saveFailed: Could not save the service. Try again.
     title: Translation service
     empty:
       title: No translation service yet

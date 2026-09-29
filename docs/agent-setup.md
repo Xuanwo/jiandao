@@ -40,8 +40,8 @@ prompt.
    ```
 
 5. **Tell the person**: open Jiandao's settings page, paste into the box in
-   the "Translation service" section (if a service is already set up, click
-   "Edit" there first), and click "Apply". Jiandao shows what will change,
+   the "Translation service" section, and click "Apply". For another service,
+   click "Add service" first. To change an entry, click its "Edit" button. Jiandao shows what will change,
    including the host that page text will be sent to, sends one short request
    to confirm, and saves the service only when that request works. Then it
    clears the clipboard. If the confirmation fails, nothing is saved and the
@@ -51,7 +51,8 @@ To change an existing configuration, ask the person to click “Copy
 instructions for your agent” in the "Translation service" section and paste
 it to you; the text ends with the current document. The key in it is masked
 (`sk-…a9f2`). Return the document with the masked key unchanged and Jiandao
-keeps the stored key; only a new key needs the clipboard step above.
+keeps that entry's stored key. A changed provider type or endpoint needs a literal
+key. Add always needs a literal key, even for an existing endpoint.
 
 ## The document
 
@@ -83,8 +84,11 @@ silently ignored setting.
 | `body`        | no                      | JSON merged into every request body, exactly as the API documents it. Objects merge key by key; anything else replaces Jiandao's value. See the recipes.                                                                                                                                                                      |
 | `temperature` | no                      | Sampling temperature. Sent only when set. Anthropic's current models accept only `1`.                                                                                                                                                                                                                                         |
 
-A document replaces the stored service with the same `type` and `baseURL`,
-or adds a new one. Other services and every other setting stay as they are.
+"Add service" saves a separate entry, even with the same `type` and `baseURL`.
+"Edit" changes only the selected entry. Neither action changes the active service.
+Select a saved service in settings or the popup. Existing translations remain;
+new requests use the selected service. First setup configures the active default
+entry. To delete the active service, select another entry first.
 When the person wants a different model or option, they hand you the current
 configuration and you return the changed document; they may also edit a
 field in place on the settings page.

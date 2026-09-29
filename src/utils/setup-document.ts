@@ -85,16 +85,26 @@ function toProviderShape(provider: Pick<SetupDocument, "type" | "baseURL">): Pic
   return { provider: provider.type, baseURL: provider.baseURL }
 }
 
-/**
- * The provider a document replaces: same type and same endpoint. Two OpenAI
- * entries with different relay URLs are different services.
- */
-export function findMatchingProvider(providersConfig: ProviderConfig[], provider: SetupDocument): ProviderConfig | undefined {
-  const wanted = resolveBaseURL(toProviderShape(provider))
-  return providersConfig.find(candidate =>
-    candidate.provider === provider.type
-    && resolveBaseURL(candidate) === wanted,
-  )
+export type SetupTarget = { kind: "add" } | { kind: "edit", providerId: string }
+
+function targetProvider(config: Config, target: SetupTarget): ProviderConfig | undefined {
+  if (target.kind === "add")
+    return undefined
+  const existing = config.providersConfig.find(p => p.id === target.providerId)
+  if (!existing)
+    throw new SetupDocumentError("INVALID_RESULT", "The service no longer exists. Reopen the editor.")
+  return existing
+}
+
+function reusableKey(existing: ProviderConfig | undefined, document: SetupDocument): string | undefined {
+  return existing?.provider === document.type && resolveBaseURL(existing) === resolveBaseURL(toProviderShape(document))
+    ? existing.apiKey
+    : undefined
+}
+
+function serviceName(config: Config, document: SetupDocument, existing?: ProviderConfig): string {
+  const names = new Set(config.providersConfig.filter(p => p.id !== existing?.id).map(p => p.name))
+  return getUniqueName(document.name ?? (existing?.provider === document.type ? existing.name : undefined) ?? PROVIDER_ITEMS[document.type].name, names)
 }
 
 function readPath(value: unknown, path: string[]): unknown {
@@ -139,34 +149,27 @@ export class SetupDocumentError extends Error {
 export interface ApplySetupDocumentResult {
   config: Config
   providerId: string
-  /** Whether the document replaced a stored service or added a new one. */
-  replaced: boolean
-  /** Whether the stored key was kept because the document carried a masked key or none. */
-  keyReused: boolean
 }
 
 /**
- * Returns the config with the document applied: the matching service is
- * replaced (or a new one appended) and becomes the translation service.
+ * Returns the config with the document applied to the explicit target.
+ * The active service does not change.
  * Every other service and setting stays as it is. The result is validated
  * against the config schema before it is returned.
  */
-export function applySetupDocument(config: Config, document: SetupDocument): ApplySetupDocumentResult {
+export function applySetupDocument(config: Config, document: SetupDocument, target: SetupTarget): ApplySetupDocumentResult {
   const provider = document
-  const existing = findMatchingProvider(config.providersConfig, provider)
+  const existing = targetProvider(config, target)
 
   const documentKey = provider.apiKey && !isMaskedApiKey(provider.apiKey) ? provider.apiKey : undefined
-  const apiKey = documentKey ?? existing?.apiKey
+  const apiKey = documentKey ?? reusableKey(existing, document)
   if (!apiKey) {
-    throw new SetupDocumentError("MISSING_API_KEY", "The document has no API key and no stored service matches it. Endpoints without authentication still need a non-empty value such as \"local\".")
+    throw new SetupDocumentError("MISSING_API_KEY", "Provide an API key for a new service or a changed destination. Endpoints without authentication still need a non-empty value such as \"local\".")
   }
-
-  const otherNames = new Set(config.providersConfig.filter(p => p.id !== existing?.id).map(p => p.name))
-  const name = provider.name ?? existing?.name ?? getUniqueName(PROVIDER_ITEMS[provider.type].name, otherNames)
 
   const next: ProviderConfig = {
     id: existing?.id ?? getRandomUUID(),
-    name: otherNames.has(name) ? getUniqueName(name, otherNames) : name,
+    name: serviceName(config, document, existing),
     enabled: true,
     provider: provider.type,
     ...(provider.api && { api: provider.api }),
@@ -185,7 +188,6 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
   const candidate: Config = {
     ...config,
     providersConfig,
-    translate: { ...config.translate, providerId: next.id },
   }
 
   const parsed = configSchema.safeParse(candidate)
@@ -193,7 +195,7 @@ export function applySetupDocument(config: Config, document: SetupDocument): App
     throw new SetupDocumentError("INVALID_RESULT", parsed.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`).join("\n"))
   }
 
-  return { config: parsed.data, providerId: next.id, replaced: !!existing, keyReused: !documentKey }
+  return { config: parsed.data, providerId: next.id }
 }
 
 /* ──────────────────────────────
@@ -208,25 +210,23 @@ export interface SetupPreview {
   host: string
   keyStatus: "new" | "reused" | "missing"
   thinkingOff: boolean | null
-  replaces: boolean
 }
 
 /** What applying the document would change, for the reader to check before confirming. */
-export function describeSetupDocument(config: Config, document: SetupDocument): SetupPreview {
+export function describeSetupDocument(config: Config, document: SetupDocument, target: SetupTarget): SetupPreview {
   const provider = document
-  const existing = findMatchingProvider(config.providersConfig, provider)
+  const existing = targetProvider(config, target)
   const hasDocumentKey = !!provider.apiKey && !isMaskedApiKey(provider.apiKey)
   const api = resolveRequestApi({ provider: provider.type, api: provider.api })
 
   return {
     type: provider.type,
     api,
-    providerName: provider.name ?? existing?.name ?? PROVIDER_ITEMS[provider.type].name,
+    providerName: serviceName(config, document, existing),
     modelId: provider.model,
     host: getRequestHost(toProviderShape(provider)),
-    keyStatus: hasDocumentKey ? "new" : existing?.apiKey ? "reused" : "missing",
+    keyStatus: hasDocumentKey ? "new" : reusableKey(existing, document) ? "reused" : "missing",
     thinkingOff: describesThinkingOff(provider.body, api),
-    replaces: !!existing,
   }
 }
 
@@ -235,8 +235,8 @@ export function describeSetupDocument(config: Config, document: SetupDocument): 
  * An agent edits this and hands it back; applying it keeps the stored key.
  * The name is left out while it is the service type's default.
  */
-export function exportSetupDocument(config: Config): SetupDocument | null {
-  const provider = config.providersConfig.find(p => p.id === config.translate.providerId)
+export function exportSetupDocument(config: Config, providerId: string): SetupDocument | null {
+  const provider = config.providersConfig.find(p => p.id === providerId)
   if (!provider)
     return null
 

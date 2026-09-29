@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: 设置
   service:
+    add: 新增服务
+    active: 当前使用
+    select: 选用
+    delete: 删除
+    deleteTitle: 删除翻译服务？
+    deleteDescription: 删除「$1」及其保存的密钥。此操作无法撤销。
+    deleteActive: 请先选用其他服务，再删除当前服务。
+    savedOnly: 保存后不会切换当前服务。
+    switchHint: 切换后保留已有译文，后续请求使用选定服务。
+    stale: 服务配置已变化，请重新打开编辑器后重试。
+    saveFailed: 无法保存服务配置，请重试。
     title: 翻译服务
     empty:
       title: 还没有翻译服务

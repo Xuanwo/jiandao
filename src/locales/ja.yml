@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: 設定
   service:
+    add: サービスを追加
+    active: 使用中
+    select: 選択
+    delete: 削除
+    deleteTitle: 翻訳サービスを削除しますか？
+    deleteDescription: 「$1」と保存済みのキーを削除します。この操作は取り消せません。
+    deleteActive: 使用中のサービスを削除する前に、別のサービスを選択してください。
+    savedOnly: 保存しても使用中のサービスは切り替わりません。
+    switchHint: 既存の訳文は保持されます。新しいリクエストには選択したサービスを使用します。
+    stale: サービスの設定が変更されました。編集画面を開き直してください。
+    saveFailed: サービスを保存できませんでした。もう一度お試しください。
     title: 翻訳サービス
     empty:
       title: 翻訳サービスがまだありません

@@ -1,11 +1,12 @@
 import type { ConnectionCheck, ProviderConfig } from "@/types/config/provider"
-import type { SetupPreview } from "@/utils/setup-document"
+import type { SetupPreview, SetupTarget } from "@/utils/setup-document"
 import { useAtomValue, useSetAtom, useStore } from "jotai"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { i18n } from "#imports"
+import { ConfirmAction } from "@/components/confirm-action"
 import { IconCheck, IconCopy } from "@/components/icons"
 import { Button } from "@/components/ui/button"
-import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
+import { configAtom, configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
 import { clearClipboard, copyText } from "@/utils/clipboard"
 import { deepEqual } from "@/utils/object"
 import { getRequestHost, resolveRequestApi } from "@/utils/providers/request"
@@ -29,17 +30,72 @@ const MONO = "font-mono text-xs text-muted-foreground"
  */
 export function ServiceSection() {
   const config = useAtomValue(configAtom)
+  const store = useStore()
+  const setConfig = useSetAtom(writeConfigAtom)
+  const setTranslate = useSetAtom(configFieldsAtomMap.translate)
+  const [target, setTarget] = useState<SetupTarget | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const active = config.providersConfig.find(p => p.id === config.translate.providerId)
-  const configured = !!active?.apiKey?.trim()
-  const [editing, setEditing] = useState(false)
+  const initialSetup = config.providersConfig.length === 1 && !active?.apiKey?.trim()
+  const editorTarget = target ?? (initialSetup && active ? { kind: "edit" as const, providerId: active.id } : null)
+  const current = editorTarget?.kind === "edit" ? config.providersConfig.find(p => p.id === editorTarget.providerId) : undefined
+
+  const remove = async (id: string) => {
+    const latest = store.get(configAtom)
+    if (latest.translate.providerId === id || latest.providersConfig.length <= 1) {
+      setError(i18n.t("options.service.deleteActive"))
+      return
+    }
+    try {
+      await setConfig({ providersConfig: latest.providersConfig.filter(p => p.id !== id) })
+    }
+    catch {
+      setError(i18n.t("options.service.saveFailed"))
+    }
+  }
 
   return (
     <SettingsSection id="service" title={i18n.t("options.service.title")}>
-      <div className="flex flex-col gap-3.5 rounded-xl border border-border bg-card px-[18px] py-4">
-        {configured && active && !editing
-          ? <ServicePreview provider={active} onEdit={() => setEditing(true)} />
-          : <ServiceEditor current={configured ? active : undefined} onDone={() => setEditing(false)} />}
-      </div>
+      {editorTarget
+        ? <div className="flex flex-col gap-3.5 rounded-xl border border-border bg-card px-[18px] py-4"><ServiceEditor key={editorTarget.kind === "edit" ? editorTarget.providerId : "add"} target={editorTarget} current={current} initialSetup={initialSetup} onDone={() => setTarget(null)} /></div>
+        : (
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs text-muted-foreground">{i18n.t("options.service.switchHint")}</p>
+                <Button variant="outline" onClick={() => setTarget({ kind: "add" })}>{i18n.t("options.service.add")}</Button>
+              </div>
+              {config.providersConfig.map(provider => (
+                <article key={provider.id} aria-label={provider.name} className="flex flex-col gap-3 rounded-xl border border-border bg-card px-[18px] py-4">
+                  <ServicePreview provider={provider} active={provider.id === config.translate.providerId} onEdit={() => setTarget({ kind: "edit", providerId: provider.id })}>
+                    {provider.id !== config.translate.providerId && (
+                      <Button
+                        variant="outline"
+                        disabled={!provider.enabled || !provider.apiKey?.trim()}
+                        onClick={() => {
+                          const latest = store.get(configAtom).providersConfig.find(p => p.id === provider.id)
+                          if (latest?.enabled && latest.apiKey?.trim())
+                            void setTranslate({ providerId: latest.id }).catch(() => setError(i18n.t("options.service.saveFailed")))
+                        }}
+                      >
+                        {i18n.t("options.service.select")}
+                      </Button>
+                    )}
+                    <ConfirmAction
+                      disabled={provider.id === config.translate.providerId || config.providersConfig.length <= 1}
+                      trigger={props => <Button variant="outline" {...props}>{i18n.t("options.service.delete")}</Button>}
+                      title={i18n.t("options.service.deleteTitle")}
+                      description={i18n.t("options.service.deleteDescription", [provider.name])}
+                      confirmLabel={i18n.t("options.service.delete")}
+                      cancelLabel={i18n.t("options.service.cancel")}
+                      onConfirm={() => remove(provider.id)}
+                    />
+                  </ServicePreview>
+                  {provider.id === config.translate.providerId && <span className="text-xs text-muted-foreground">{i18n.t("options.service.deleteActive")}</span>}
+                </article>
+              ))}
+            </div>
+          )}
+      {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
     </SettingsSection>
   )
 }
@@ -61,11 +117,11 @@ function NameAndModel({ name, model, size = "text-sm" }: { name: string, model: 
   )
 }
 
-function CopyInstructionsButton() {
+function CopyInstructionsButton({ target }: { target: SetupTarget }) {
   const store = useStore()
   const [copied, setCopied] = useState(false)
   const copy = async () => {
-    if (await copyText(buildAgentInstructions(store.get(configAtom)))) {
+    if (await copyText(buildAgentInstructions(store.get(configAtom), target))) {
       setCopied(true)
       setTimeout(setCopied, COPIED_FEEDBACK_MS, false)
     }
@@ -101,7 +157,7 @@ function serviceDetails(provider: ProviderConfig): string[] {
   return parts
 }
 
-function ServicePreview({ provider, onEdit }: { provider: ProviderConfig, onEdit: () => void }) {
+function ServicePreview({ provider, active, onEdit, children }: { provider: ProviderConfig, active: boolean, onEdit: () => void, children: React.ReactNode }) {
   const store = useStore()
   const setConfig = useSetAtom(writeConfigAtom)
   const [testing, setTesting] = useState(false)
@@ -121,9 +177,12 @@ function ServicePreview({ provider, onEdit }: { provider: ProviderConfig, onEdit
   }
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex flex-col gap-3">
       <div className="flex min-w-0 flex-1 flex-col gap-[5px]">
-        <NameAndModel name={provider.name} model={provider.model} />
+        <div className="flex flex-wrap items-center gap-3">
+          <NameAndModel name={provider.name} model={provider.model} />
+          {active && <span className="text-xs text-link">{i18n.t("options.service.active")}</span>}
+        </div>
         <Details parts={serviceDetails(provider)} />
         <div className="flex items-center gap-1.5 text-xs" data-testid="service-status">
           <Dot className={testing ? "bg-muted-foreground/50" : status.dot} />
@@ -134,13 +193,14 @@ function ServicePreview({ provider, onEdit }: { provider: ProviderConfig, onEdit
           <code className="block whitespace-pre-wrap font-mono text-xs leading-[17px] text-muted-foreground">{provider.connectionCheck.error}</code>
         )}
       </div>
-      <div className="flex shrink-0 gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant="outline" className="px-3.5 text-[13px] font-normal" disabled={testing} onClick={() => void test()}>
           {i18n.t("options.service.test")}
         </Button>
         <Button variant="outline" className="px-3.5 text-[13px] font-normal" disabled={testing} onClick={onEdit}>
           {i18n.t("options.service.edit")}
         </Button>
+        {children}
       </div>
     </div>
   )
@@ -170,7 +230,7 @@ function previewDetails(preview: SetupPreview): string[] {
   return parts
 }
 
-function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefined, onDone: () => void }) {
+function ServiceEditor({ current, target, initialSetup, onDone }: { current: ProviderConfig | undefined, target: SetupTarget, initialSetup: boolean, onDone: () => void }) {
   const store = useStore()
   const config = useAtomValue(configAtom)
   const setConfig = useSetAtom(writeConfigAtom)
@@ -178,7 +238,7 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
 
   // The editor opens on the current service, masked, so a field can be changed in place.
   const [initial] = useState(() => {
-    const exported = current ? exportSetupDocument(config) : null
+    const exported = current?.apiKey ? exportSetupDocument(config, current.id) : null
     return exported ? stringifySetupDocument(exported) : ""
   })
   const [text, setText] = useState(initial)
@@ -207,8 +267,8 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
   }, [initial])
 
   const parsed = useMemo(() => text.trim() ? parseSetupDocument(text) : null, [text])
-  const unchanged = !!current && !!parsed?.ok && deepEqual(parsed.document, exportSetupDocument(config))
-  const preview = parsed?.ok && !unchanged ? describeSetupDocument(config, parsed.document) : null
+  const unchanged = !!current && !!parsed?.ok && deepEqual(parsed.document, exportSetupDocument(config, current.id))
+  const preview = parsed?.ok && !unchanged && (target.kind === "add" || current) ? describeSetupDocument(config, parsed.document, target) : null
   const canApply = !!preview && preview.keyStatus !== "missing" && !applying
 
   const apply = async () => {
@@ -217,15 +277,29 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
     setApplying(true)
     setFailure(null)
     try {
-      const { config: next, providerId } = applySetupDocument(store.get(configAtom), parsed.document)
+      const original = current
+      const { config: next, providerId } = applySetupDocument(store.get(configAtom), parsed.document, target)
       const provider = next.providersConfig.find(p => p.id === providerId)!
       const check = await checkConnection(provider)
       if (!check.ok) {
         setFailure(check.error ?? "")
         return
       }
-      const saved = withConnectionCheck(next, providerId, check)
-      await setConfig({ providersConfig: saved.providersConfig, translate: saved.translate })
+      const latest = store.get(configAtom)
+      if (target.kind === "edit") {
+        const updated = latest.providersConfig.find(p => p.id === target.providerId)
+        if (!original || !updated || !deepEqual({ ...original, connectionCheck: undefined }, { ...updated, connectionCheck: undefined })) {
+          setFailure(i18n.t("options.service.stale"))
+          return
+        }
+      }
+      const saved = { ...provider, connectionCheck: check }
+      const names = latest.providersConfig.filter(p => p.id !== saved.id)
+      if (names.some(p => p.name === saved.name)) {
+        setFailure(i18n.t("options.service.stale"))
+        return
+      }
+      await setConfig({ providersConfig: target.kind === "add" ? [...latest.providersConfig, saved] : latest.providersConfig.map(p => p.id === saved.id ? saved : p) })
       await clearClipboard()
       if (mountedRef.current)
         onDone()
@@ -242,7 +316,7 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
 
   return (
     <>
-      {current
+      {current && !initialSetup
         ? (
             <Labeled label={i18n.t("options.service.label.current")}>
               <NameAndModel name={current.name} model={current.model} size="text-[13px]" />
@@ -252,11 +326,12 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1.5 text-sm font-semibold">
                 <Dot className="bg-attention" />
-                {i18n.t("options.service.empty.title")}
+                {i18n.t(initialSetup ? "options.service.empty.title" : "options.service.add")}
               </div>
-              <p className="m-0 text-xs leading-[18px] text-muted-foreground">{i18n.t("options.service.empty.description")}</p>
+              <p className="m-0 text-xs leading-[18px] text-muted-foreground">{i18n.t(initialSetup ? "options.service.empty.description" : "options.service.savedOnly")}</p>
             </div>
           )}
+      {current && !initialSetup && <p className="text-xs text-muted-foreground">{i18n.t("options.service.savedOnly")}</p>}
       <textarea
         ref={textareaRef}
         aria-label={i18n.t("options.service.editorLabel")}
@@ -299,8 +374,8 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
         </Labeled>
       )}
       <div className="flex items-center gap-2 pt-1">
-        <div className="flex-1"><CopyInstructionsButton /></div>
-        {current && (
+        <div className="flex-1"><CopyInstructionsButton target={target} /></div>
+        {!initialSetup && (
           <Button variant="outline" className="px-3.5 text-[13px] font-normal" disabled={applying} onClick={onDone}>
             {i18n.t("options.service.cancel")}
           </Button>

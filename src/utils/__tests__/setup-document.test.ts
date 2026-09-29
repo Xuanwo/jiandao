@@ -72,7 +72,7 @@ describe("parseSetupDocument", () => {
 })
 
 describe("applySetupDocument", () => {
-  it("adds a new service and makes it the translation service, leaving other settings alone", () => {
+  it("user adds a service: Given a valid document, When saved, Then selection and other settings stay unchanged", () => {
     const parsed = parseSetupDocument(JSON.stringify({
       type: "openai-compatible",
       name: "Ollama",
@@ -84,11 +84,9 @@ describe("applySetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    const { config, providerId, replaced, keyReused } = applySetupDocument(DEFAULT_CONFIG, parsed.document)
+    const { config, providerId } = applySetupDocument(DEFAULT_CONFIG, parsed.document, { kind: "add" })
     const added = config.providersConfig.find(p => p.id === providerId)
 
-    expect(replaced).toBe(false)
-    expect(keyReused).toBe(false)
     expect(config.providersConfig).toHaveLength(DEFAULT_CONFIG.providersConfig.length + 1)
     expect(added).toEqual({
       id: providerId,
@@ -100,7 +98,7 @@ describe("applySetupDocument", () => {
       model: "qwen3:8b",
       body: { reasoning_effort: "none" },
     })
-    expect(config.translate).toEqual({ ...DEFAULT_CONFIG.translate, providerId })
+    expect(config.translate).toEqual(DEFAULT_CONFIG.translate)
     expect(config.language).toEqual(DEFAULT_CONFIG.language)
   })
 
@@ -111,7 +109,7 @@ describe("applySetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    const { config, providerId } = applySetupDocument(stored, parsed.document)
+    const { config, providerId } = applySetupDocument(stored, parsed.document, { kind: "edit", providerId: "openai-default" })
     expect(config.providersConfig.find(p => p.id === providerId)).not.toHaveProperty("connectionCheck")
   })
 
@@ -123,9 +121,8 @@ describe("applySetupDocument", () => {
     const stored: Config = { ...configWithOpenAIKey("sk-old-key") }
     stored.providersConfig = [...stored.providersConfig, { id: "claude", name: "Claude", enabled: true, provider: "anthropic", apiKey: "sk-ant-x", model: "claude-haiku-4-5" }]
 
-    const { config, providerId, replaced } = applySetupDocument(stored, parsed.document)
+    const { config, providerId } = applySetupDocument(stored, parsed.document, { kind: "edit", providerId: "openai-default" })
 
-    expect(replaced).toBe(true)
     expect(providerId).toBe("openai-default")
     expect(config.providersConfig).toHaveLength(stored.providersConfig.length)
     expect(config.providersConfig.find(p => p.id === "openai-default")).toMatchObject({
@@ -138,15 +135,14 @@ describe("applySetupDocument", () => {
 
   it("keeps the stored key when the document carries the masked key from an export", () => {
     const stored = configWithOpenAIKey("sk-proj-1234567890a9f2")
-    const exported = exportSetupDocument(stored)
+    const exported = exportSetupDocument(stored, "openai-default")
     if (!exported)
       throw new Error("export failed")
     expect(exported.apiKey).toBe("sk-proj-…a9f2")
 
     const edited = { ...exported, model: "gpt-5-mini" }
-    const { config, keyReused } = applySetupDocument(stored, edited)
+    const { config } = applySetupDocument(stored, edited, { kind: "edit", providerId: "openai-default" })
 
-    expect(keyReused).toBe(true)
     expect(config.providersConfig.find(p => p.id === "openai-default")).toMatchObject({
       apiKey: "sk-proj-1234567890a9f2",
       model: "gpt-5-mini",
@@ -158,7 +154,7 @@ describe("applySetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    expect(() => applySetupDocument(DEFAULT_CONFIG, parsed.document)).toThrow(SetupDocumentError)
+    expect(() => applySetupDocument(DEFAULT_CONFIG, parsed.document, { kind: "add" })).toThrow(SetupDocumentError)
   })
 
   it("treats a relay with its own base URL as a different service from the official API", () => {
@@ -166,9 +162,8 @@ describe("applySetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    const { config, replaced } = applySetupDocument(configWithOpenAIKey("sk-official"), parsed.document)
+    const { config } = applySetupDocument(configWithOpenAIKey("sk-official"), parsed.document, { kind: "add" })
 
-    expect(replaced).toBe(false)
     expect(config.providersConfig.filter(p => p.provider === "openai")).toHaveLength(2)
     expect(config.providersConfig.find(p => p.id === "openai-default")?.apiKey).toBe("sk-official")
   })
@@ -180,7 +175,7 @@ describe("describeSetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    expect(describeSetupDocument(DEFAULT_CONFIG, parsed.document)).toEqual({
+    expect(describeSetupDocument(DEFAULT_CONFIG, parsed.document, { kind: "add" })).toEqual({
       type: "deepseek",
       api: "openai-chat",
       providerName: "DeepSeek",
@@ -188,7 +183,6 @@ describe("describeSetupDocument", () => {
       host: "api.deepseek.com",
       keyStatus: "new",
       thinkingOff: true,
-      replaces: false,
     })
   })
 
@@ -206,7 +200,7 @@ describe("describeSetupDocument", () => {
       const parsed = parseSetupDocument(JSON.stringify({ apiKey: "k", model: "m", ...provider }))
       if (!parsed.ok)
         throw new Error(parsed.error)
-      expect(describeSetupDocument(DEFAULT_CONFIG, parsed.document).thinkingOff, JSON.stringify(provider)).toBe(expected)
+      expect(describeSetupDocument(DEFAULT_CONFIG, parsed.document, { kind: "add" }).thinkingOff, JSON.stringify(provider)).toBe(expected)
     }
   })
 
@@ -215,7 +209,7 @@ describe("describeSetupDocument", () => {
     if (!parsed.ok)
       throw new Error(parsed.error)
 
-    const preview = describeSetupDocument(DEFAULT_CONFIG, parsed.document)
+    const preview = describeSetupDocument(DEFAULT_CONFIG, parsed.document, { kind: "add" })
     expect(preview.host).toBe("localhost:11434")
     expect(preview.keyStatus).toBe("missing")
     expect(preview.thinkingOff).toBeNull()
@@ -238,7 +232,7 @@ describe("api key masking", () => {
 
 describe("exportSetupDocument", () => {
   it("round-trips through parse with the masked key", () => {
-    const exported = exportSetupDocument(configWithOpenAIKey("sk-abcdefghijkl"))
+    const exported = exportSetupDocument(configWithOpenAIKey("sk-abcdefghijkl"), "openai-default")
     if (!exported)
       throw new Error("export failed")
 
@@ -246,5 +240,34 @@ describe("exportSetupDocument", () => {
     expect(reparsed.ok).toBe(true)
     // The default name is left out, so the document holds only what the reader or agent chose.
     expect(exported).toEqual({ type: "openai", apiKey: "sk-…ijkl", model: "gpt-6-luna" })
+  })
+})
+
+describe("user manages independent service configurations", () => {
+  it("user adds a service: Given the same endpoint, When a second model is saved, Then both entries remain and selection stays unchanged", () => {
+    const stored = configWithOpenAIKey("first-key")
+    const result = applySetupDocument(stored, { type: "openai", apiKey: "second-key", model: "second-model" }, { kind: "add" })
+    expect(result.config.providersConfig).toHaveLength(2)
+    expect(result.config.providersConfig[0]).toEqual(stored.providersConfig[0])
+    expect(result.config.translate).toEqual(stored.translate)
+  })
+
+  it("user edits an inactive service: Given duplicate endpoints, When its masked document is saved, Then only its own key is reused", () => {
+    const stored = configWithOpenAIKey("first-key")
+    stored.providersConfig.push({ ...stored.providersConfig[0], id: "second", name: "Second", apiKey: "second-key" })
+    const document = exportSetupDocument(stored, "second")!
+    expect(document.apiKey).toBe("…-key")
+    const result = applySetupDocument(stored, { ...document, model: "second-model" }, { kind: "edit", providerId: "second" })
+    expect(result.config.providersConfig[0]).toEqual(stored.providersConfig[0])
+    expect(result.config.providersConfig[1]).toMatchObject({ id: "second", apiKey: "second-key", model: "second-model" })
+    expect(result.config.translate).toEqual(stored.translate)
+  })
+
+  it("user protects a stored key: Given a masked key, When adding or changing destination, Then the key is not reused", () => {
+    const stored = configWithOpenAIKey("first-key")
+    const document = { type: "openai" as const, apiKey: "…-key", model: "model" }
+    expect(() => applySetupDocument(stored, document, { kind: "add" })).toThrow(SetupDocumentError)
+    expect(() => applySetupDocument(stored, { ...document, baseURL: "https://other.example/v1" }, { kind: "edit", providerId: "openai-default" })).toThrow(SetupDocumentError)
+    expect(() => applySetupDocument(stored, document, { kind: "edit", providerId: "deleted" })).toThrow(SetupDocumentError)
   })
 })

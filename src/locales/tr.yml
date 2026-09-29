@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: Ayarlar
   service:
+    add: Hizmet ekle
+    active: Geçerli hizmet
+    select: Seç
+    delete: Sil
+    deleteTitle: Çeviri hizmeti silinsin mi?
+    deleteDescription: «$1» ve kayıtlı anahtarı silinir. Bu işlem geri alınamaz.
+    deleteActive: Geçerli hizmeti silmeden önce başka bir hizmet seçin.
+    savedOnly: Kaydetmek geçerli hizmeti değiştirmez.
+    switchHint: Mevcut çeviriler korunur. Yeni istekler seçilen hizmeti kullanır.
+    stale: Hizmet değişti. Düzenleyiciyi yeniden açıp tekrar deneyin.
+    saveFailed: Hizmet kaydedilemedi. Tekrar deneyin.
     title: Çeviri hizmeti
     empty:
       title: Henüz çeviri hizmeti yok

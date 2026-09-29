@@ -46,6 +46,17 @@ errorRecovery:
 options:
   title: Configuración
   service:
+    add: Añadir servicio
+    active: Servicio actual
+    select: Seleccionar
+    delete: Eliminar
+    deleteTitle: ¿Eliminar el servicio de traducción?
+    deleteDescription: Eliminar «$1» y su clave guardada. Esta acción no se puede deshacer.
+    deleteActive: Selecciona otro servicio antes de eliminar el actual.
+    savedOnly: Guardar no cambia el servicio actual.
+    switchHint: Las traducciones existentes se conservan. Las nuevas solicitudes usan el servicio seleccionado.
+    stale: El servicio ha cambiado. Vuelve a abrir el editor e inténtalo de nuevo.
+    saveFailed: No se pudo guardar el servicio. Inténtalo de nuevo.
     title: Servicio de traducción
     empty:
       title: Aún no hay servicio de traducción
