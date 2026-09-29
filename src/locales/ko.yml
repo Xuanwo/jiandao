@@ -29,6 +29,8 @@ popup:
     title: 아직 번역 서비스가 없습니다
     description: 에이전트가 만든 구성을 설정 페이지에 붙여 넣으면 번역할 수 있습니다.
     openSettings: 설정에서 구성하기
+    resetTitle: 번역 서비스를 다시 구성해 주세요
+    resetDescription: Jiandao의 구성 형식이 바뀌어 이전 구성을 이어 쓸 수 없어 삭제했습니다. 에이전트가 만든 구성을 설정 페이지에 붙여 넣으면 다시 번역할 수 있습니다.
 errorRecovery:
   title: 문제가 발생했습니다
   description: 복구 모드가 활성화되었습니다. 페이지를 새로고침하거나 설정을 초기화한 뒤 다시 시도하세요.
@@ -50,6 +52,9 @@ options:
     empty:
       title: 아직 번역 서비스가 없습니다
       description: 안내를 에이전트에게 전달하세요. 에이전트가 키로 번역 서비스 구성을 확인해 클립보드에 넣어 줍니다. 아래에 붙여 넣으세요.
+    reset:
+      title: 번역 서비스를 다시 구성해 주세요
+      description: Jiandao의 구성 형식이 바뀌어 이전 구성을 이어 쓸 수 없어 삭제했습니다. 안내를 에이전트에게 전달하세요. 에이전트가 키로 번역 서비스 구성을 확인해 클립보드에 넣어 줍니다. 아래에 붙여 넣으세요.
     copyInstructions: 에이전트용 안내 복사
     copied: 복사됨
     edit: 수정

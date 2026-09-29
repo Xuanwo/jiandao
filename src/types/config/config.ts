@@ -12,8 +12,17 @@ const languageSchema = z.object({
   level: langLevel,
 })
 
+/**
+ * Version of the stored config shape. Bump it with every change to the
+ * shape and add the step from the previous version to CONFIG_MIGRATIONS
+ * (utils/config/migrate.ts); a stored config with no path to this version
+ * is cleared.
+ */
+export const CONFIG_VERSION = 1
+
 // Complete config schema
 export const configSchema = z.object({
+  version: z.literal(CONFIG_VERSION),
   language: languageSchema,
   providersConfig: providersConfigSchema,
   // A stored config without this section gets the default of each field.

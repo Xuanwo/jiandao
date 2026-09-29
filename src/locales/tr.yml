@@ -29,6 +29,8 @@ popup:
     title: Henüz çeviri hizmeti yok
     description: Ajanınızın oluşturduğu yapılandırmayı ayarlar sayfasına yapıştırın, çeviriye başlayın.
     openSettings: Ayarlarda yapılandır
+    resetTitle: Çeviri hizmetini yeniden yapılandırın
+    resetDescription: Jiandao yapılandırma biçimini değiştirdi; eski yapılandırma aktarılamadığı için silindi. Ajanınızın oluşturduğu yapılandırmayı ayarlar sayfasına yapıştırın, çeviriye devam edin.
 errorRecovery:
   title: Bir sorun oluştu
   description: Kurtarma modu etkin. Sayfayı yenileyin veya ayarları sıfırlayıp tekrar deneyin.
@@ -50,6 +52,9 @@ options:
     empty:
       title: Henüz çeviri hizmeti yok
       description: Talimatları ajanınıza verin. Ajan, hizmet yapılandırmasını anahtarınızla doğrulayıp panoya koyar; aşağıya yapıştırın.
+    reset:
+      title: Çeviri hizmetini yeniden yapılandırın
+      description: Jiandao yapılandırma biçimini değiştirdi; eski yapılandırma aktarılamadığı için silindi. Talimatları ajanınıza verin. Ajan, hizmet yapılandırmasını anahtarınızla doğrulayıp panoya koyar; aşağıya yapıştırın.
     copyInstructions: Ajan için talimatları kopyala
     copied: Kopyalandı
     edit: Düzenle

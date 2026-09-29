@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai"
 import { i18n } from "#imports"
 import { SegmentedControl } from "@/components/segmented-control"
+import { useConfigReset } from "@/hooks/use-config-reset"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { featureProviderConfigAtom } from "@/utils/atoms/provider"
 import { LanguageRow } from "./components/language-row"
@@ -34,13 +35,14 @@ export default function App() {
   usePopupSync()
   const providerConfig = useAtomValue(featureProviderConfigAtom("translate"))
   const needsApiKey = !!providerConfig && !providerConfig.apiKey?.trim()
+  const configReset = useConfigReset()
 
   return (
     <div className="flex min-h-[300px] flex-col justify-between">
       <div className="flex flex-col gap-3.5 px-4 pt-4 pb-4">
         <LanguageRow muted={needsApiKey} />
         {needsApiKey
-          ? <SetupPromptCard />
+          ? <SetupPromptCard afterReset={configReset} />
           : (
               <>
                 <DisplayModeControl />

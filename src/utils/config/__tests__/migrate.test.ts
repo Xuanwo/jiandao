@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { configSchema } from "@/types/config/config"
+import { CONFIG_VERSION } from "@/types/config/config"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
-import { migrateStoredConfig } from "../migrate"
+import { migrateStoredConfig, upgradeConfigVersion } from "../migrate"
 
-/** The three services Plainly 1.0 stored on a fresh install, with a key added to one. */
+/** A service as Plainly 1.0 stored it: the model is an object and options use the AI SDK's names. */
 const legacyConfig = {
   ...DEFAULT_CONFIG,
+  version: undefined,
   providersConfig: [
     {
       id: "openai-default",
@@ -14,54 +15,53 @@ const legacyConfig = {
       provider: "openai",
       apiKey: "sk-old",
       model: { model: "gpt-5-mini", isCustomModel: false, customModel: null },
-      providerOptions: { reasoningEffort: "minimal", textVerbosity: "low" },
-      headers: { "X-Test": "1", "X-Empty": "", "X-Number": 1 },
-    },
-    {
-      id: "deepseek-default",
-      name: "DeepSeek",
-      enabled: true,
-      provider: "deepseek",
-      model: { model: "deepseek-v4-flash", isCustomModel: true, customModel: " deepseek-flash " },
-      providerOptions: { thinking: { type: "disabled" } },
-    },
-    {
-      id: "openai-compatible-default",
-      name: "Custom Provider",
-      enabled: true,
-      provider: "openai-compatible",
-      baseURL: "https://api.example.com/v1",
-      model: { model: "use-custom-model", isCustomModel: true, customModel: null },
-      providerOptions: { reasoning_effort: "none", reasoningEffort: "low" },
+      providerOptions: { reasoningEffort: "minimal" },
     },
   ],
 }
 
-describe("migrateStoredConfig", () => {
-  it("turns the 1.0 model object and SDK options into a model ID and a request body", () => {
-    const migrated = migrateStoredConfig(legacyConfig)
-    const parsed = configSchema.safeParse(migrated)
-    expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true)
-    if (!parsed.success)
-      return
+function withoutVersion(config: object): Record<string, unknown> {
+  const { version: _, ...rest } = config as Record<string, unknown>
+  return rest
+}
 
-    expect(parsed.data.providersConfig).toEqual([
-      expect.objectContaining({
-        id: "openai-default",
-        apiKey: "sk-old",
-        model: "gpt-5-mini",
-        body: { reasoning: { effort: "minimal" }, text: { verbosity: "low" } },
-        headers: { "X-Test": "1" },
-      }),
-      expect.objectContaining({ id: "deepseek-default", model: "deepseek-flash", body: { thinking: { type: "disabled" } } }),
-      expect.objectContaining({ id: "openai-compatible-default", model: "", body: { reasoning_effort: "low" } }),
-    ])
-    expect(parsed.data.providersConfig[0]).not.toHaveProperty("providerOptions")
+describe("migrateStoredConfig", () => {
+  it("keeps a config at the current version", () => {
+    expect(migrateStoredConfig(DEFAULT_CONFIG)).toEqual({ ok: true, config: DEFAULT_CONFIG })
   })
 
-  it("leaves a config that is already in the current shape untouched", () => {
-    const current = { ...DEFAULT_CONFIG, providersConfig: [{ ...DEFAULT_CONFIG.providersConfig[0], body: { reasoning: { effort: "none" } } }] }
-    expect(migrateStoredConfig(current)).toEqual(current)
-    expect(migrateStoredConfig(null)).toBeNull()
+  it("reads a config without version, as 1.1.0 stored it, as version 1", () => {
+    expect(migrateStoredConfig(withoutVersion(DEFAULT_CONFIG))).toEqual({ ok: true, config: DEFAULT_CONFIG })
+  })
+
+  it("reports a conflict for the 1.0 shape instead of converting it", () => {
+    const result = migrateStoredConfig(withoutVersion(legacyConfig))
+    expect(result.ok).toBe(false)
+  })
+
+  it("reports a conflict for a config from a newer build", () => {
+    const result = migrateStoredConfig({ ...DEFAULT_CONFIG, version: CONFIG_VERSION + 1 })
+    expect(result).toEqual({ ok: false, reason: `config version ${CONFIG_VERSION + 1} is newer than ${CONFIG_VERSION}` })
+  })
+
+  it("reports a conflict for a value that is not a config", () => {
+    expect(migrateStoredConfig("config").ok).toBe(false)
+    expect(migrateStoredConfig({ ...DEFAULT_CONFIG, version: "1" }).ok).toBe(false)
+  })
+})
+
+describe("upgradeConfigVersion", () => {
+  const migrations = {
+    2: (config: Record<string, unknown>) => ({ ...config, steps: ["2"] }),
+    3: (config: Record<string, unknown>) => ({ ...config, steps: [...config.steps as string[], "3"] }),
+  }
+
+  it("runs each step from the stored version to the target in order", () => {
+    expect(upgradeConfigVersion({ version: 1 }, 3, migrations)).toEqual({ ok: true, config: { version: 3, steps: ["2", "3"] } })
+    expect(upgradeConfigVersion({ version: 2, steps: [] }, 3, migrations)).toEqual({ ok: true, config: { version: 3, steps: ["3"] } })
+  })
+
+  it("fails when a step on the way is missing", () => {
+    expect(upgradeConfigVersion({ version: 1 }, 4, migrations)).toEqual({ ok: false, reason: "no migration from config version 3 to 4" })
   })
 })

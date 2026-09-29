@@ -9,20 +9,22 @@ export const extensionPath = resolve(".output/chrome-mv3")
 /**
  * Starts headless Chromium with the built extension and a new profile.
  * Returns the browser context, its first page and the extension ID.
+ * `userDataDir` reuses a profile, and `extension` loads another build of the
+ * extension, so that a test can start an older build and then update it.
  */
-export async function launchBrowser() {
+export async function launchBrowser({ userDataDir = "", extension = extensionPath } = {}) {
   // Without a build, Chromium loads no extension, and the wait for its service worker only times out.
-  await access(resolve(extensionPath, "manifest.json")).catch(() => {
-    throw new Error(`no built extension in ${extensionPath}; run pnpm build first`)
+  await access(resolve(extension, "manifest.json")).catch(() => {
+    throw new Error(`no built extension in ${extension}; run pnpm build first`)
   })
   // An empty path makes Playwright create a temporary profile and delete it on close.
-  const context = await chromium.launchPersistentContext("", {
+  const context = await chromium.launchPersistentContext(userDataDir, {
     // Headless Chromium loads extensions; the headless shell does not.
     channel: "chromium",
     headless: true,
     // On Linux, Chromium takes the extension UI language from LANGUAGE. The tests find elements by their English names.
     env: { ...process.env, LANGUAGE: "en" },
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
+    args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
   })
   recordBrowserEvents(context)
   try {

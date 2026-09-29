@@ -5,8 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { i18n } from "#imports"
 import { IconCheck, IconCopy } from "@/components/icons"
 import { Button } from "@/components/ui/button"
+import { useConfigReset } from "@/hooks/use-config-reset"
 import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
 import { clearClipboard, copyText } from "@/utils/clipboard"
+import { clearConfigResetNotice } from "@/utils/config/storage"
 import { deepEqual } from "@/utils/object"
 import { getRequestHost, resolveRequestApi } from "@/utils/providers/request"
 import { checkConnection, withConnectionCheck } from "@/utils/providers/test-connection"
@@ -32,13 +34,14 @@ export function ServiceSection() {
   const active = config.providersConfig.find(p => p.id === config.translate.providerId)
   const configured = !!active?.apiKey?.trim()
   const [editing, setEditing] = useState(false)
+  const configReset = useConfigReset()
 
   return (
     <SettingsSection id="service" title={i18n.t("options.service.title")}>
       <div className="flex flex-col gap-3.5 rounded-xl border border-border bg-card px-[18px] py-4">
         {configured && active && !editing
           ? <ServicePreview provider={active} onEdit={() => setEditing(true)} />
-          : <ServiceEditor current={configured ? active : undefined} onDone={() => setEditing(false)} />}
+          : <ServiceEditor current={configured ? active : undefined} afterReset={configReset} onDone={() => setEditing(false)} />}
       </div>
     </SettingsSection>
   )
@@ -170,7 +173,7 @@ function previewDetails(preview: SetupPreview): string[] {
   return parts
 }
 
-function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefined, onDone: () => void }) {
+function ServiceEditor({ current, afterReset, onDone }: { current: ProviderConfig | undefined, afterReset: boolean, onDone: () => void }) {
   const store = useStore()
   const config = useAtomValue(configAtom)
   const setConfig = useSetAtom(writeConfigAtom)
@@ -226,6 +229,7 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
       }
       const saved = withConnectionCheck(next, providerId, check)
       await setConfig({ providersConfig: saved.providersConfig, translate: saved.translate })
+      await clearConfigResetNotice()
       await clearClipboard()
       if (mountedRef.current)
         onDone()
@@ -252,9 +256,9 @@ function ServiceEditor({ current, onDone }: { current: ProviderConfig | undefine
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1.5 text-sm font-semibold">
                 <Dot className="bg-attention" />
-                {i18n.t("options.service.empty.title")}
+                {afterReset ? i18n.t("options.service.reset.title") : i18n.t("options.service.empty.title")}
               </div>
-              <p className="m-0 text-xs leading-[18px] text-muted-foreground">{i18n.t("options.service.empty.description")}</p>
+              <p className="m-0 text-xs leading-[18px] text-muted-foreground">{afterReset ? i18n.t("options.service.reset.description") : i18n.t("options.service.empty.description")}</p>
             </div>
           )}
       <textarea

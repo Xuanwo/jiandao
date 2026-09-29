@@ -29,6 +29,8 @@ popup:
     title: 還沒有翻譯服務
     description: 在設定頁貼上 agent 產生的設定，就能翻譯。
     openSettings: 前往設定
+    resetTitle: 需要重新設定翻譯服務
+    resetDescription: 簡道更新了設定格式，舊設定無法沿用，已清除。在設定頁貼上 agent 產生的設定，就能繼續翻譯。
 errorRecovery:
   title: 應用程式發生異常
   description: 已進入復原模式。請重新整理頁面或重設設定後再試一次。
@@ -50,6 +52,9 @@ options:
     empty:
       title: 還沒有翻譯服務
       description: 把說明交給你的 agent。它會用你的金鑰驗證翻譯服務的設定，放進剪貼簿，你貼到下面。
+    reset:
+      title: 需要重新設定翻譯服務
+      description: 簡道更新了設定格式，舊設定無法沿用，已清除。把說明交給你的 agent，它會用你的金鑰驗證翻譯服務的設定，放進剪貼簿，你貼到下面。
     copyInstructions: 複製給 agent 的說明
     copied: 已複製
     edit: 修改

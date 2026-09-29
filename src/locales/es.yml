@@ -29,6 +29,8 @@ popup:
     title: Aún no hay servicio de traducción
     description: Pega en la página de ajustes la configuración que genera tu agente y podrás traducir.
     openSettings: Configurar en ajustes
+    resetTitle: Vuelve a configurar el servicio de traducción
+    resetDescription: Jiandao cambió el formato de su configuración y la anterior no se pudo conservar, así que se borró. Pega en la página de ajustes la configuración que genera tu agente para volver a traducir.
 errorRecovery:
   title: Algo salió mal
   description: El modo de recuperación está activo. Actualiza la página o restablece la configuración y vuelve a intentarlo.
@@ -50,6 +52,9 @@ options:
     empty:
       title: Aún no hay servicio de traducción
       description: Pasa las instrucciones a tu agente. Verificará la configuración del servicio con tu clave y la dejará en el portapapeles; pégala abajo.
+    reset:
+      title: Vuelve a configurar el servicio de traducción
+      description: Jiandao cambió el formato de su configuración y la anterior no se pudo conservar, así que se borró. Pasa las instrucciones a tu agente. Verificará la configuración del servicio con tu clave y la dejará en el portapapeles; pégala abajo.
     copyInstructions: Copiar instrucciones para tu agente
     copied: Copiado
     edit: Editar

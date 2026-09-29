@@ -1,75 +1,79 @@
-import { DEFAULT_REQUEST_API, isProviderType } from "@/types/config/provider"
+import type { Config } from "@/types/config/config"
+import { CONFIG_VERSION, configSchema } from "@/types/config/config"
 
 /**
- * Plainly 1.0 stored the model as `{ model, isCustomModel, customModel }` and
- * request options in the AI SDK's own vocabulary (`providerOptions`). Both
- * became plain values: `model` is the ID the service expects, `body` is JSON
- * merged into the request. This runs on every stored config before schema
- * validation and leaves configs that are already in the new shape untouched.
+ * Upgrades one stored config from the version before its key to that
+ * version. It receives the raw stored object, which may not match any
+ * current type, and returns the next version's shape; the result's
+ * `version` is set by the caller.
  */
+export type ConfigMigration = (config: Record<string, unknown>) => Record<string, unknown>
+
+/**
+ * Every change to the stored shape bumps CONFIG_VERSION and adds the step
+ * from the previous version here, keyed by the version it produces. Steps
+ * are kept for every version a released build wrote, so an install that
+ * skipped several releases still reaches the current shape.
+ */
+export const CONFIG_MIGRATIONS: Readonly<Record<number, ConfigMigration>> = {}
+
+/**
+ * Jiandao 1.1.0 stored configs without `version`; their shape is version 1.
+ * Older configs have no `version` either, but version 1 rejects their
+ * shape, so they end up as a conflict.
+ */
+const UNVERSIONED_CONFIG_VERSION = 1
+
+export type ConfigMigrationResult
+  = | { ok: true, config: Config }
+    | { ok: false, reason: string }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-function legacyModelId(model: unknown): string | undefined {
-  if (typeof model === "string")
-    return undefined
-  if (!isRecord(model))
-    return ""
-  const selected = model.isCustomModel ? model.customModel : model.model
-  return typeof selected === "string" ? selected.trim() : ""
+/**
+ * Runs the steps that bring a stored object from its `version` to
+ * `targetVersion`, without checking the result against a schema. It fails
+ * for a version with no path to the target, including one newer than it.
+ */
+export function upgradeConfigVersion(
+  stored: Record<string, unknown>,
+  targetVersion: number,
+  migrations: Readonly<Record<number, ConfigMigration>>,
+): { ok: true, config: Record<string, unknown> } | { ok: false, reason: string } {
+  const version = stored.version ?? UNVERSIONED_CONFIG_VERSION
+  if (typeof version !== "number" || !Number.isInteger(version) || version < 1)
+    return { ok: false, reason: `unknown config version ${JSON.stringify(version)}` }
+  if (version > targetVersion)
+    return { ok: false, reason: `config version ${version} is newer than ${targetVersion}` }
+
+  let config = stored
+  for (let next = version + 1; next <= targetVersion; next++) {
+    const migrate = migrations[next]
+    if (!migrate)
+      return { ok: false, reason: `no migration from config version ${next - 1} to ${next}` }
+    config = migrate(config)
+  }
+  return { ok: true, config: { ...config, version: targetVersion } }
 }
 
-/** SDK option names → the fields the wire format actually uses. Unknown keys pass through as they are. */
-function legacyOptionsToBody(options: Record<string, unknown>, api: string): Record<string, unknown> {
-  const body: Record<string, unknown> = {}
-  for (const [key, value] of Object.entries(options)) {
-    if (api === "openai-responses" && key === "reasoningEffort")
-      body.reasoning = { ...(isRecord(body.reasoning) ? body.reasoning : {}), effort: value }
-    else if (api === "openai-responses" && key === "textVerbosity")
-      body.text = { ...(isRecord(body.text) ? body.text : {}), verbosity: value }
-    else if (api === "openai-chat" && key === "reasoningEffort")
-      body.reasoning_effort = value
-    else if (api === "openai-chat" && key === "textVerbosity")
-      body.verbosity = value
-    else
-      body[key] = value
-  }
-  return body
-}
+/**
+ * Brings a stored config to CONFIG_VERSION and checks it against the current
+ * schema. A config that cannot get there is a conflict: it comes from a
+ * version with no migration path, from a newer build, or does not match its
+ * own version's shape. The caller clears it instead of keeping part of it.
+ */
+export function migrateStoredConfig(stored: unknown): ConfigMigrationResult {
+  if (!isRecord(stored))
+    return { ok: false, reason: "the stored config is not an object" }
 
-function migrateProvider(provider: unknown): unknown {
-  if (!isRecord(provider))
-    return provider
-  const type = provider.provider
-  if (!isProviderType(String(type)))
-    return provider
+  const upgraded = upgradeConfigVersion(stored, CONFIG_VERSION, CONFIG_MIGRATIONS)
+  if (!upgraded.ok)
+    return upgraded
 
-  const next: Record<string, unknown> = { ...provider }
-  const model = legacyModelId(provider.model)
-  if (model !== undefined)
-    next.model = model
-
-  if ("providerOptions" in next) {
-    const { providerOptions, ...rest } = next
-    const api = DEFAULT_REQUEST_API[type as keyof typeof DEFAULT_REQUEST_API]
-    const body = isRecord(providerOptions) ? legacyOptionsToBody(providerOptions, api) : {}
-    Object.assign(next, rest)
-    delete next.providerOptions
-    if (Object.keys(body).length > 0)
-      next.body = body
-  }
-
-  if (isRecord(next.headers)) {
-    next.headers = Object.fromEntries(Object.entries(next.headers).filter(([, value]) => typeof value === "string" && value !== ""))
-  }
-
-  return next
-}
-
-export function migrateStoredConfig(stored: unknown): unknown {
-  if (!isRecord(stored) || !Array.isArray(stored.providersConfig))
-    return stored
-  return { ...stored, providersConfig: stored.providersConfig.map(migrateProvider) }
+  const parsed = configSchema.safeParse(upgraded.config)
+  if (!parsed.success)
+    return { ok: false, reason: `config does not match version ${CONFIG_VERSION}: ${parsed.error.message}` }
+  return { ok: true, config: parsed.data }
 }

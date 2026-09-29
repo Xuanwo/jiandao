@@ -58,7 +58,6 @@ export const writeConfigAtom = atom(
       try {
         // Storage write always executes (not affected by version check)
         await storageAdapter.set(CONFIG_STORAGE_KEY, nextToPersist, configSchema)
-        await storageAdapter.setMeta(CONFIG_STORAGE_KEY, { lastModifiedAt: Date.now() })
 
         // ───────────────────────────────────────────────────────────────────
         // STEP 3: Reconcile atom with persisted value (stale-write check)

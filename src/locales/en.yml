@@ -29,6 +29,8 @@ popup:
     title: No translation service yet
     description: Paste the configuration your agent generates on the settings page, and you can translate.
     openSettings: Set up in settings
+    resetTitle: Set up your translation service again
+    resetDescription: Jiandao changed its configuration format and cleared the old one, which could not be carried over. Paste the configuration your agent generates on the settings page to translate again.
 errorRecovery:
   title: Something went wrong
   description: Recovery mode is active. Refresh the page or reset settings and try again.
@@ -50,6 +52,9 @@ options:
     empty:
       title: No translation service yet
       description: Hand the instructions to your agent. It verifies the service configuration with your key and puts it on the clipboard; paste it below.
+    reset:
+      title: Set up your translation service again
+      description: Jiandao changed its configuration format and cleared the old one, which could not be carried over. Hand the instructions to your agent. It verifies the service configuration with your key and puts it on the clipboard; paste it below.
     copyInstructions: Copy instructions for your agent
     copied: Copied
     edit: Edit

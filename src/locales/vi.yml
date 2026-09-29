@@ -29,6 +29,8 @@ popup:
     title: Chưa có dịch vụ dịch
     description: Dán cấu hình do agent của bạn tạo vào trang cài đặt là có thể dịch.
     openSettings: Thiết lập trong cài đặt
+    resetTitle: Hãy thiết lập lại dịch vụ dịch
+    resetDescription: Jiandao đã đổi định dạng cấu hình, cấu hình cũ không dùng tiếp được nên đã bị xóa. Dán cấu hình do agent của bạn tạo vào trang cài đặt để dịch tiếp.
 errorRecovery:
   title: Đã xảy ra sự cố
   description: Chế độ khôi phục đang bật. Hãy tải lại trang hoặc đặt lại cài đặt rồi thử lại.
@@ -50,6 +52,9 @@ options:
     empty:
       title: Chưa có dịch vụ dịch
       description: Đưa hướng dẫn cho agent của bạn. Agent sẽ dùng khóa của bạn để kiểm tra cấu hình dịch vụ rồi đặt vào bộ nhớ tạm; hãy dán vào bên dưới.
+    reset:
+      title: Hãy thiết lập lại dịch vụ dịch
+      description: Jiandao đã đổi định dạng cấu hình, cấu hình cũ không dùng tiếp được nên đã bị xóa. Đưa hướng dẫn cho agent của bạn. Agent sẽ dùng khóa của bạn để kiểm tra cấu hình dịch vụ rồi đặt vào bộ nhớ tạm; hãy dán vào bên dưới.
     copyInstructions: Sao chép hướng dẫn cho agent
     copied: Đã sao chép
     edit: Sửa

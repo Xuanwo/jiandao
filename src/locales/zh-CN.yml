@@ -29,6 +29,8 @@ popup:
     title: 还没有翻译服务
     description: 在设置页贴入 agent 生成的配置，就能翻译。
     openSettings: 去设置里配置
+    resetTitle: 需要重新配置翻译服务
+    resetDescription: 简道更新了配置格式，旧配置无法沿用，已清除。在设置页贴入 agent 生成的配置，就能继续翻译。
 errorRecovery:
   title: 应用发生异常
   description: 已进入恢复模式。刷新页面或重置设置后再试。
@@ -50,6 +52,9 @@ options:
     empty:
       title: 还没有翻译服务
       description: 把说明交给你的 agent。它用你的密钥验证好翻译服务的配置，放进剪贴板，你贴到下面。
+    reset:
+      title: 需要重新配置翻译服务
+      description: 简道更新了配置格式，旧配置无法沿用，已清除。把说明交给你的 agent，它用你的密钥验证好翻译服务的配置，放进剪贴板，你贴到下面。
     copyInstructions: 复制给 agent 的说明
     copied: 已复制
     edit: 修改

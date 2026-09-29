@@ -1,4 +1,5 @@
 import type { Config } from "@/types/config/config"
+import type { ConfigMeta } from "@/types/config/meta"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
@@ -57,4 +58,15 @@ export function subscribeLocalConfig(onConfig: (config: Config | null) => void):
     stopped = true
     unwatch()
   }
+}
+
+/** Whether the stored config was cleared on a version conflict and no service has been applied since. */
+export async function wasConfigReset(): Promise<boolean> {
+  const meta = await storage.getMeta<ConfigMeta>(`local:${CONFIG_STORAGE_KEY}`)
+  return typeof meta?.resetAt === "number"
+}
+
+/** Ends the reset notice once the reader has configured a service again. */
+export async function clearConfigResetNotice(): Promise<void> {
+  await storage.removeMeta(`local:${CONFIG_STORAGE_KEY}`, "resetAt")
 }

@@ -22,9 +22,6 @@ export const storageAdapter = {
       throw new Error(parsedValue.error.message)
     }
   },
-  async setMeta(key: string, meta: Record<string, unknown>) {
-    await storage.setMeta(`local:${key}`, meta)
-  },
   watch<T>(key: string, callback: (newValue: T) => void) {
     const unwatch = storage.watch<T>(`local:${key}`, (newValue) => {
       if (isNonNullish(newValue))
