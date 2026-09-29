@@ -1,6 +1,11 @@
+import type { z } from "zod"
 import type { Config } from "@/types/config/config"
 import { CONFIG_VERSION, configSchema } from "@/types/config/config"
-import { describeConfigIssues } from "./storage"
+
+/** Describe schema issues without stored values, which can contain API keys. */
+function describeConfigIssues(error: z.ZodError): string {
+  return error.issues.map(issue => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")
+}
 
 /**
  * Upgrades one stored config from the version before its key to that
@@ -63,7 +68,7 @@ export function upgradeConfigVersion(
  * Brings a stored config to CONFIG_VERSION and checks it against the current
  * schema. A config that cannot get there is a conflict: it comes from a
  * version with no migration path, from a newer build, or does not match its
- * own version's shape. The caller clears it instead of keeping part of it.
+ * own version's shape. Each caller decides how to handle the conflict.
  */
 export function migrateStoredConfig(stored: unknown): ConfigMigrationResult {
   if (!isRecord(stored))

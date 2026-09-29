@@ -1,19 +1,9 @@
-import type { z } from "zod"
 import type { Config } from "@/types/config/config"
 import type { ConfigMeta } from "@/types/config/meta"
 import { storage } from "#imports"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
 import { migrateStoredConfig } from "./migrate"
-
-/**
- * The path and message of each schema issue, for logs and error messages.
- * Issue messages name the expected shape, never the stored value, so an API
- * key does not end up in the text.
- */
-export function describeConfigIssues(error: z.ZodError): string {
-  return error.issues.map(issue => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")
-}
 
 /**
  * Migrates a stored config in memory: a same-version replacement or interrupted
