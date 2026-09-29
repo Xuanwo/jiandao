@@ -25,6 +25,26 @@ async function storedApiKey() {
   return stored ? apiKeyOf(stored) : undefined
 }
 
+it("user opens settings without an install event: Given a versionless service, When the atom mounts and storage changes, Then services are migrated without writing storage", async () => {
+  const { version: _, ...legacy } = configWithApiKey("test-legacy-key")
+  await storage.setItem(STORAGE_ITEM, legacy)
+  const store = createStore()
+  const unsubscribe = store.sub(configAtom, () => {})
+  try {
+    await vi.waitFor(() => expect(store.get(configAtom)).toEqual({ ...legacy, version: 1 }))
+    expect(await storage.getItem(STORAGE_ITEM)).toEqual(legacy)
+
+    const updated = { ...legacy, translate: { ...legacy.translate, mode: "translationOnly" } }
+    await storage.setItem(STORAGE_ITEM, updated)
+    await vi.waitFor(() => expect(store.get(configAtom)).toEqual({ ...updated, version: 1 }))
+    expect(await storage.getItem(STORAGE_ITEM)).toEqual(updated)
+  }
+  finally {
+    unsubscribe()
+    await storage.removeItem(STORAGE_ITEM)
+  }
+})
+
 describe("configAtom storage sync", () => {
   const store = createStore()
   const shownApiKeys: Array<string | undefined> = []
