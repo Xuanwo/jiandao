@@ -6,7 +6,7 @@ const getItemMock = vi.fn()
 const clearMock = vi.fn()
 const setItemMock = vi.fn()
 const setMetaMock = vi.fn()
-const loggerWarnMock = vi.fn()
+const loggerErrorMock = vi.fn()
 
 vi.mock("#imports", () => ({
   storage: {
@@ -28,7 +28,7 @@ vi.mock("wxt/utils/storage", () => ({
 
 vi.mock("@/utils/logger", () => ({
   logger: {
-    warn: loggerWarnMock,
+    error: loggerErrorMock,
   },
 }))
 
@@ -103,6 +103,23 @@ describe("initializeConfig", () => {
     expect(setItemMock).toHaveBeenCalledWith("local:config", buildStableConfig())
     expect(setMetaMock).toHaveBeenCalledWith("local:config", { resetAt: expect.any(Number) })
     expect(clearMock.mock.invocationCallOrder[0]).toBeLessThan(setItemMock.mock.invocationCallOrder[0])
-    expect(loggerWarnMock).toHaveBeenCalledTimes(1)
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("logs which field failed when it clears a config, without the API key", async () => {
+    const config = buildStableConfig()
+    getItemMock.mockResolvedValueOnce({
+      ...config,
+      providersConfig: config.providersConfig.map(provider => ({ ...provider, apiKey: "sk-secret", temperature: -1 })),
+    })
+
+    const { initializeConfig } = await import("../init")
+    await initializeConfig()
+
+    expect(clearMock).toHaveBeenCalledWith("local")
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1)
+    const [message] = loggerErrorMock.mock.calls[0]
+    expect(message).toContain("providersConfig.0.temperature")
+    expect(message).not.toContain("sk-secret")
   })
 })

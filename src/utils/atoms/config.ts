@@ -1,7 +1,9 @@
+import type { Getter, Setter } from "jotai"
 import type { Config } from "@/types/config/config"
 import { atom } from "jotai"
 import { selectAtom } from "jotai/utils"
 import { configSchema } from "@/types/config/config"
+import { getLocalConfigForWrite } from "../config/storage"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
 import { deepMerge } from "../object"
@@ -29,63 +31,96 @@ let writeQueue: Promise<void> = Promise.resolve()
  */
 let writeVersion = 0
 
-export const writeConfigAtom = atom(
-  null,
-  async (get, set, patch: Partial<Config>) => {
-    // ─────────────────────────────────────────────────────────────────────────
-    // STEP 1: Optimistic update (immediate UI feedback)
-    // ─────────────────────────────────────────────────────────────────────────
-    const localPrev = get(configAtom)
-    const optimisticNext = deepMerge(localPrev, patch)
-    set(configAtom, optimisticNext)
+/** The config to store, and the stored config it was built from, if any. */
+interface PlannedWrite {
+  next: Config
+  stored?: Config
+}
 
-    // Capture version for this write (used for stale-write detection later)
-    const currentWriteVersion = ++writeVersion
+/**
+ * Queues one storage write and shows `optimistic` right away. `plan` runs in
+ * queue order. If the write fails, the atom goes back to the stored config
+ * the plan read, or else to its previous value.
+ */
+function queueConfigWrite(
+  get: Getter,
+  set: Setter,
+  optimistic: Config,
+  plan: () => Promise<PlannedWrite>,
+): Promise<void> {
+  // ─────────────────────────────────────────────────────────────────────────
+  // STEP 1: Optimistic update (immediate UI feedback)
+  // ─────────────────────────────────────────────────────────────────────────
+  const localPrev = get(configAtom)
+  set(configAtom, optimistic)
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // STEP 2: Queue the actual storage write
-    // ─────────────────────────────────────────────────────────────────────────
-    // Chain onto writeQueue so writes execute in order.
-    // Note: `.then(callback)` schedules callback to microtask queue (async),
-    // but `writeQueue = task` assignment happens synchronously.
-    const task = writeQueue.then(async () => {
+  // Capture version for this write (used for stale-write detection later)
+  const currentWriteVersion = ++writeVersion
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // STEP 2: Queue the actual storage write
+  // ─────────────────────────────────────────────────────────────────────────
+  // Chain onto writeQueue so writes execute in order.
+  // Note: `.then(callback)` schedules callback to microtask queue (async),
+  // but `writeQueue = task` assignment happens synchronously.
+  const task = writeQueue.then(async () => {
+    let planned: PlannedWrite | undefined
+    try {
       // Always read fresh from storage to capture any writes that completed before us.
       // This ensures we don't lose concurrent field updates:
       //   write({x:1}) then write({y:2}) → storage ends up with {x:1, y:2}
-      const configInStorage = await storageAdapter.get<Config>(CONFIG_STORAGE_KEY, DEFAULT_CONFIG, configSchema)
-      const nextToPersist = deepMerge(configInStorage, patch)
+      planned = await plan()
+      const nextToPersist = planned.next
 
-      try {
-        // Storage write always executes (not affected by version check)
-        await storageAdapter.set(CONFIG_STORAGE_KEY, nextToPersist, configSchema)
+      // Storage write always executes (not affected by version check)
+      await storageAdapter.set(CONFIG_STORAGE_KEY, nextToPersist, configSchema)
 
-        // ───────────────────────────────────────────────────────────────────
-        // STEP 3: Reconcile atom with persisted value (stale-write check)
-        // ───────────────────────────────────────────────────────────────────
-        // Only update atom if no newer writes happened since we started.
-        // If a newer write exists, its optimistic update already set the correct UI state,
-        // so we skip to avoid "flashing back" to this older value.
-        if (currentWriteVersion === writeVersion) {
-          set(configAtom, nextToPersist)
-        }
+      // ───────────────────────────────────────────────────────────────────
+      // STEP 3: Reconcile atom with persisted value (stale-write check)
+      // ───────────────────────────────────────────────────────────────────
+      // Only update atom if no newer writes happened since we started.
+      // If a newer write exists, its optimistic update already set the correct UI state,
+      // so we skip to avoid "flashing back" to this older value.
+      if (currentWriteVersion === writeVersion) {
+        set(configAtom, nextToPersist)
       }
-      catch (error) {
-        console.error("Failed to set config to storage:", error)
+    }
+    catch (error) {
+      console.error("Failed to set config to storage:", error)
 
-        // Roll back to storage value on error, but only if we're still the latest write.
-        if (currentWriteVersion === writeVersion) {
-          set(configAtom, configInStorage)
-        }
-
-        throw error
+      // Roll back, but only if we're still the latest write.
+      if (currentWriteVersion === writeVersion) {
+        set(configAtom, planned?.stored ?? localPrev)
       }
-    })
 
-    // Update queue head. Use `.catch(() => {})` to ensure queue continues even if this write fails.
-    writeQueue = task.catch(() => {})
+      throw error
+    }
+  })
 
-    return task
-  },
+  // Update queue head. Use `.catch(() => {})` to ensure queue continues even if this write fails.
+  writeQueue = task.catch(() => {})
+
+  return task
+}
+
+/**
+ * Merges a patch into the stored config. The write fails, and stores
+ * nothing, when the stored config does not pass the schema.
+ */
+export const writeConfigAtom = atom(
+  null,
+  (get, set, patch: Partial<Config>) =>
+    queueConfigWrite(get, set, deepMerge(get(configAtom), patch), async () => {
+      const stored = await getLocalConfigForWrite()
+      return { next: deepMerge(stored, patch), stored }
+    }),
+)
+
+/** Replaces the stored config with the default config, whatever is stored now. */
+export const resetConfigAtom = atom(
+  null,
+  (get, set) =>
+    queueConfigWrite(get, set, DEFAULT_CONFIG, async () => ({ next: DEFAULT_CONFIG })),
 )
 
 /**

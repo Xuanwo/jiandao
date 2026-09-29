@@ -14,6 +14,7 @@ export async function executeTranslate<TContext>(
     forceBackgroundFetch?: boolean
     isBatch?: boolean
     context?: TContext
+    signal?: AbortSignal
   },
 ) {
   const preparedText = prepareTranslationText(text)

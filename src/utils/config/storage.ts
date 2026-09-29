@@ -1,9 +1,19 @@
+import type { z } from "zod"
 import type { Config } from "@/types/config/config"
 import type { ConfigMeta } from "@/types/config/meta"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
+
+/**
+ * The path and message of each schema issue, for logs and error messages.
+ * Issue messages name the expected shape, never the stored value, so an API
+ * key does not end up in the text.
+ */
+export function describeConfigIssues(error: z.ZodError): string {
+  return error.issues.map(issue => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")
+}
 
 /**
  * Checks a stored config value against the config schema. It gives null for a
@@ -16,7 +26,7 @@ function parseStoredConfig(config: unknown): Config | null {
   }
   const parsedConfig = configSchema.safeParse(config)
   if (!parsedConfig.success) {
-    logger.error("Config is invalid, using default config")
+    logger.error(`Stored config is invalid, using the default config: ${describeConfigIssues(parsedConfig.error)}`)
     return DEFAULT_CONFIG
   }
   return parsedConfig.data
@@ -24,6 +34,22 @@ function parseStoredConfig(config: unknown): Config | null {
 
 export async function getLocalConfig() {
   return parseStoredConfig(await storage.getItem<unknown>(`local:${CONFIG_STORAGE_KEY}`))
+}
+
+/**
+ * The stored config that a partial write merges into. A missing config gives
+ * the default config, because there is nothing to lose. An invalid config
+ * throws: merging the patch into the default config would replace every
+ * stored service.
+ */
+export async function getLocalConfigForWrite(): Promise<Config> {
+  const stored = await storage.getItem<unknown>(`local:${CONFIG_STORAGE_KEY}`)
+  if (stored === null || stored === undefined)
+    return DEFAULT_CONFIG
+  const parsed = configSchema.safeParse(stored)
+  if (!parsed.success)
+    throw new Error(`The stored config is invalid, so nothing was saved: ${describeConfigIssues(parsed.error)}`)
+  return parsed.data
 }
 
 /**

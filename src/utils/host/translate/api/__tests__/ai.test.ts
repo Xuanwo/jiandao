@@ -36,7 +36,7 @@ describe("aiTranslate", () => {
     await expect(aiTranslate("hello", "Chinese", providerConfig, promptResolver)).resolves.toBe("你好")
 
     expect(promptResolver).toHaveBeenCalledWith("Chinese", "hello", undefined)
-    expect(mocks.requestText).toHaveBeenCalledWith(providerConfig, { system: "system", prompt: "prompt", temperature: 0.3 })
+    expect(mocks.requestText).toHaveBeenCalledWith(providerConfig, { system: "system", prompt: "prompt", temperature: 0.3 }, { signal: undefined })
   })
 
   it("keeps only the text after an inline reasoning block", async () => {

@@ -47,7 +47,8 @@ export async function initializeConfig() {
   }
 
   if (conflict !== null) {
-    logger.warn(`Clearing the stored config: ${conflict}`)
+    // logger.error prints in store builds too, so a report carries the cause. The reason names fields, never stored values.
+    logger.error(`Clearing the stored config: ${conflict}`)
     // Everything in local storage derives from the old config (or from builds
     // before it), so none of it is kept.
     await storage.clear("local")

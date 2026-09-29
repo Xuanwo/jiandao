@@ -15,7 +15,7 @@ export async function aiTranslate<TContext>(
   targetLangName: string,
   providerConfig: ProviderConfig,
   promptResolver: PromptResolver<TContext>,
-  options?: { isBatch?: boolean, context?: TContext },
+  options?: { isBatch?: boolean, context?: TContext, signal?: AbortSignal },
 ) {
   const { systemPrompt, prompt } = await promptResolver(targetLangName, text, options)
 
@@ -23,7 +23,7 @@ export async function aiTranslate<TContext>(
     system: systemPrompt,
     prompt,
     temperature: providerConfig.temperature,
-  })
+  }, { signal: options?.signal })
 
   // Some local models return their reasoning inline; only the text after it is the translation.
   const [, finalTranslation = translatedText] = translatedText.match(THINK_TAG_RE) || []

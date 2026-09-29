@@ -1,5 +1,6 @@
 import type { Config } from "@/types/config/config"
 import { CONFIG_VERSION, configSchema } from "@/types/config/config"
+import { describeConfigIssues } from "./storage"
 
 /**
  * Upgrades one stored config from the version before its key to that
@@ -74,6 +75,6 @@ export function migrateStoredConfig(stored: unknown): ConfigMigrationResult {
 
   const parsed = configSchema.safeParse(upgraded.config)
   if (!parsed.success)
-    return { ok: false, reason: `config does not match version ${CONFIG_VERSION}: ${parsed.error.message}` }
+    return { ok: false, reason: `config does not match version ${CONFIG_VERSION}: ${describeConfigIssues(parsed.error)}` }
   return { ok: true, config: parsed.data }
 }
