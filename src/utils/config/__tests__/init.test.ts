@@ -7,6 +7,7 @@ const getMetaMock = vi.fn()
 const setItemMock = vi.fn()
 const setMetaMock = vi.fn()
 const loggerWarnMock = vi.fn()
+const loggerErrorMock = vi.fn()
 
 vi.mock("#imports", () => ({
   storage: {
@@ -29,6 +30,7 @@ vi.mock("wxt/utils/storage", () => ({
 vi.mock("@/utils/logger", () => ({
   logger: {
     warn: loggerWarnMock,
+    error: loggerErrorMock,
   },
 }))
 
@@ -113,6 +115,25 @@ describe("initializeConfig", () => {
       schemaVersion: CONFIG_SCHEMA_VERSION,
       lastModifiedAt: 888,
     })
+  })
+
+  it("replaces an invalid stored config and logs which field failed, without the API key", async () => {
+    const config = buildStableConfig()
+    const invalidConfig = {
+      ...config,
+      providersConfig: config.providersConfig.map(provider => ({ ...provider, apiKey: "sk-secret", temperature: -1 })),
+    }
+    getItemMock.mockResolvedValueOnce(invalidConfig)
+    getMetaMock.mockResolvedValueOnce({ schemaVersion: CONFIG_SCHEMA_VERSION, lastModifiedAt: 1 })
+
+    const { initializeConfig } = await import("../init")
+    await initializeConfig()
+
+    expect(setItemMock).toHaveBeenCalledWith("local:config", DEFAULT_CONFIG)
+    expect(loggerErrorMock).toHaveBeenCalledTimes(1)
+    const [message] = loggerErrorMock.mock.calls[0]
+    expect(message).toContain("providersConfig.0.temperature")
+    expect(message).not.toContain("sk-secret")
   })
 
   it("only updates meta when config is unchanged but lastModifiedAt is missing", async () => {

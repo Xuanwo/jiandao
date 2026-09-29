@@ -23,11 +23,15 @@ type Level = "log" | "info" | "warn" | "error"
 
 function noop() {}
 
+/**
+ * Errors print in every build, so a report from a store install can include
+ * them; the other levels print only in development.
+ */
 function createLogger(level: Level) {
-  if (!isDev) {
+  if (!isDev && level !== "error") {
     return noop
   }
-  const prefix = "[dev-log]"
+  const prefix = "[jiandao]"
   // Node 环境 → 用 ANSI；否则用浏览器 %c
   const useAnsi = typeof window === "undefined"
 

@@ -6,6 +6,7 @@ import { CONFIG_SCHEMA_VERSION, CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../co
 import { logger } from "../logger"
 import { deepEqual } from "../object"
 import { migrateStoredConfig } from "./migrate"
+import { describeConfigIssues } from "./storage"
 
 /**
  * Initialize the config, this function should only be called once in the background script
@@ -30,7 +31,7 @@ export async function initializeConfig() {
 
   const parseResult = configSchema.safeParse(config)
   if (!parseResult.success) {
-    logger.warn("Config is invalid, using default config")
+    logger.error(`Stored config is invalid, replacing it with the default config: ${describeConfigIssues(parseResult.error)}`)
     config = DEFAULT_CONFIG
     didConfigChange = true
   }

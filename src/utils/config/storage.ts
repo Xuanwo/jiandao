@@ -1,8 +1,18 @@
+import type { z } from "zod"
 import type { Config } from "@/types/config/config"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
+
+/**
+ * The path and message of each schema issue, for logs and error messages.
+ * Issue messages name the expected shape, never the stored value, so an API
+ * key does not end up in the text.
+ */
+export function describeConfigIssues(error: z.ZodError): string {
+  return error.issues.map(issue => `${issue.path.join(".") || "(root)"}: ${issue.message}`).join("; ")
+}
 
 /**
  * Checks a stored config value against the config schema. It gives null for a
@@ -15,7 +25,7 @@ function parseStoredConfig(config: unknown): Config | null {
   }
   const parsedConfig = configSchema.safeParse(config)
   if (!parsedConfig.success) {
-    logger.error("Config is invalid, using default config")
+    logger.error(`Stored config is invalid, using the default config: ${describeConfigIssues(parsedConfig.error)}`)
     return DEFAULT_CONFIG
   }
   return parsedConfig.data
