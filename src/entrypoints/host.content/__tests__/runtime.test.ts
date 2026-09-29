@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { ContentScriptContext } from "#imports"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { bootstrapHostContent } from "../runtime"
 
 const {
@@ -91,8 +91,20 @@ vi.mock("../translation-control/page-translation", () => ({
   },
 }))
 
+const contextCleanups: Array<() => void> = []
+
+afterEach(() => {
+  for (const cleanup of contextCleanups.splice(0))
+    cleanup()
+})
+
 function createContentScriptContext() {
   const invalidationCallbacks: Array<() => void> = []
+  const invalidate = () => {
+    for (const callback of invalidationCallbacks.splice(0))
+      callback()
+  }
+  contextCleanups.push(invalidate)
 
   return {
     ctx: {
@@ -100,11 +112,7 @@ function createContentScriptContext() {
         invalidationCallbacks.push(callback)
       },
     } as ContentScriptContext,
-    invalidate: () => {
-      for (const callback of invalidationCallbacks) {
-        callback()
-      }
-    },
+    invalidate,
   }
 }
 
@@ -116,7 +124,7 @@ async function flushAsyncWork(): Promise<void> {
 
 describe("bootstrapHostContent keeps the toggle handler whatever else fails", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
     messageHandlers.clear()
     managerInstances.length = 0
 
@@ -174,7 +182,7 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
 
 describe("bootstrapHostContent URL changes", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
     messageHandlers.clear()
     managerInstances.length = 0
 
@@ -239,6 +247,7 @@ describe("bootstrapHostContent URL changes", () => {
     }))
     await flushAsyncWork()
 
+    expect(mockSendMessage.mock.calls.filter(([name]) => name === "reportDetectedPageLanguage")).toHaveLength(2)
     expect(manager.start).not.toHaveBeenCalled()
     expect(manager.restart).not.toHaveBeenCalled()
     expect(manager.stop).not.toHaveBeenCalled()
