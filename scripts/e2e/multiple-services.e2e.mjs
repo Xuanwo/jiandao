@@ -171,3 +171,23 @@ it("user rejects a stale edit: Given two settings windows, When one changes the 
     release()
   }
 })
+
+it("user protects a newer configuration: Given an open editor, When another window changes the service before Apply, Then the old document cannot overwrite it", async () => {
+  const launched = await launchBrowser()
+  context = launched.context
+  const { page, extensionId } = launched
+  await configureService(page, extensionId, setupDocumentFor(service.origin))
+  const section = page.locator("#service")
+  await section.getByRole("button", { name: "Edit", exact: true }).click()
+  const editor = section.getByLabel("Translation service configuration")
+  await editor.fill(JSON.stringify({ ...JSON.parse(await editor.inputValue()), model: "old-document-model" }))
+  await context.serviceWorkers()[0].evaluate(async () => {
+    const { config } = await chrome.storage.local.get("config")
+    config.providersConfig[0].model = "newer-model"
+    await chrome.storage.local.set({ config })
+  })
+  await section.getByText("newer-model", { exact: true }).waitFor()
+  await section.getByRole("button", { name: "Apply", exact: true }).click()
+  await section.getByText("The service changed. Reopen the editor and try again.", { exact: true }).waitFor({ timeout: 5_000 })
+  assert.equal((await storedConfig(context)).providersConfig[0].model, "newer-model")
+})

@@ -241,6 +241,7 @@ function ServiceEditor({ current, target, initialSetup, onDone }: { current: Pro
     const exported = current?.apiKey ? exportSetupDocument(config, current.id) : null
     return exported ? stringifySetupDocument(exported) : ""
   })
+  const [original] = useState(current)
   const [text, setText] = useState(initial)
   const [applying, setApplying] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
@@ -277,7 +278,6 @@ function ServiceEditor({ current, target, initialSetup, onDone }: { current: Pro
     setApplying(true)
     setFailure(null)
     try {
-      const original = current
       const { config: next, providerId } = applySetupDocument(store.get(configAtom), parsed.document, target)
       const provider = next.providersConfig.find(p => p.id === providerId)!
       const check = await checkConnection(provider)
