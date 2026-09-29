@@ -36,6 +36,22 @@ export async function getLocalConfig() {
 }
 
 /**
+ * The stored config that a partial write merges into. A missing config gives
+ * the default config, because there is nothing to lose. An invalid config
+ * throws: merging the patch into the default config would replace every
+ * stored service.
+ */
+export async function getLocalConfigForWrite(): Promise<Config> {
+  const stored = await storage.getItem<unknown>(`local:${CONFIG_STORAGE_KEY}`)
+  if (stored === null || stored === undefined)
+    return DEFAULT_CONFIG
+  const parsed = configSchema.safeParse(stored)
+  if (!parsed.success)
+    throw new Error(`The stored config is invalid, so nothing was saved: ${describeConfigIssues(parsed.error)}`)
+  return parsed.data
+}
+
+/**
  * Calls back with each change of the stored config. It gives the new and the
  * old value after the same check as getLocalConfig. Returns the function that
  * stops the watch.

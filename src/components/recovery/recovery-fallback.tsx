@@ -5,8 +5,7 @@ import { ConfirmAction } from "@/components/confirm-action"
 import { IconAlertCircle } from "@/components/icons"
 import { toast } from "@/components/toast"
 import { Button } from "@/components/ui/button"
-import { writeConfigAtom } from "@/utils/atoms/config"
-import { DEFAULT_CONFIG } from "@/utils/constants/config"
+import { resetConfigAtom } from "@/utils/atoms/config"
 
 interface RecoveryFallbackProps {
   error: Error | null
@@ -14,13 +13,13 @@ interface RecoveryFallbackProps {
 }
 
 export function RecoveryFallback({ error, onRecovered }: RecoveryFallbackProps) {
-  const setConfig = useSetAtom(writeConfigAtom)
+  const resetConfig = useSetAtom(resetConfigAtom)
   const [isResetting, setIsResetting] = useState(false)
 
   const handleResetConfig = async () => {
     setIsResetting(true)
     try {
-      await setConfig(DEFAULT_CONFIG)
+      await resetConfig()
       toast.success(i18n.t("errorRecovery.resetSuccess"))
       onRecovered()
     }
