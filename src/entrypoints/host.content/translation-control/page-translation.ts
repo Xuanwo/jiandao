@@ -1,4 +1,6 @@
 import type { Config } from "@/types/config/config"
+import { i18n } from "#imports"
+import { toast } from "@/components/toast"
 import { getLocalConfig } from "@/utils/config/storage"
 import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
@@ -87,7 +89,11 @@ export class PageTranslationManager implements IPageTranslationManager {
 
     const config = await getLocalConfig()
     if (!config) {
+      // There is nothing stored to translate with. Say so with the toast the
+      // reader already gets for a service without a key, instead of returning
+      // silently: "the translate button does nothing" was this branch.
       console.warn("Config is not initialized")
+      toast.error(i18n.t("translation.noApiKey"))
       return
     }
 

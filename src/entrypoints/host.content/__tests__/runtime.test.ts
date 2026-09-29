@@ -14,6 +14,7 @@ const {
   mockOnMessage,
   mockSendMessage,
   mockSetupUrlChangeListener,
+  mockWatchConfigChanges,
 } = vi.hoisted(() => ({
   messageHandlers: new Map<string, (msg?: any) => any>(),
   managerInstances: [] as Array<{
@@ -29,6 +30,7 @@ const {
   mockOnMessage: vi.fn(),
   mockSendMessage: vi.fn(),
   mockSetupUrlChangeListener: vi.fn(),
+  mockWatchConfigChanges: vi.fn(),
 }))
 
 vi.mock("@/utils/content/page-language", () => ({
@@ -58,6 +60,10 @@ vi.mock("../listen", () => ({
 
 vi.mock("../mount-host-toast", () => ({
   mountHostToast: mockMountHostToast,
+}))
+
+vi.mock("../translation-control/handle-config-change", () => ({
+  watchConfigChanges: mockWatchConfigChanges,
 }))
 
 vi.mock("../translation-control/bind-translation-shortcut", () => ({
@@ -108,6 +114,64 @@ async function flushAsyncWork(): Promise<void> {
   await Promise.resolve()
 }
 
+describe("bootstrapHostContent keeps the toggle handler whatever else fails", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    messageHandlers.clear()
+    managerInstances.length = 0
+
+    mockSetupUrlChangeListener.mockReturnValue(vi.fn())
+    mockMountHostToast.mockReturnValue(vi.fn())
+    mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
+    mockWatchConfigChanges.mockReturnValue(vi.fn())
+    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
+      messageHandlers.set(name, handler)
+      return vi.fn()
+    })
+    mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
+    mockSendMessage.mockImplementation((name: string) =>
+      Promise.resolve(name === "getEnablePageTranslationFromContentScript" ? false : undefined))
+  })
+
+  /**
+   * Reading the shortcut is a storage read, and storage throws in an invalidated
+   * extension context. The popup's translate button talks to a handler
+   * registered in the same bootstrap, so a failure here used to leave the page
+   * permanently unable to translate: nothing happened, and nothing was logged.
+   */
+  it("a storage read that throws while binding the shortcut leaves the toggle handler registered", async () => {
+    mockBindTranslationShortcutKey.mockRejectedValue(new Error("Extension context invalidated"))
+
+    const { ctx } = createContentScriptContext()
+    await bootstrapHostContent(ctx)
+
+    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+  })
+
+  it("a storage area that throws while watching the config leaves the toggle handler registered", async () => {
+    mockWatchConfigChanges.mockImplementation(() => {
+      throw new Error("storage.local is undefined")
+    })
+
+    const { ctx } = createContentScriptContext()
+    await bootstrapHostContent(ctx)
+
+    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+    expect(messageHandlers.has("refreshDetectedPageLanguage")).toBe(true)
+  })
+
+  it("a failing style injection leaves the toggle handler registered", async () => {
+    mockEnsurePresetStyles.mockImplementation(() => {
+      throw new Error("no document")
+    })
+
+    const { ctx } = createContentScriptContext()
+    await bootstrapHostContent(ctx)
+
+    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+  })
+})
+
 describe("bootstrapHostContent URL changes", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -117,6 +181,7 @@ describe("bootstrapHostContent URL changes", () => {
     mockSetupUrlChangeListener.mockReturnValue(vi.fn())
     mockMountHostToast.mockReturnValue(vi.fn())
     mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
+    mockWatchConfigChanges.mockReturnValue(vi.fn())
     mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
       messageHandlers.set(name, handler)
       return vi.fn()

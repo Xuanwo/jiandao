@@ -14,31 +14,107 @@ import { watchConfigChanges } from "./translation-control/handle-config-change"
 import { PageTranslationManager } from "./translation-control/page-translation"
 
 export async function bootstrapHostContent(ctx: ContentScriptContext) {
-  ensurePresetStyles(document)
-
-  const cleanupUrlListener = setupUrlChangeListener()
-
-  const removeHostToast = window === window.top ? mountHostToast() : () => {}
-
   const manager = new PageTranslationManager({
     root: null,
     rootMargin: `${PRELOAD_MARGIN_PX}px`,
     threshold: PRELOAD_THRESHOLD,
   })
 
-  // Translate the page again when the popup or the options page changes the translation mode.
-  // A change before this point needs no action: page translation starts later and reads the current config.
-  const unwatchConfig = watchConfigChanges(manager)
+  // The message handlers come first, before anything that can fail.
+  //
+  // The popup's translate button talks to `askManagerToTogglePageTranslation`.
+  // Everything below reads storage or asks the background, and each of those can
+  // throw — a storage hiccup, an extension context invalidated by a reload, a
+  // profile that never had a config. Registering this handler after them meant
+  // any such failure left the page permanently unable to translate: the button
+  // did nothing, nothing was shown to the reader, and nothing was logged.
+  const cleanupTranslationStateListener = onMessage("askManagerToTogglePageTranslation", (msg) => {
+    const { enabled } = msg.data
+    if (enabled === manager.isActive)
+      return
+    if (!enabled) {
+      manager.stop()
+      return
+    }
+    void manager.start().catch(error => logger.error("Failed to start page translation", error))
+  })
 
-  // Turn the word-prefix emphasis on and off when the reader changes the setting.
-  const wordPrefixEmphasis = createWordPrefixEmphasisController(document)
-  const unsubscribeWordPrefixEmphasis = subscribeLocalConfig(config => wordPrefixEmphasis.setEnabled(config?.reading.wordPrefixEmphasis === true))
-
-  const cleanupTranslationShortcut = await bindTranslationShortcutKey(manager)
+  const cleanupFrameTranslationStateListener = window === window.top
+    ? () => {}
+    : onMessage("notifyTranslationStateChanged", (msg) => {
+        const { enabled } = msg.data
+        if (enabled === manager.isActive)
+          return
+        if (!enabled) {
+          manager.stop()
+          return
+        }
+        void manager.start().catch(error => logger.error("Failed to start page translation in an iframe", error))
+      })
 
   const detectAndReportPageLanguage = async (url: string) => {
-    const { detectedCodeOrUnd } = await detectPageLanguageLightweight()
-    void sendMessage("reportDetectedPageLanguage", { url, detectedCodeOrUnd })
+    try {
+      const { detectedCodeOrUnd } = await detectPageLanguageLightweight()
+      void sendMessage("reportDetectedPageLanguage", { url, detectedCodeOrUnd })
+    }
+    catch (error) {
+      logger.error("Failed to detect and report the page language", error)
+    }
+  }
+
+  const cleanupDetectedLanguageRefreshListener = window === window.top
+    ? onMessage("refreshDetectedPageLanguage", () => {
+        void detectAndReportPageLanguage(window.location.href)
+      })
+    : () => {}
+
+  // Everything from here on is best-effort: it must not be able to take the
+  // handlers above down with it.
+  try {
+    ensurePresetStyles(document)
+  }
+  catch (error) {
+    logger.error("Failed to inject the preset styles", error)
+  }
+
+  const cleanupUrlListener = setupUrlChangeListener()
+
+  const removeHostToast = window === window.top
+    ? (() => {
+        try {
+          return mountHostToast()
+        }
+        catch (error) {
+          logger.error("Failed to mount the page toast", error)
+          return () => {}
+        }
+      })()
+    : () => {}
+
+  // Translate the page again when the popup or the options page changes the translation mode.
+  // A change before this point needs no action: page translation starts later and reads the current config.
+  const unwatchConfig = setupStorageWatch("the config watch", () => watchConfigChanges(manager))
+
+  // Turn the word-prefix emphasis on and off when the reader changes the setting.
+  let wordPrefixEmphasis = { setEnabled: (_enabled: boolean) => {} }
+  try {
+    wordPrefixEmphasis = createWordPrefixEmphasisController(document)
+  }
+  catch (error) {
+    logger.error("Failed to set up word-prefix emphasis", error)
+  }
+  const unsubscribeWordPrefixEmphasis = setupStorageWatch(
+    "the word-prefix emphasis watch",
+    () => subscribeLocalConfig(config => wordPrefixEmphasis.setEnabled(config?.reading.wordPrefixEmphasis === true)),
+  )
+
+  // The shortcut is a convenience; the popup's button is the main way in.
+  let cleanupTranslationShortcut = () => {}
+  try {
+    cleanupTranslationShortcut = await bindTranslationShortcutKey(manager)
+  }
+  catch (error) {
+    logger.error("Failed to bind the page-translation shortcut", error)
   }
 
   // For late-loading iframes: check if translation is already enabled for this tab
@@ -51,7 +127,7 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
     logger.error("Failed to check translation state:", error)
   }
   if (translationEnabled) {
-    void manager.start()
+    void manager.start().catch(error => logger.error("Failed to resume page translation", error))
   }
 
   const handleUrlChange = async (from: string, to: string) => {
@@ -78,29 +154,6 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
   }
   window.addEventListener("extension:URLChange", handleExtensionUrlChange)
 
-  // Listen for translation state changes from background
-  const cleanupTranslationStateListener = onMessage("askManagerToTogglePageTranslation", (msg) => {
-    const { enabled } = msg.data
-    if (enabled === manager.isActive)
-      return
-    enabled ? void manager.start() : manager.stop()
-  })
-
-  const cleanupFrameTranslationStateListener = window === window.top
-    ? () => {}
-    : onMessage("notifyTranslationStateChanged", (msg) => {
-        const { enabled } = msg.data
-        if (enabled === manager.isActive)
-          return
-        enabled ? void manager.start() : manager.stop()
-      })
-
-  const cleanupDetectedLanguageRefreshListener = window === window.top
-    ? onMessage("refreshDetectedPageLanguage", () => {
-        void detectAndReportPageLanguage(window.location.href)
-      })
-    : () => {}
-
   ctx.onInvalidated(() => {
     removeHostToast()
     cleanupUrlListener()
@@ -118,5 +171,20 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
   // Only the top frame should detect and set language to avoid race conditions from iframes
   if (window === window.top) {
     await detectAndReportPageLanguage(window.location.href)
+  }
+}
+
+/**
+ * Storage watches talk to the storage area, which throws in an invalidated
+ * extension context. Returns a cleanup function either way, so the caller's
+ * teardown stays correct.
+ */
+function setupStorageWatch(what: string, setup: () => () => void): () => void {
+  try {
+    return setup()
+  }
+  catch (error) {
+    logger.error(`Failed to set up ${what}`, error)
+    return () => {}
   }
 }
