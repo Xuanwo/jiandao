@@ -11,6 +11,7 @@ window.JIANDAO_CANVAS = {
     { file: "Popup-Translating.html", title: "弹窗 · 翻译中", x: 800, y: 0, w: 320, h: 300 },
     { file: "Popup-Dark.html", title: "弹窗 · 深色（跟随系统）", x: 1200, y: 0, w: 320, h: 300 },
     { file: "Popup-Emphasis.html", title: "弹窗 · 英文词首加粗已打开：底栏按钮按下，与翻译操作分开", x: 1600, y: 0, w: 320, h: 300 },
+    { file: "Popup-Setup-Reset.html", title: "弹窗 · 旧配置冲突已清除：说明原因，引导重新配置", x: 2000, y: 0, w: 320, h: 300 },
     { file: "Page.html", title: "页面内 · 朱红译文细线 + 工具栏图标状态", x: 0, y: 780, w: 880, h: 600 },
     { file: "Icon.html", title: "图标 · 16 / 32 / 48 / 128 与工具栏两种状态", x: 960, y: 780, w: 1120, h: 640 },
     { file: "Palette.html", title: "配色 · 浅色 / 深色", x: 2160, y: 780, w: 1040, h: 640 },
@@ -28,6 +29,7 @@ window.JIANDAO_CANVAS = {
     { file: "Settings-Editing.html", title: "翻译服务 · 修改中：当前一行 + 编辑框（已全选）", x: 2400, y: 5060, w: 720, h: 420 },
     { file: "Settings-Edited.html", title: "翻译服务 · 待应用：当前 / 应用后上下对照", x: 3200, y: 5060, w: 720, h: 440 },
     { file: "Settings-Failed.html", title: "翻译服务 · 应用失败：多一行连接结果，不保存", x: 4000, y: 5060, w: 720, h: 500 },
+    { file: "Settings-Agent-Reset.html", title: "翻译服务 · 旧配置冲突已清除：未配置状态多一句原因", x: 4800, y: 5060, w: 720, h: 420 },
     { file: "Quality-Prompt-Editing.html", title: "译文质量 · 修改提示词：原地展开两段文本", x: 0, y: 5900, w: 720, h: 740 },
   ],
   notes: [
@@ -35,7 +37,7 @@ window.JIANDAO_CANVAS = {
     { text: "弹窗：一句话式的顺序，从哪种语言 → 译成什么 → 怎么显示 → 翻译", x: 0, y: -260, maxW: 1520 },
     { text: "设置：一页到底，按使用频率排序，没有需要用户调的参数", x: 0, y: 1500, maxW: 2240 },
     { text: "翻译服务：平时只显示预览，需要时原地出现编辑框；配置只含服务本身", x: 0, y: 3760, maxW: 2480 },
-    { text: "翻译服务一节的各个状态", x: 0, y: 4800, maxW: 4720 },
+    { text: "翻译服务一节的各个状态", x: 0, y: 4800, maxW: 5520 },
     { text: "译文质量：提示词平时只显示名称，需要时原地展开", x: 0, y: 5640, maxW: 1520 },
   ],
 }
