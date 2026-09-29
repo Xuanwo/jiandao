@@ -55,7 +55,7 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
   const detectAndReportPageLanguage = async (url: string) => {
     try {
       const { detectedCodeOrUnd } = await detectPageLanguageLightweight()
-      void sendMessage("reportDetectedPageLanguage", { url, detectedCodeOrUnd })
+      await sendMessage("reportDetectedPageLanguage", { url, detectedCodeOrUnd })
     }
     catch (error) {
       logger.error("Failed to detect and report the page language", error)
@@ -139,13 +139,18 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
   const handleUrlChange = async (from: string, to: string) => {
     if (from !== to) {
       logger.info("URL changed from", from, "to", to)
-      if (manager.isActive) {
-        if (areSamePageTranslationOrigin(from, to)) {
-          await manager.restart()
+      try {
+        if (manager.isActive) {
+          if (areSamePageTranslationOrigin(from, to)) {
+            await manager.restart()
+          }
+          else {
+            manager.stop()
+          }
         }
-        else {
-          manager.stop()
-        }
+      }
+      catch (error) {
+        logger.error("Failed to update page translation after a URL change", error)
       }
       // Only the top frame should detect and set language to avoid race conditions from iframes
       if (window === window.top) {
