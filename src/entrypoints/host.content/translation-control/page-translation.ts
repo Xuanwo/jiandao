@@ -52,6 +52,7 @@ export class PageTranslationManager implements IPageTranslationManager {
   }
 
   private isPageTranslating: boolean = false
+  private startGeneration = 0
   private intersectionObserver: IntersectionObserver | null = null
   private mutationObservers: MutationObserver[] = []
   private walkId: string | null = null
@@ -87,65 +88,88 @@ export class PageTranslationManager implements IPageTranslationManager {
       return
     }
 
-    const config = await getLocalConfig()
-    if (!config) {
-      // There is nothing stored to translate with. Say so with the toast the
-      // reader already gets for a service without a key, instead of returning
-      // silently: "the translate button does nothing" was this branch.
-      console.warn("Config is not initialized")
-      toast.error(i18n.t("translation.noApiKey"))
-      return
-    }
-
-    if (!validateTranslationConfigAndToast({
-      providersConfig: config.providersConfig,
-      translate: config.translate,
-      language: config.language,
-    })) {
-      return
-    }
-
-    await sendMessage("setAndNotifyPageTranslationStateChangedByManager", {
-      enabled: true,
-      url: window.location.href,
-    })
-
+    // Claim the session before any await: the background can echo enabled back
+    // to this frame while its enable request is still pending.
     this.isPageTranslating = true
-    resetTranslationProgress()
-    await this.primeDocumentTitleContext(
-      config.translate.enableAIContentAware,
-    )
-    this.startDocumentTitleTracking()
-
-    // Listen to existing elements when they enter the viewport
-    const walkId = getRandomUUID()
-    this.walkId = walkId
-    const walkController = new AbortController()
-    this.walkController = walkController
-    this.intersectionObserver = new IntersectionObserver(async (entries, observer) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          if (isHTMLElement(entry.target)) {
-            if (!entry.target.closest(`.${CONTENT_WRAPPER_CLASS}`)) {
-              const currentConfig = await getLocalConfig()
-              if (!currentConfig) {
-                logger.error("Global config is not initialized")
-                return
-              }
-              void translateWalkedElement(entry.target, walkId, currentConfig, false, walkController.signal)
-            }
-          }
-          observer.unobserve(entry.target)
-        }
+    const generation = ++this.startGeneration
+    let enableRequested = false
+    try {
+      const config = await getLocalConfig()
+      if (generation !== this.startGeneration)
+        return
+      if (!config) {
+        // There is nothing stored to translate with. Say so with the toast the
+        // reader already gets for a service without a key, instead of returning
+        // silently: "the translate button does nothing" was this branch.
+        console.warn("Config is not initialized")
+        toast.error(i18n.t("translation.noApiKey"))
+        this.stopInternal({ notify: false })
+        return
       }
-    }, this.intersectionOptions)
 
-    // Initialize walkability state for existing elements
-    this.addWalkBlockedElements(document.body)
-    await this.observeTopLevelParagraphs(document.body, config)
+      if (!validateTranslationConfigAndToast({
+        providersConfig: config.providersConfig,
+        translate: config.translate,
+        language: config.language,
+      })) {
+        this.stopInternal({ notify: false })
+        return
+      }
 
-    // Start observing mutations from document.body and all shadow roots
-    this.observeMutations(document.body)
+      enableRequested = true
+      await sendMessage("setAndNotifyPageTranslationStateChangedByManager", {
+        enabled: true,
+        url: window.location.href,
+      })
+
+      if (generation !== this.startGeneration)
+        return
+      resetTranslationProgress()
+      await this.primeDocumentTitleContext(
+        config.translate.enableAIContentAware,
+      )
+      if (generation !== this.startGeneration)
+        return
+      this.startDocumentTitleTracking()
+
+      // Listen to existing elements when they enter the viewport
+      const walkId = getRandomUUID()
+      this.walkId = walkId
+      const walkController = new AbortController()
+      this.walkController = walkController
+      this.intersectionObserver = new IntersectionObserver(async (entries, observer) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (isHTMLElement(entry.target)) {
+              if (!entry.target.closest(`.${CONTENT_WRAPPER_CLASS}`)) {
+                const currentConfig = await getLocalConfig()
+                if (!currentConfig) {
+                  logger.error("Global config is not initialized")
+                  return
+                }
+                void translateWalkedElement(entry.target, walkId, currentConfig, false, walkController.signal)
+              }
+            }
+            observer.unobserve(entry.target)
+          }
+        }
+      }, this.intersectionOptions)
+
+      // Initialize walkability state for existing elements
+      this.addWalkBlockedElements(document.body)
+      await this.observeTopLevelParagraphs(document.body, config)
+      if (generation !== this.startGeneration)
+        return
+
+      // Start observing mutations from document.body and all shadow roots
+      this.observeMutations(document.body)
+    }
+    catch (error) {
+      // A canceled startup must not tear down a newer session.
+      if (generation === this.startGeneration)
+        this.stopInternal({ notify: enableRequested })
+      throw error
+    }
   }
 
   stop(): void {
@@ -168,11 +192,12 @@ export class PageTranslationManager implements IPageTranslationManager {
       return
     }
 
+    ++this.startGeneration
     if (notify) {
       void sendMessage("setAndNotifyPageTranslationStateChangedByManager", {
         enabled: false,
         url: window.location.href,
-      })
+      }).catch(error => logger.error("Failed to notify page translation stopped", error))
     }
 
     this.isPageTranslating = false
