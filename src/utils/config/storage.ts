@@ -2,9 +2,9 @@ import type { z } from "zod"
 import type { Config } from "@/types/config/config"
 import type { ConfigMeta } from "@/types/config/meta"
 import { storage } from "#imports"
-import { configSchema } from "@/types/config/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
+import { migrateStoredConfig } from "./migrate"
 
 /**
  * The path and message of each schema issue, for logs and error messages.
@@ -16,20 +16,21 @@ export function describeConfigIssues(error: z.ZodError): string {
 }
 
 /**
- * Checks a stored config value against the config schema. It gives null for a
- * missing value and the default config for an invalid value.
+ * Migrates a stored config in memory: a same-version replacement or interrupted
+ * onInstalled may leave it unmigrated. Reads never persist or clear it.
+ * It gives null for a missing value and the default config for an invalid value.
  */
 function parseStoredConfig(config: unknown): Config | null {
-  if (!config) {
+  if (config === null || config === undefined) {
     logger.warn("No config found in storage")
     return null
   }
-  const parsedConfig = configSchema.safeParse(config)
-  if (!parsedConfig.success) {
-    logger.error(`Stored config is invalid, using the default config: ${describeConfigIssues(parsedConfig.error)}`)
+  const migrated = migrateStoredConfig(config)
+  if (!migrated.ok) {
+    logger.error(`Stored config is invalid, using the default config: ${migrated.reason}`)
     return DEFAULT_CONFIG
   }
-  return parsedConfig.data
+  return migrated.config
 }
 
 export async function getLocalConfig() {
@@ -46,10 +47,10 @@ export async function getLocalConfigForWrite(): Promise<Config> {
   const stored = await storage.getItem<unknown>(`local:${CONFIG_STORAGE_KEY}`)
   if (stored === null || stored === undefined)
     return DEFAULT_CONFIG
-  const parsed = configSchema.safeParse(stored)
-  if (!parsed.success)
-    throw new Error(`The stored config is invalid, so nothing was saved: ${describeConfigIssues(parsed.error)}`)
-  return parsed.data
+  const migrated = migrateStoredConfig(stored)
+  if (!migrated.ok)
+    throw new Error(`The stored config is invalid, so nothing was saved: ${migrated.reason}`)
+  return migrated.config
 }
 
 /**
