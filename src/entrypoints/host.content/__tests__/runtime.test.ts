@@ -93,6 +93,24 @@ vi.mock("../translation-control/page-translation", () => ({
 
 const contextCleanups: Array<() => void> = []
 
+beforeEach(() => {
+  vi.resetAllMocks()
+  messageHandlers.clear()
+  managerInstances.length = 0
+
+  mockSetupUrlChangeListener.mockReturnValue(vi.fn())
+  mockMountHostToast.mockReturnValue(vi.fn())
+  mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
+  mockWatchConfigChanges.mockReturnValue(vi.fn())
+  mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
+    messageHandlers.set(name, handler)
+    return vi.fn()
+  })
+  mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
+  mockSendMessage.mockImplementation((name: string) =>
+    Promise.resolve(name === "getEnablePageTranslationFromContentScript" ? false : undefined))
+})
+
 afterEach(() => {
   for (const cleanup of contextCleanups.splice(0))
     cleanup()
@@ -123,24 +141,6 @@ async function flushAsyncWork(): Promise<void> {
 }
 
 describe("bootstrapHostContent keeps the toggle handler whatever else fails", () => {
-  beforeEach(() => {
-    vi.resetAllMocks()
-    messageHandlers.clear()
-    managerInstances.length = 0
-
-    mockSetupUrlChangeListener.mockReturnValue(vi.fn())
-    mockMountHostToast.mockReturnValue(vi.fn())
-    mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
-    mockWatchConfigChanges.mockReturnValue(vi.fn())
-    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
-      messageHandlers.set(name, handler)
-      return vi.fn()
-    })
-    mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
-    mockSendMessage.mockImplementation((name: string) =>
-      Promise.resolve(name === "getEnablePageTranslationFromContentScript" ? false : undefined))
-  })
-
   /**
    * Reading the shortcut is a storage read, and storage throws in an invalidated
    * extension context. The popup's translate button talks to a handler
@@ -181,28 +181,6 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
 })
 
 describe("bootstrapHostContent URL changes", () => {
-  beforeEach(() => {
-    vi.resetAllMocks()
-    messageHandlers.clear()
-    managerInstances.length = 0
-
-    mockSetupUrlChangeListener.mockReturnValue(vi.fn())
-    mockMountHostToast.mockReturnValue(vi.fn())
-    mockBindTranslationShortcutKey.mockResolvedValue(vi.fn())
-    mockWatchConfigChanges.mockReturnValue(vi.fn())
-    mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
-      messageHandlers.set(name, handler)
-      return vi.fn()
-    })
-    mockDetectPageLanguageLightweight.mockResolvedValue({ detectedCodeOrUnd: "fra" })
-    mockSendMessage.mockImplementation((name: string) => {
-      if (name === "getEnablePageTranslationFromContentScript")
-        return Promise.resolve(false)
-
-      return Promise.resolve(undefined)
-    })
-  })
-
   it("refreshes active page translation on same-origin SPA navigation without disabling the session", async () => {
     mockSendMessage.mockImplementation((name: string) => {
       if (name === "getEnablePageTranslationFromContentScript")
