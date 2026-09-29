@@ -11,7 +11,8 @@ import { storageAdapter } from "./storage-adapter"
 
 export const configAtom = atom<Config>(DEFAULT_CONFIG)
 
-// Keep each store's rollback baseline separate from its pending optimistic values.
+// Queued tasks share this mutable record. No UI subscribes to its fields.
+// Keep the confirmed baseline separate from pending optimistic values.
 const writeBatchAtom = atom<{ confirmed: Config, pending: number } | null>(null)
 
 /**
@@ -27,6 +28,8 @@ let writeQueue: Promise<void> = Promise.resolve()
 
 /**
  * Global counter to detect stale writes.
+ * The queue and counter assume one active config store per JavaScript context.
+ * Popup and settings pages have separate contexts.
  *
  * Each write captures its version at invocation time. After async storage completes,
  * we compare captured vs current version to determine if this is still the latest write.
