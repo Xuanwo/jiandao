@@ -121,7 +121,16 @@ it("user updates from a build whose config cannot be migrated: Given the 1.0 con
   await page.locator("#service").getByText("Set up your translation service again").waitFor()
 
   await configureService(page, extensionId, setupDocumentFor(service.origin))
-  const meta = await worker.evaluate(async () => (await chrome.storage.local.get("config$")).config$)
+  // "Connected" shows once the config is saved; the notice is cleared right after.
+  const meta = await worker.evaluate(async () => {
+    for (let i = 0; i < 100; i++) {
+      const { config$ } = await chrome.storage.local.get("config$")
+      if (config$?.resetAt === undefined)
+        return config$
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    return (await chrome.storage.local.get("config$")).config$
+  })
   assert.equal(meta?.resetAt, undefined, "applying a service ends the notice")
 
   await page.goto(`chrome-extension://${extensionId}/popup.html`)
