@@ -17,6 +17,7 @@ window.JIANDAO_CANVAS = {
     { file: "Palette.html", title: "配色 · 浅色 / 深色", x: 2160, y: 780, w: 1040, h: 640 },
     { file: "Page-Emphasis.html", title: "页面内 · 英文词首加粗（未翻译）：每个英文单词的前一半加粗，标题不变", x: 3280, y: 780, w: 880, h: 600 },
     { file: "Page-Emphasis-Translated.html", title: "页面内 · 英文词首加粗（双语对照）：原文按同一规则加粗，中文译文和标题不变", x: 4240, y: 780, w: 880, h: 680 },
+    { file: "Page-Missing-Service.html", title: "页面内 · 缺少翻译服务：提示去工具栏设置，保留原文", x: 5200, y: 780, w: 880, h: 600 },
     { file: "Settings.html", title: "设置 · 单页（翻译服务、阅读、译文质量、快捷键；无高级、无外观）", x: 0, y: 1760, w: 1120, h: 1160 },
     { file: "Adaptive.html", title: "去掉高级和外观：各项改由什么自动决定", x: 1200, y: 1760, w: 1040, h: 840 },
     { file: "Settings-Emphasis.html", title: "阅读 · 英文词首加粗已打开：两段预览里的英文都加粗，中文不变", x: 2320, y: 1760, w: 720, h: 560 },
