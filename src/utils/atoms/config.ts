@@ -3,7 +3,7 @@ import type { Config } from "@/types/config/config"
 import { atom } from "jotai"
 import { selectAtom } from "jotai/utils"
 import { configSchema } from "@/types/config/config"
-import { getLocalConfigForWrite } from "../config/storage"
+import { getLocalConfig, getLocalConfigForWrite } from "../config/storage"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
 import { deepMerge } from "../object"
@@ -152,7 +152,7 @@ configAtom.onMount = (setAtom: (newValue: Config) => void) => {
     // Do not apply the value of the event. Read storage after the queued writes.
     // A newer local write makes this read stale, because its optimistic value is newer.
     void writeQueue.then(async () => {
-      const value = await storageAdapter.get<Config>(CONFIG_STORAGE_KEY, DEFAULT_CONFIG, configSchema)
+      const value = await getLocalConfig() ?? DEFAULT_CONFIG
       if (currentWriteVersion === writeVersion) {
         setAtom(value)
       }
