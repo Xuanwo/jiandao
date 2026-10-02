@@ -14,20 +14,21 @@ import { watchConfigChanges } from "./translation-control/handle-config-change"
 import { PageTranslationManager } from "./translation-control/page-translation"
 
 export async function bootstrapHostContent(ctx: ContentScriptContext) {
+  ensurePresetStyles(document)
+  const cleanupUrlListener = setupUrlChangeListener()
+  const removeHostToast = window === window.top ? mountHostToast() : () => {}
+
   const manager = new PageTranslationManager({
     root: null,
     rootMargin: `${PRELOAD_MARGIN_PX}px`,
     threshold: PRELOAD_THRESHOLD,
   })
 
-  // The message handlers come first, before anything that can fail.
-  //
-  // The popup's translate button talks to `askManagerToTogglePageTranslation`.
-  // Everything below reads storage or asks the background, and each of those can
-  // throw — a storage hiccup, an extension context invalidated by a reload, a
-  // profile that never had a config. Registering this handler after them meant
-  // any such failure left the page permanently unable to translate: the button
-  // did nothing, nothing was shown to the reader, and nothing was logged.
+  const unwatchConfig = watchConfigChanges(manager)
+  const wordPrefixEmphasis = createWordPrefixEmphasisController(document)
+  const unsubscribeWordPrefixEmphasis = subscribeLocalConfig(config => wordPrefixEmphasis.setEnabled(config?.reading.wordPrefixEmphasis === true))
+
+  // Register messages before awaiting storage or the background.
   const cleanupTranslationStateListener = onMessage("askManagerToTogglePageTranslation", (msg) => {
     const { enabled } = msg.data
     if (enabled === manager.isActive)
@@ -68,53 +69,7 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
       })
     : () => {}
 
-  // Everything from here on is best-effort: it must not be able to take the
-  // handlers above down with it.
-  try {
-    ensurePresetStyles(document)
-  }
-  catch (error) {
-    logger.error("Failed to inject the preset styles", error)
-  }
-
-  let cleanupUrlListener = () => {}
-  try {
-    cleanupUrlListener = setupUrlChangeListener()
-  }
-  catch (error) {
-    logger.error("Failed to set up URL change detection", error)
-  }
-
-  const removeHostToast = window === window.top
-    ? (() => {
-        try {
-          return mountHostToast()
-        }
-        catch (error) {
-          logger.error("Failed to mount the page toast", error)
-          return () => {}
-        }
-      })()
-    : () => {}
-
-  // Translate the page again when the popup or the options page changes the translation mode.
-  // A change before this point needs no action: page translation starts later and reads the current config.
-  const unwatchConfig = setupStorageWatch("the config watch", () => watchConfigChanges(manager))
-
-  // Turn the word-prefix emphasis on and off when the reader changes the setting.
-  let wordPrefixEmphasis = { setEnabled: (_enabled: boolean) => {} }
-  try {
-    wordPrefixEmphasis = createWordPrefixEmphasisController(document)
-  }
-  catch (error) {
-    logger.error("Failed to set up word-prefix emphasis", error)
-  }
-  const unsubscribeWordPrefixEmphasis = setupStorageWatch(
-    "the word-prefix emphasis watch",
-    () => subscribeLocalConfig(config => wordPrefixEmphasis.setEnabled(config?.reading.wordPrefixEmphasis === true)),
-  )
-
-  // The shortcut is a convenience; the popup's button is the main way in.
+  // A failed shortcut read must not disable the popup's translation button.
   let cleanupTranslationShortcut = () => {}
   try {
     cleanupTranslationShortcut = await bindTranslationShortcutKey(manager)
@@ -182,20 +137,5 @@ export async function bootstrapHostContent(ctx: ContentScriptContext) {
   // Only the top frame should detect and set language to avoid race conditions from iframes
   if (window === window.top) {
     await detectAndReportPageLanguage(window.location.href)
-  }
-}
-
-/**
- * Storage watches talk to the storage area, which throws in an invalidated
- * extension context. Returns a cleanup function either way, so the caller's
- * teardown stays correct.
- */
-function setupStorageWatch(what: string, setup: () => () => void): () => void {
-  try {
-    return setup()
-  }
-  catch (error) {
-    logger.error(`Failed to set up ${what}`, error)
-    return () => {}
   }
 }

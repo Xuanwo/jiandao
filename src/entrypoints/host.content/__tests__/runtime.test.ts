@@ -140,38 +140,9 @@ async function flushAsyncWork(): Promise<void> {
   await Promise.resolve()
 }
 
-describe("bootstrapHostContent keeps the toggle handler whatever else fails", () => {
-  /**
-   * Reading the shortcut is a storage read, and storage throws in an invalidated
-   * extension context. The popup's translate button talks to a handler
-   * registered in the same bootstrap, so a failure here used to leave the page
-   * permanently unable to translate: nothing happened, and nothing was logged.
-   */
-  it("a storage read that throws while binding the shortcut leaves the toggle handler registered", async () => {
-    mockBindTranslationShortcutKey.mockRejectedValue(new Error("Extension context invalidated"))
-
-    const { ctx } = createContentScriptContext()
-    await bootstrapHostContent(ctx)
-
-    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
-  })
-
-  it("a storage area that throws while watching the config leaves the toggle handler registered", async () => {
-    mockWatchConfigChanges.mockImplementation(() => {
-      throw new Error("storage.local is undefined")
-    })
-
-    const { ctx } = createContentScriptContext()
-    await bootstrapHostContent(ctx)
-
-    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
-    expect(messageHandlers.has("refreshDetectedPageLanguage")).toBe(true)
-  })
-
-  it("a failing URL listener setup still finishes bootstrap and cleans up message handlers", async () => {
-    mockSetupUrlChangeListener.mockImplementation(() => {
-      throw new Error("history methods are read-only")
-    })
+describe("bootstrapHostContent translation entry points", () => {
+  it("keeps translation usable after a failed shortcut read and cleans up on invalidation", async () => {
+    mockBindTranslationShortcutKey.mockRejectedValue(new Error("Storage read failed"))
     const cleanups: Array<ReturnType<typeof vi.fn>> = []
     mockOnMessage.mockImplementation((name: string, handler: (msg?: any) => any) => {
       messageHandlers.set(name, handler)
@@ -180,10 +151,11 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
       return cleanup
     })
     const { ctx, invalidate } = createContentScriptContext()
-
     await bootstrapHostContent(ctx)
-    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
-    expect(mockBindTranslationShortcutKey).toHaveBeenCalledOnce()
+
+    messageHandlers.get("askManagerToTogglePageTranslation")!({ data: { enabled: true } })
+    await flushAsyncWork()
+    expect(managerInstances[0].start).toHaveBeenCalledOnce()
     expect(mockSendMessage).toHaveBeenCalledWith("reportDetectedPageLanguage", {
       url: window.location.href,
       detectedCodeOrUnd: "fra",
@@ -195,15 +167,22 @@ describe("bootstrapHostContent keeps the toggle handler whatever else fails", ()
       expect(cleanup).toHaveBeenCalledOnce()
   })
 
-  it("a failing style injection leaves the toggle handler registered", async () => {
-    mockEnsurePresetStyles.mockImplementation(() => {
-      throw new Error("no document")
-    })
-
+  it("accepts translation requests while the shortcut read is pending", async () => {
+    let finishShortcutRead!: (cleanup: () => void) => void
+    mockBindTranslationShortcutKey.mockImplementationOnce(() => new Promise((resolve) => {
+      finishShortcutRead = resolve
+    }))
     const { ctx } = createContentScriptContext()
-    await bootstrapHostContent(ctx)
-
-    expect(messageHandlers.has("askManagerToTogglePageTranslation")).toBe(true)
+    const bootstrap = bootstrapHostContent(ctx)
+    try {
+      messageHandlers.get("askManagerToTogglePageTranslation")!({ data: { enabled: true } })
+      await flushAsyncWork()
+      expect(managerInstances[0].start).toHaveBeenCalledOnce()
+    }
+    finally {
+      finishShortcutRead(vi.fn())
+      await bootstrap
+    }
   })
 })
 

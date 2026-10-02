@@ -1,4 +1,6 @@
 import type { Config } from "@/types/config/config"
+import { i18n } from "#imports"
+import { toast } from "@/components/toast"
 import { getLocalConfig } from "@/utils/config/storage"
 import { CONTENT_WRAPPER_CLASS } from "@/utils/constants/dom-labels"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
@@ -97,6 +99,7 @@ export class PageTranslationManager implements IPageTranslationManager {
         return
       if (!config) {
         console.warn("Config is not initialized")
+        toast.error(i18n.t("translation.noApiKey"))
         this.stopInternal({ notify: false })
         return
       }
