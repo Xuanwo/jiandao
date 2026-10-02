@@ -62,7 +62,7 @@ const plainly10Config = {
  * profile. Chromium sees a newer version of the same extension and runs it as
  * an update. Returns the launched browser once the config is initialized.
  */
-async function updateFrom(items) {
+async function updateFrom(items, expectReset = false) {
   const dir = await mkdtemp(join(tmpdir(), "jiandao-update-"))
   cleanup.push(() => rm(dir, { recursive: true, force: true }))
   const oldBuild = join(dir, "old-build")
@@ -84,20 +84,21 @@ async function updateFrom(items) {
   const launched = await launchBrowser({ userDataDir })
   context = launched.context
   const worker = context.serviceWorkers()[0]
-  await waitForConfig(worker)
+  await waitForConfig(worker, expectReset)
   return { ...launched, worker }
 }
 
-/** Waits until the extension has written a config with a version, which initializeConfig does last. */
-async function waitForConfig(worker) {
-  await worker.evaluate(async () => {
+/** Reset metadata is written after the config, so reset cases must wait for both. */
+async function waitForConfig(worker, expectReset = false) {
+  await worker.evaluate(async (reset) => {
     for (let i = 0; i < 100; i++) {
-      if ((await chrome.storage.local.get("config")).config?.version !== undefined)
+      const stored = await chrome.storage.local.get(["config", "config$"])
+      if (stored.config?.version !== undefined && (!reset || typeof stored.config$?.resetAt === "number"))
         return
       await new Promise(resolve => setTimeout(resolve, 50))
     }
     throw new Error("the config was not initialized")
-  })
+  }, expectReset)
 }
 
 it("user updates from a build whose config cannot be migrated: Given the 1.0 config, When the extension updates, Then local storage is cleared, the popup and settings explain why, and applying a service ends the notice", async () => {
@@ -105,7 +106,7 @@ it("user updates from a build whose config cannot be migrated: Given the 1.0 con
     config: plainly10Config,
     config$: { schemaVersion: 1, lastModifiedAt: 1 },
     theme: "dark",
-  })
+  }, true)
 
   const stored = await worker.evaluate(() => chrome.storage.local.get(null))
   assert.deepEqual(Object.keys(stored).sort(), ["config", "config$"], "nothing but the new config is left")
@@ -121,7 +122,16 @@ it("user updates from a build whose config cannot be migrated: Given the 1.0 con
   await page.locator("#service").getByText("Set up your translation service again").waitFor()
 
   await configureService(page, extensionId, setupDocumentFor(service.origin))
-  const meta = await worker.evaluate(async () => (await chrome.storage.local.get("config$")).config$)
+  // "Connected" shows once the config is saved; the notice is cleared right after.
+  const meta = await worker.evaluate(async () => {
+    for (let i = 0; i < 100; i++) {
+      const { config$ } = await chrome.storage.local.get("config$")
+      if (config$?.resetAt === undefined)
+        return config$
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    return (await chrome.storage.local.get("config$")).config$
+  })
   assert.equal(meta?.resetAt, undefined, "applying a service ends the notice")
 
   await page.goto(`chrome-extension://${extensionId}/popup.html`)
