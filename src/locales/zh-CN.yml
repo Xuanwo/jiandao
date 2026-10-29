@@ -92,7 +92,7 @@ options:
       translationOnly: 仅译文
     wordPrefixEmphasis:
       title: 英文词首加粗
-      description: 加粗每个英文单词的前半部分。
+      description: 加粗英文单词的前半部分，长度不超过 4 的单词保持原样。
     style:
       title: 译文样式
       custom: 自定义 CSS

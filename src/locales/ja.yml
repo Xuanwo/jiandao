@@ -92,7 +92,7 @@ options:
       translationOnly: 翻訳のみ
     wordPrefixEmphasis:
       title: 英単語の前半を太字に
-      description: 英単語ごとに前半を太字にします。
+      description: 英単語の前半を太字にします。4 文字以下の単語はそのまま表示します。
     style:
       title: 翻訳のスタイル
       custom: カスタム CSS

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>页面内 · 表格双语对照</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#222930;color:#D1D7E0;font-family:-apple-system,"SF Pro Text","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif}
+.window{width:880px;height:660px;border:1px solid #444C56;border-radius:12px;overflow:hidden}
+.bar{height:44px;background:#2D333B;border-bottom:1px solid #444C56;display:flex;align-items:center;padding:0 16px;font-size:12px;color:#ADB6C2}
+article{padding:32px 40px;font-size:16px;line-height:1.6}
+h1{font-size:26px;line-height:1.3;margin:0 0 8px}
+a{color:#58A6FF}
+table{width:100%;border-collapse:collapse;margin-top:28px}
+th,td{border:1px solid #444C56;padding:10px 14px;text-align:left;vertical-align:top}
+th:first-child{width:28%}
+.translation{display:block;margin:8px 0;border-left:2px solid rgba(242,74,44,.75);padding-left:12px;font-family:"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="bar">example.org/tools</div>
+  <article>
+    <h1>Tools catalog</h1>
+    <div class="translation">工具目录</div>
+    <table>
+      <thead><tr>
+        <th scope="col">Tool<span class="translation">工具</span></th>
+        <th scope="col">Description<span class="translation">说明</span></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><a href="https://example.org/tools/checker">Release checker</a><span class="translation">发布检查器</span></td>
+          <td>Check release packages before publishing a new version.<span class="translation">在发布新版本前检查发布包。</span></td>
+        </tr>
+        <tr>
+          <td><a href="https://example.org/tools/mapper">Source mapper</a><span class="translation">源码映射器</span></td>
+          <td>Find source locations and preserve links between files.<span class="translation">查找源码位置，保留文件之间的链接。</span></td>
+        </tr>
+        <tr>
+          <td><a href="https://example.org/tools/report">Coverage report</a><span class="translation">覆盖率报告</span></td>
+          <td>Show a report of tested paths and missing edge cases.<span class="translation">列出已测试的路径和尚未覆盖的边界情况。</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+</div>
+</body>
+</html>

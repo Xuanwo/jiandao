@@ -92,7 +92,7 @@ options:
       translationOnly: Solo traducción
     wordPrefixEmphasis:
       title: Negrita al inicio de las palabras en inglés
-      description: Pone en negrita la primera mitad de cada palabra en inglés.
+      description: Pone en negrita la primera mitad de las palabras en inglés y deja sin cambios las de cuatro caracteres o menos.
     style:
       title: Estilo de la traducción
       custom: CSS personalizado

@@ -127,6 +127,148 @@ describe("translate", () => {
     })
   }
 
+  describe("table cell boundaries", () => {
+    it.each(["inline", "contents"])("bilingual mode keeps translations in cells through a display:%s wrapper", async (display) => {
+      const { container } = render(
+        <section>
+          <div>
+            <span style={{ display }}>
+              <table>
+                <caption>Available tools</caption>
+                <thead>
+                  <tr>
+                    <th><span style={{ display: "inline" }}>Tool</span></th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="https://example.org/checker">Release checker</a></td>
+                    <td>Check release packages</td>
+                  </tr>
+                  <tr>
+                    <td>Source mapper</td>
+                    <td>Find source locations</td>
+                  </tr>
+                </tbody>
+              </table>
+            </span>
+          </div>
+        </section>,
+      )
+      const table = container.querySelector("table")!
+      const cells = [...table.querySelectorAll("th, td")]
+      const originalTexts = cells.map(cell => cell.textContent)
+
+      await removeOrShowPageTranslation("bilingual", true)
+
+      expect(table.rows).toHaveLength(3)
+      for (const [index, cell] of cells.entries()) {
+        const translation = cell.querySelector(`.${BLOCK_CONTENT_CLASS}`)
+        expect(translation?.textContent).toBe(MOCK_TRANSLATION)
+        expect(translation?.closest("th, td")).toBe(cell)
+        expect(cell.textContent).toContain(originalTexts[index])
+      }
+      expect(table.caption?.querySelector(`.${BLOCK_CONTENT_CLASS}`)?.textContent).toBe(MOCK_TRANSLATION)
+      const link = table.querySelector("a")!
+      expect(link.textContent).toBe("Release checker")
+      expect(link.querySelector(`.${CONTENT_WRAPPER_CLASS}`)).toBeNull()
+      expect(table.querySelectorAll(`.${CONTENT_WRAPPER_CLASS}`)).toHaveLength(7)
+
+      await removeOrShowPageTranslation("bilingual", true)
+      expect(table.querySelector(`.${CONTENT_WRAPPER_CLASS}`)).toBeNull()
+      expect(cells.map(cell => cell.textContent)).toEqual(originalTexts)
+    })
+
+    it("translation only mode preserves cell structure when CSS makes rows and cells inline", async () => {
+      const { container } = render(
+        <section>
+          <table style={{ display: "inline" }}>
+            <tbody style={{ display: "contents" }}>
+              <tr style={{ display: "inline" }}>
+                <th scope="row" style={{ display: "inline" }}>Release checker</th>
+                <td style={{ display: "inline" }}><a href="https://example.org/checker">Check release packages</a></td>
+                <td rowSpan={2} style={{ display: "inline" }}>Shared notes</td>
+              </tr>
+              <tr style={{ display: "inline" }}><td colSpan={2} style={{ display: "inline" }}>Source mapper</td></tr>
+            </tbody>
+          </table>
+        </section>,
+      )
+      await removeOrShowPageTranslation("translationOnly", true)
+
+      const table = container.querySelector("table")!
+      expect(table.rows).toHaveLength(2)
+      expect(table.rows[0].cells).toHaveLength(3)
+      expect(table.rows[1].cells).toHaveLength(1)
+      for (const cell of table.querySelectorAll("th, td")) {
+        expect(cell.textContent).toBe(MOCK_TRANSLATION)
+      }
+      expect(table.querySelector("th")?.getAttribute("scope")).toBe("row")
+      expect(table.querySelector("td[rowspan]")?.getAttribute("rowspan")).toBe("2")
+      expect(table.querySelector("td[colspan]")?.getAttribute("colspan")).toBe("2")
+
+      await removeOrShowPageTranslation("translationOnly", true)
+      expect(container.querySelector(`.${CONTENT_WRAPPER_CLASS}`)).toBeNull()
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("https://example.org/checker")
+      expect(container.querySelector("a")?.textContent).toBe("Check release packages")
+    })
+
+    it("translation only mode leaves excluded siblings of a cell link out of the request and on the page", async () => {
+      vi.mocked(translateTextForPage).mockClear()
+      const { container } = render(
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <a href="https://example.org/checker">Release checker</a>
+                <span hidden>Private annotation</span>
+                <pre>excludedSnippet()</pre>
+              </td>
+            </tr>
+          </tbody>
+        </table>,
+      )
+      const link = container.querySelector("a")!
+      const onClick = vi.fn(event => event.preventDefault())
+      link.addEventListener("click", onClick)
+      await removeOrShowPageTranslation("translationOnly", true)
+
+      expect(vi.mocked(translateTextForPage).mock.calls.map(([text]) => text)).toEqual(["Release checker"])
+      expect(container.querySelector("[hidden]")?.textContent).toBe("Private annotation")
+      expect(container.querySelector("pre")?.textContent).toBe("excludedSnippet()")
+      expect(container.querySelector("a")).toBe(link)
+      expect(link.textContent).toBe(MOCK_TRANSLATION)
+      link.dispatchEvent(new MouseEvent("click", { cancelable: true }))
+      expect(onClick).toHaveBeenCalledOnce()
+    })
+
+    it("keeps separate paragraphs and nested tables inside their own cells", async () => {
+      const { container } = render(
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <p>First explanation</p>
+                <p>Second explanation</p>
+                <table><tbody><tr><td>Nested detail</td></tr></tbody></table>
+              </td>
+              <td>Neighbor detail</td>
+            </tr>
+          </tbody>
+        </table>,
+      )
+      await removeOrShowPageTranslation("bilingual", true)
+
+      const tables = container.querySelectorAll("table")
+      const translations = [...container.querySelectorAll(`.${BLOCK_CONTENT_CLASS}`)]
+      expect(translations.map(node => node.textContent)).toEqual(Array.from({ length: 4 }).fill(MOCK_TRANSLATION))
+      expect(translations.map(node => node.closest("p, td")?.tagName)).toEqual(["P", "P", "TD", "TD"])
+      expect(tables[1].querySelectorAll(`.${CONTENT_WRAPPER_CLASS}`)).toHaveLength(1)
+      expect(tables[0].rows[0].cells[1].querySelectorAll(`.${CONTENT_WRAPPER_CLASS}`)).toHaveLength(1)
+    })
+  })
+
   describe("translateTextForPage stub", () => {
     it("translateTextForPage should be mocked", async () => {
       expect(await translateTextForPage("任何文字")).toBe(MOCK_TRANSLATION)
