@@ -29,11 +29,11 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-it("user reads Latin words and other scripts: Given a mixed text, When emphasis starts, Then the first half of each Latin word is highlighted and the page DOM does not change", () => {
+it("user reads Latin words and other scripts: Given a mixed text, When emphasis starts, Then words longer than four get a prefix, short words stay plain and the page DOM does not change", () => {
   // Given
   document.body.innerHTML = "<p></p>"
   const paragraph = select("p")
-  paragraph.textContent = "A cat reads quietly. naïve élan don't 中文 日本語 한국어 العربية 👩‍💻 <script> & 123"
+  paragraph.textContent = "A to cat book reads quietly. naïve élan élans it's don’t don't 中文 日本語 한국어 العربية 👩‍💻 <script> & 123"
   const text = paragraph.firstChild
   const markup = document.body.innerHTML
 
@@ -41,7 +41,7 @@ it("user reads Latin words and other scripts: Given a mixed text, When emphasis 
   stop = startWordPrefixEmphasis(document.body)
 
   // Then: a letter with its combining marks counts as one letter, and so does an apostrophe.
-  expect(highlightedPrefixes()).toEqual(["ca", "rea", "quie", "naï", "él", "don", "scr"])
+  expect(highlightedPrefixes()).toEqual(["rea", "quie", "naï", "éla", "don", "don", "scr"])
   expect(document.body.innerHTML).toBe(markup)
   expect(paragraph.firstChild).toBe(text)
 })
@@ -52,14 +52,14 @@ it("user keeps code, controls and headings plain: Given a page with them, When e
     <pre>sample code</pre><code>inline code</code><kbd>keyboard shortcut</kbd>
     <div contenteditable="true"><p>editable text</p></div><div role="textbox">textbox text</div>
     <button>button text</button><select><option>option text</option></select><textarea>input text</textarea>
-    <strong>important text</strong><b>bold text</b><svg><text>vector text</text></svg>
+    <strong>important text</strong><b>already bold</b><svg><text>vector text</text></svg>
     <div class="${TRANSLATION_ERROR_CONTAINER_CLASS}">Translation failed</div>`
 
   // When
   stop = startWordPrefixEmphasis(document.body)
 
   // Then
-  expect(highlightedPrefixes()).toEqual(["Read", "lin", "te"])
+  expect(highlightedPrefixes()).toEqual(["Read", "lin"])
 })
 
 it("user reads a page that changes: Given emphasis on, When the page changes, adds, moves, removes and merges text, Then the highlight follows the page and keeps no range of removed text", async () => {
@@ -90,6 +90,19 @@ it("user reads a page that changes: Given emphasis on, When the page changes, ad
   // Then
   expect(highlightedPrefixes()).toEqual(["Upda", "pass", "Hel", "wonde", "wor"])
   expect(wordPrefixRangeCount()).toBe(5)
+
+  // When: an emphasized word becomes short, then grows past the threshold again.
+  select("#first").firstChild!.textContent = "book"
+  await flushMutations()
+
+  // Then: the old ranges are removed, not just hidden by the shorter text.
+  expect(highlightedPrefixes(select("#first"))).toEqual([])
+  expect(wordPrefixRangeCount()).toBe(3)
+
+  select("#first").firstChild!.textContent = "books"
+  await flushMutations()
+  expect(highlightedPrefixes(select("#first"))).toEqual(["boo"])
+  expect(wordPrefixRangeCount()).toBe(4)
 })
 
 it("user edits text in place: Given emphasized text, When the page makes it editable and then not, Then the text is plain while editable and highlighted again after", async () => {

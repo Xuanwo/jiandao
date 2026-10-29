@@ -92,7 +92,7 @@ options:
       translationOnly: Chỉ bản dịch
     wordPrefixEmphasis:
       title: In đậm đầu từ tiếng Anh
-      description: In đậm nửa đầu của mỗi từ tiếng Anh.
+      description: In đậm nửa đầu các từ tiếng Anh, giữ nguyên các từ có tối đa bốn ký tự.
     style:
       title: Kiểu bản dịch
       custom: CSS tùy chỉnh

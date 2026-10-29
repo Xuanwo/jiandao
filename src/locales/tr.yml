@@ -92,7 +92,7 @@ options:
       translationOnly: Yalnızca çeviri
     wordPrefixEmphasis:
       title: İngilizce kelime başlarını kalın yap
-      description: Her İngilizce kelimenin ilk yarısını kalın yapar.
+      description: İngilizce kelimelerin ilk yarısını kalın yapar; dört veya daha az karakterli kelimeleri değiştirmez.
     style:
       title: Çeviri stili
       custom: Özel CSS

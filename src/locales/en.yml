@@ -92,7 +92,7 @@ options:
       translationOnly: Translation only
     wordPrefixEmphasis:
       title: Bold English word starts
-      description: Makes the first half of each English word bold.
+      description: Makes the first half of English words bold, leaving words of four characters or fewer unchanged.
     style:
       title: Translation style
       custom: Custom CSS

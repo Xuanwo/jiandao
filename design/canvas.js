@@ -15,7 +15,7 @@ window.JIANDAO_CANVAS = {
     { file: "Page.html", title: "页面内 · 朱红译文细线 + 工具栏图标状态", x: 0, y: 780, w: 880, h: 600 },
     { file: "Icon.html", title: "图标 · 16 / 32 / 48 / 128 与工具栏两种状态", x: 960, y: 780, w: 1120, h: 640 },
     { file: "Palette.html", title: "配色 · 浅色 / 深色", x: 2160, y: 780, w: 1040, h: 640 },
-    { file: "Page-Emphasis.html", title: "页面内 · 英文词首加粗（未翻译）：每个英文单词的前一半加粗，标题不变", x: 3280, y: 780, w: 880, h: 600 },
+    { file: "Page-Emphasis.html", title: "页面内 · 英文词首加粗（未翻译）：长度超过 4 的英文单词前半部分加粗，短词和标题不变", x: 3280, y: 780, w: 880, h: 600 },
     { file: "Page-Emphasis-Translated.html", title: "页面内 · 英文词首加粗（双语对照）：原文按同一规则加粗，中文译文和标题不变", x: 4240, y: 780, w: 880, h: 680 },
     { file: "Page-Missing-Service.html", title: "页面内 · 缺少翻译服务：提示去工具栏设置，保留原文", x: 5200, y: 780, w: 880, h: 600 },
     { file: "Settings.html", title: "设置 · 单页（翻译服务、阅读、译文质量、快捷键；无高级、无外观）", x: 0, y: 1760, w: 1120, h: 1160 },

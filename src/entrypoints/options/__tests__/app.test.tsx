@@ -98,7 +98,7 @@ describe("settings page", () => {
     // The emphasis switch changes the English preview the way it changes pages.
     expect(highlightedPrefixes(englishPreview)).toEqual([])
     fireEvent.click(screen.getByRole("switch", { name: "options.reading.wordPrefixEmphasis.title" }))
-    await waitFor(() => expect(highlightedPrefixes(englishPreview).slice(0, 3)).toEqual(["Read", "an", "exper"]))
+    await waitFor(() => expect(highlightedPrefixes(englishPreview).slice(0, 3)).toEqual(["Read", "exper", "tra"]))
     expect(store.get(configAtom).reading.wordPrefixEmphasis).toBe(true)
 
     fireEvent.click(screen.getByRole("switch", { name: "options.reading.wordPrefixEmphasis.title" }))

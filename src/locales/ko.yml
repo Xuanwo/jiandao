@@ -92,7 +92,7 @@ options:
       translationOnly: 번역만
     wordPrefixEmphasis:
       title: 영어 단어 앞부분 굵게
-      description: 영어 단어마다 앞쪽 절반을 굵게 표시합니다.
+      description: 영어 단어의 앞쪽 절반을 굵게 표시하고, 4자 이하의 단어는 그대로 둡니다.
     style:
       title: 번역 스타일
       custom: 사용자 지정 CSS

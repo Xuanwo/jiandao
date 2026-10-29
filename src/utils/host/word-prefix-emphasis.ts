@@ -20,7 +20,7 @@ const HAS_LATIN = /\p{Script=Latin}/u
 /**
  * The prefix of each Latin word in the text: the first half, rounded up, of
  * its letters. A letter with its combining marks counts as one letter, and so
- * does an apostrophe. A word of one letter has no prefix.
+ * does an apostrophe. Words of four letters or fewer have no prefix.
  */
 export function wordPrefixRanges(text: Text): StaticRange[] {
   // Most page text nodes are whitespace or non-Latin; skip them before matching words.
@@ -31,7 +31,7 @@ export function wordPrefixRanges(text: Text): StaticRange[] {
     if (!LATIN_WORD.test(word))
       continue
     const letters = [...word.matchAll(LETTERS)].map(letter => letter[0])
-    if (letters.length < 2)
+    if (letters.length <= 4)
       continue
     const prefixLength = letters.slice(0, Math.ceil(letters.length / 2)).join("").length
     ranges.push(new StaticRange({ startContainer: text, startOffset: index, endContainer: text, endOffset: index + prefixLength }))
