@@ -10,13 +10,28 @@ const MODE_LABELS = { bilingual: "Bilingual", translationOnly: "Translation only
 const PASSAGE = "Reading unfamiliar words takes practice. Keep the whole sentence in view."
 const PASSAGE_PREFIXES = ["Read", "unfam", "wor", "tak", "prac", "Ke", "th", "who", "sent", "i", "vi"]
 
+const CHAT_MESSAGE = "https://example.com/lexicon?entry=cedar\n词条卡片显示读音，旁边的技术备注保持原样。\n```html\n<tr><th id=\"sound\">讀音</th>\n    <td headers=\"sound\"><span>jí qū áo yá</span></td></tr>\n```\n\n纸鸢目录中的 nebula 工具记录 maple/archive 路径，版本标签使用 cedarKey 和 FIELD_NAME。\n终端备注：使用 sample cli 查看记录。"
+const escapeHtml = text => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+
 const articlePage = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Reading preferences</title>
 <style>body { font: 20px/1.8 system-ui; max-width: 760px; margin: 40px auto; } .icon > svg:only-child { width: 40px; }</style></head>
 <body><h1>A quiet moment to read</h1><article><p id="passage">${PASSAGE}</p>
 <p id="mixed">Café naïve élan. 中文和日本語保持原样。 <a class="icon" id="link" href="#note"><svg viewBox="0 0 1 1" width="16"></svg>Read the note</a>.</p>
 <pre id="code">const message = "Keep code unchanged";</pre>
 <p contenteditable="true" id="editor">Editable words stay unchanged.</p>
-<p id="note">Choose the presentation that feels comfortable for long articles.</p></article></body></html>`
+<p id="note">Choose the presentation that feels comfortable for long articles.</p>
+<section id="protected">
+<table lang="zh-Hant-TW"><tr><th id="col1">漢語拼音</th><td headers="col1"><ib data-pre="">jí qū áo yá </ib> </td></tr><tr><td>ji qu ao ya</td></tr></table>
+<p id="unmarked-pinyin">jí qū áo yá jí qū áo yá</p>
+<div dir="auto" data-message-text="true" id="chat">${escapeHtml(CHAT_MESSAGE)}</div>
+<p lang="zh">目录使用 <span>sample cli</span> 查看记录</p>
+<p id="non-english" lang="de">Lesen macht Freude.</p>
+</section>
+<p id="technical">Visit https://example.com/read, email reader@example.com, or open src/main.ts. Keep reading.</p>
+<div id="plain-code">${escapeHtml("Before reading.\n```html\n<tr><td>Keep code unchanged</td></tr>\n```\nAfter reading. Use `wordPrefixRanges(text)` carefully. <span title=\"Quoted > text\">No code emphasis</span> Keep reading. Use wordPrefixEmphasis and API_KEY unchanged.")}</div>
+<p id="foreign">Café naïve élan. English prose stays readable.</p>
+<p id="language" lang="en-US"><span>Reading daily.</span></p>
+</article></body></html>`
 
 let service
 let pages
@@ -165,7 +180,7 @@ it("user chooses word-prefix emphasis: Given an open article, When the switch is
   // Then: code and editable text stay plain.
   await article.bringToFront()
   await waitForPrefixes(article, "#passage", PASSAGE_PREFIXES)
-  assert.deepEqual((await readHighlight(article, "#mixed")).prefixes, ["Ca", "naï", "él", "Re", "th", "no"])
+  assert.deepEqual((await readHighlight(article, "#mixed")).prefixes, [])
   assert.deepEqual((await readHighlight(article, "#code")).prefixes, [])
   assert.deepEqual((await readHighlight(article, "#editor")).prefixes, [])
   assert.ok(await paintsHighlight(article), "the page styles paint the highlight")
@@ -191,8 +206,60 @@ it("user chooses word-prefix emphasis: Given an open article, When the switch is
   await article.waitForFunction(name => !CSS.highlights.has(name), WORD_PREFIX_HIGHLIGHT)
 })
 
+it("user reads pronunciation and technical text: Given a dictionary and a plain chat message, When emphasis is on, Then protected text stays plain and English prose keeps its prefixes", async () => {
+  // Given / When
+  const options = await setUp()
+  await setEmphasis(options, true)
+  const article = await openArticle()
+  await waitForPrefixes(article, "#passage", PASSAGE_PREFIXES)
+
+  // Then: the browser supplies the real Highlight API; the extension does not change source text.
+  assert.deepEqual((await readHighlight(article, "#protected")).prefixes, [])
+  assert.equal(await article.locator("#chat").textContent(), CHAT_MESSAGE)
+  assert.deepEqual((await readHighlight(article, "#technical")).prefixes, ["Vis", "ema", "o", "op", "Ke", "read"])
+  assert.deepEqual((await readHighlight(article, "#plain-code")).prefixes, ["Bef", "read", "Aft", "read", "Us", "caref", "Ke", "read", "Us", "an", "uncha"])
+  assert.deepEqual((await readHighlight(article, "#foreign")).prefixes, ["Engl", "pro", "sta", "read"])
+  await waitForPrefixes(article, "#language", ["Read", "dai"])
+
+  // When: the page changes the language on an ancestor, then declares English on its child.
+  await article.locator("#language").evaluate(element => element.lang = "zh-Hant")
+  await article.waitForFunction(name => ![...CSS.highlights.get(name)].some(range => document.querySelector("#language").contains(range.startContainer)), WORD_PREFIX_HIGHLIGHT)
+  await article.locator("#language span").evaluate(element => element.lang = "en")
+
+  // Then
+  await waitForPrefixes(article, "#language", ["Read", "dai"])
+
+  // When: a chat renderer splits a fence across spans, or inserts Chinese next to an English span.
+  await article.locator("#plain-code").evaluate((element) => {
+    element.textContent = "Before reading.\n```html\n"
+    const span = document.createElement("span")
+    span.textContent = "Keep code unchanged"
+    element.append(span, "\n```\nAfter reading.")
+  })
+  await article.locator("#language").evaluate(element => element.append("使用 gh cli"))
+
+  // Then: inline markup does not defeat the text protections, and old prefixes disappear.
+  await article.waitForFunction(name => ![...CSS.highlights.get(name)].some(range => document.querySelector("#language").contains(range.startContainer)), WORD_PREFIX_HIGHLIGHT)
+  assert.deepEqual((await readHighlight(article, "#plain-code")).prefixes, ["Bef", "read", "Aft", "read"])
+
+  // When: a renderer splits an accented word and the page changes its document language.
+  await article.locator("#foreign").evaluate((element) => {
+    element.replaceChildren("Caf")
+    const span = document.createElement("span")
+    span.textContent = "é"
+    element.append(span, " reading.")
+  })
+  await waitForPrefixes(article, "#foreign", ["read"])
+  await article.evaluate(() => document.documentElement.lang = "zh-Hant-TW")
+
+  // Then: the inherited document language also applies after startup.
+  await article.waitForFunction(name => ![...CSS.highlights.get(name)].some(range => document.querySelector("#passage").contains(range.startContainer)), WORD_PREFIX_HIGHLIGHT)
+  await article.evaluate(() => document.documentElement.lang = "en")
+  await waitForPrefixes(article, "#passage", PASSAGE_PREFIXES)
+})
+
 for (const mode of ["translationOnly", "bilingual"]) {
-  it(`user reads a ${mode} translation with emphasis: Given emphasis on, When the article is translated and then shown in the original, Then the translation and the original get prefixes, and no range of removed text stays`, async () => {
+  it(`user reads a ${mode} translation with emphasis: Given emphasis on, When the article is translated and then shown in the original, Then the Chinese translation stays plain and the English original gets prefixes again`, async () => {
     // Given
     const options = await setUp(mode)
     await setEmphasis(options, true)
@@ -203,7 +270,10 @@ for (const mode of ["translationOnly", "bilingual"]) {
     await pressTranslateShortcut(article)
 
     // Then: the fake service translates to "【译】" and the first 24 characters of the paragraph.
-    await waitForPrefixes(article, `#passage .${CONTENT_WRAPPER_CLASS}`, ["Read", "unfam", "wor"])
+    await article.locator(`#passage .${CONTENT_WRAPPER_CLASS}`).filter({ hasText: "【译】" }).waitFor()
+    assert.deepEqual((await readHighlight(article, `#passage .${CONTENT_WRAPPER_CLASS}`)).prefixes, [])
+    if (mode === "bilingual")
+      assert.deepEqual((await readHighlight(article, "#passage")).prefixes, PASSAGE_PREFIXES)
     assert.equal((await readHighlight(article)).stale, 0)
 
     // When

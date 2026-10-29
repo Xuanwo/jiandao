@@ -27,21 +27,22 @@ afterEach(() => {
   stop = () => {}
   vi.unstubAllGlobals()
   document.body.replaceChildren()
+  document.documentElement.removeAttribute("lang")
 })
 
-it("user reads Latin words and other scripts: Given a mixed text, When emphasis starts, Then the first half of each Latin word is highlighted and the page DOM does not change", () => {
+it("user reads English prose: Given English text with accented loanwords, When emphasis starts, Then English words get prefixes and the page DOM does not change", () => {
   // Given
   document.body.innerHTML = "<p></p>"
   const paragraph = select("p")
-  paragraph.textContent = "A cat reads quietly. naïve élan don't 中文 日本語 한국어 العربية 👩‍💻 <script> & 123"
+  paragraph.textContent = "A cat reads quietly. naïve élan don't 👩‍💻 <script> & 123"
   const text = paragraph.firstChild
   const markup = document.body.innerHTML
 
   // When
   stop = startWordPrefixEmphasis(document.body)
 
-  // Then: a letter with its combining marks counts as one letter, and so does an apostrophe.
-  expect(highlightedPrefixes()).toEqual(["ca", "rea", "quie", "naï", "él", "don", "scr"])
+  // Then: accented loanwords and literal markup stay plain; apostrophes count toward the prefix length.
+  expect(highlightedPrefixes()).toEqual(["ca", "rea", "quie", "don"])
   expect(document.body.innerHTML).toBe(markup)
   expect(paragraph.firstChild).toBe(text)
 })
@@ -111,6 +112,40 @@ it("user edits text in place: Given emphasized text, When the page makes it edit
 
   // Then
   expect(highlightedPrefixes()).toEqual(["Edit", "tit"])
+})
+
+it("user removes an inline language region: Given emphasized inline text, When its language changes and it leaves the page in one update, Then no highlight remains on the removed text", async () => {
+  // Given: MutationObserver delivers both records after the element has no parent.
+  document.body.innerHTML = "<p><span lang=\"en\">Reading daily.</span></p>"
+  const span = select("span")
+  stop = startWordPrefixEmphasis(document.body)
+  expect(highlightedPrefixes()).toEqual(["Read", "dai"])
+
+  // When
+  span.lang = "zh"
+  span.remove()
+  await flushMutations()
+
+  // Then
+  expect(wordPrefixRangeCount()).toBe(0)
+  expect(highlightedPrefixes()).toEqual([])
+})
+
+it("user closes an emphasized inline preview: Given a custom inline root, When the root leaves the page and its text changes, Then its removed text has no prefixes", async () => {
+  // Given
+  document.body.innerHTML = "<reading-preview>Reading daily.</reading-preview>"
+  const preview = select("reading-preview")
+  stop = startWordPrefixEmphasis(preview)
+  expect(highlightedPrefixes()).toEqual(["Read", "dai"])
+
+  // When: the root is detached before the observer delivers its records.
+  preview.lang = "zh"
+  preview.remove()
+  preview.firstChild!.textContent = "Another passage."
+  await flushMutations()
+
+  // Then
+  expect(wordPrefixRangeCount()).toBe(0)
 })
 
 it("user reads split accents: Given a text node that starts with a combining mark, When emphasis starts, Then the mark is not a word start", () => {

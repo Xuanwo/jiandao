@@ -1,4 +1,4 @@
-import { REACT_SHADOW_HOST_CLASS, TRANSLATION_ERROR_CONTAINER_CLASS, WORD_PREFIX_HIGHLIGHT } from "@/utils/constants/dom-labels"
+import { CONTENT_WRAPPER_CLASS, REACT_SHADOW_HOST_CLASS, TRANSLATION_ERROR_CONTAINER_CLASS, WORD_PREFIX_HIGHLIGHT } from "@/utils/constants/dom-labels"
 import { isElement, isTextNode } from "./dom/filter"
 
 // Text in these elements keeps its look: code, controls, editable text, headings and text that is already bold.
@@ -10,30 +10,29 @@ const EXCLUDED_SELECTOR = [
   `.${REACT_SHADOW_HOST_CLASS}`, `.${TRANSLATION_ERROR_CONTAINER_CLASS}`,
 ].join(",")
 // A change of these attributes can move text into or out of an excluded element.
-const EXCLUSION_ATTRIBUTES = ["contenteditable", "role"]
-// A word starts with a letter: a leading combining mark belongs to the previous text node.
-const LATIN_WORD = /^\p{Script=Latin}[\p{Script=Latin}\p{M}]*(?:['’][\p{Script=Latin}\p{M}]+)*$/u
-const WORDS = /[\p{L}\p{M}\p{N}]+(?:['’][\p{L}\p{M}\p{N}]+)*/gu
-const LETTERS = /\P{M}\p{M}*/gu
-const HAS_LATIN = /\p{Script=Latin}/u
+const EXCLUSION_ATTRIBUTES = ["contenteditable", "role", "lang", "xml:lang"]
+const TEXT_CONTEXT = `p,div,li,td,th,blockquote,figcaption,article,section,body,html,.${CONTENT_WRAPPER_CLASS}`
+const NON_LATIN_LETTER = /(?!\p{Script=Latin})\p{L}/u
+const ENGLISH_WORD = /^[a-z]+(?:['’][a-z]+)*$/i
+const WORDS = /[\p{L}\p{M}\p{N}_]+(?:['’][\p{L}\p{M}\p{N}_]+)*/gu
+// Preserve offsets while excluding code, addresses and paths in ordinary text containers.
+const PROTECTED_TEXT = /```[\s\S]*?(?:```|$)|~~~[\s\S]*?(?:~~~|$)|`[^`\n]*(?:`|$)|<([a-z][\w:-]*)\b(?:"[^"]*"|'[^']*'|[^'">])*>[^<]*<\/\1\s*>|<\/?[a-z](?:"[^"]*"|'[^']*'|[^'">])*>|\b(?:[a-z][\w+.-]*:\/\/|www\.)[^\s<>]+|(?<![\w.+-])[\w.+-]+@[\w.-]+|(?<![\w~.-])(?:[\w~.-]*[/\\])+[\w./\\-]+|\b[\w-]+(?:\.[\w-]+)+/gi
 
-/**
- * The prefix of each Latin word in the text: the first half, rounded up, of
- * its letters. A letter with its combining marks counts as one letter, and so
- * does an apostrophe. A word of one letter has no prefix.
- */
-export function wordPrefixRanges(text: Text): StaticRange[] {
-  // Most page text nodes are whitespace or non-Latin; skip them before matching words.
-  if (!HAS_LATIN.test(text.data))
+function textContext(node: Node): Element | null {
+  return node.parentElement?.closest(TEXT_CONTEXT) ?? node.parentElement
+}
+
+/** The first half of each English word, rounded up; one-letter words stay plain. */
+function wordPrefixRanges(text: Text, plain: string): StaticRange[] {
+  const languageElement = text.parentElement?.closest("[lang],[xml\\:lang]")
+  const language = (languageElement?.getAttribute("lang") ?? languageElement?.getAttribute("xml:lang") ?? "").trim()
+  if (language && !/^en(?:-|$)/i.test(language))
     return []
   const ranges: StaticRange[] = []
-  for (const { 0: word, index } of text.data.matchAll(WORDS)) {
-    if (!LATIN_WORD.test(word))
+  for (const { 0: word, index } of plain.matchAll(WORDS)) {
+    if (word.length < 2)
       continue
-    const letters = [...word.matchAll(LETTERS)].map(letter => letter[0])
-    if (letters.length < 2)
-      continue
-    const prefixLength = letters.slice(0, Math.ceil(letters.length / 2)).join("").length
+    const prefixLength = Math.ceil(word.length / 2)
     ranges.push(new StaticRange({ startContainer: text, startOffset: index, endContainer: text, endOffset: index + prefixLength }))
   }
   return ranges
@@ -84,9 +83,9 @@ export function startWordPrefixEmphasis(root: HTMLElement): () => void {
     rangesOfText.delete(text)
   }
 
-  function emphasizeText(text: Text) {
+  function emphasizeText(text: Text, plain: string) {
     forgetText(text)
-    const ranges = wordPrefixRanges(text)
+    const ranges = wordPrefixRanges(text, plain)
     if (ranges.length === 0)
       return
     ranges.forEach(range => highlight.add(range))
@@ -115,7 +114,27 @@ export function startWordPrefixEmphasis(root: HTMLElement): () => void {
     const element = isElement(node) ? node : node.parentElement
     if (!node.isConnected || !element || element.closest(EXCLUDED_SELECTOR))
       return
-    eachText(node, true, emphasizeText)
+    const contexts = new Map<Element | null, Text[]>()
+    eachText(node, true, (text) => {
+      const context = textContext(text)
+      const texts = contexts.get(context) ?? []
+      texts.push(text)
+      contexts.set(context, texts)
+    })
+    for (const texts of contexts.values()) {
+      // Inline markup can split a URL or a code fence. Mask the complete text before mapping its offsets back.
+      const content = texts.map(text => text.data).join("")
+      // Translation wrappers own a separate context, so a Chinese translation does not suppress the English original.
+      const plain = NON_LATIN_LETTER.test(content)
+        ? " ".repeat(content.length)
+        : content.replace(PROTECTED_TEXT, match => " ".repeat(match.length)).replace(WORDS, word =>
+            ENGLISH_WORD.test(word) && !/[a-z][A-Z]/.test(word) ? word : " ".repeat(word.length))
+      let offset = 0
+      for (const text of texts) {
+        emphasizeText(text, plain.slice(offset, offset + text.length))
+        offset += text.length
+      }
+    }
   }
 
   function forget(node: Node) {
@@ -124,21 +143,24 @@ export function startWordPrefixEmphasis(root: HTMLElement): () => void {
 
   const observer = new MutationObserver((records) => {
     // Forget every touched node first, so that a node that moves in this batch gets its ranges again.
-    const touched: Node[] = []
+    const touched = new Set<Node>()
     for (const record of records) {
-      if (record.type === "childList") {
+      if (record.type === "childList")
         record.removedNodes.forEach(forget)
-        touched.push(...record.addedNodes)
-      }
-      else {
-        forget(record.target)
-        touched.push(record.target)
-      }
+      const target = root.contains(record.target)
+        ? isElement(record.target) && record.target.matches(TEXT_CONTEXT)
+          ? record.target
+          : textContext(record.target) ?? root
+        : root
+      forget(target)
+      touched.add(target)
     }
     touched.forEach(emphasize)
   })
   emphasize(root)
   observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: EXCLUSION_ATTRIBUTES })
+  for (let ancestor = root.parentElement; ancestor; ancestor = ancestor.parentElement)
+    observer.observe(ancestor, { attributes: true, attributeFilter: EXCLUSION_ATTRIBUTES })
 
   return () => {
     observer.disconnect()
