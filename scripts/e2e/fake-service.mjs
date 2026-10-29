@@ -10,6 +10,18 @@ function article(description) {
 </body></html>`
 }
 
+function tableArticle() {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Tools catalog</title><style>
+body{max-width:800px;margin:32px auto;padding:0 16px;font:16px/1.6 system-ui}table{border-collapse:collapse;width:100%}th,td{border:1px solid #aaa;padding:10px;text-align:left;vertical-align:top}a{color:#2b45b8}
+</style></head><body><article><h1>Tools catalog</h1><div><span style="display:contents"><table>
+<thead><tr><th scope="col">Tool</th><th scope="col">Description</th></tr></thead>
+<tbody>
+<tr><td><a href="https://example.org/checker">Release checker</a></td><td>Check release packages before publishing.</td></tr>
+<tr><td><a href="https://example.org/mapper">Source mapper</a></td><td>Find source locations across files.</td></tr>
+<tr><td><a href="https://example.org/report">Coverage report</a></td><td>Show tested paths and missing edge cases.</td></tr>
+</tbody></table></span></div><p>Read the catalog before selecting a tool.</p></article></body></html>`
+}
+
 /**
  * How the first message starts in the other requests to the service: the
  * language detection prompt (src/utils/prompts/language-detection.ts) and the
@@ -19,7 +31,8 @@ export const OTHER_REQUEST_PREFIXES = { languageDetection: "You are a language d
 
 /**
  * A local stand-in for an OpenAI-compatible service, plus an English article
- * to translate at `/article` (`?description=` adds a meta description).
+ * to translate at `/article` (`?description=` adds a meta description), plus a
+ * table inside a transparent wrapper at `/table`.
  * `POST /v1/chat/completions` splits the last user message at the standalone
  * `%%` lines and answers each part with "【译】" and the first 24 characters
  * of the part's last line, keeping the batch separators Jiandao uses, so a
@@ -38,6 +51,11 @@ export async function startFakeService() {
     if (request.method === "GET" && url.pathname === "/article") {
       response.setHeader("Content-Type", "text/html; charset=utf-8")
       response.end(article(url.searchParams.get("description")))
+      return
+    }
+    if (request.method === "GET" && url.pathname === "/table") {
+      response.setHeader("Content-Type", "text/html; charset=utf-8")
+      response.end(tableArticle())
       return
     }
     let body = ""

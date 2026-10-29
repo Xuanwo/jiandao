@@ -76,7 +76,7 @@ export async function translateNodesBilingualMode(
 
     const lastNode = transNodes.at(-1)!
     const targetNode
-      = transNodes.length === 1 && isBlockTransNode(lastNode) && isHTMLElement(lastNode)
+      = transNodes.length === 1 && isBlockTransNode(lastNode) && isHTMLElement(lastNode) && lastNode.tagName !== "TD" && lastNode.tagName !== "TH"
         ? unwrapDeepestOnlyHTMLChild(lastNode)
         : lastNode
 

@@ -110,6 +110,49 @@ it("user changes the display mode while the page is translating: Given a slow se
     })
 })
 
+it("user translates a table: Given cells inside a transparent wrapper, When translation modes change and the original is restored, Then each translation stays in its cell and the table and links remain usable", async () => {
+  const { popup } = await setUpService()
+  const article = await context.newPage()
+  await article.goto(`${service.origin}/table`)
+  const table = article.locator("table")
+  const cells = table.locator("th, td")
+  const originals = await cells.allTextContents()
+  const links = await table.locator("a").evaluateAll(nodes => nodes.map(node => node.href))
+
+  await pressTranslateShortcut(article)
+  await article.waitForFunction(() => document.querySelectorAll("table .jiandao-translated-block-content").length === 8, undefined, { timeout: 20_000 })
+
+  assert.equal(await article.locator(".jiandao-translated-content-wrapper").count(), 10, "one translation per cell, plus the heading and paragraph")
+  assert.equal(await table.locator("tr").count(), 4)
+  assert.equal(await table.locator("a .jiandao-translated-content-wrapper").count(), 0, "cell translations are not added to the original links")
+  for (const [index, original] of originals.entries()) {
+    assert.equal(await cells.nth(index).locator(".jiandao-translated-block-content").textContent(), `【译】${original.slice(0, 24)}`)
+  }
+  assert.ok(await table.evaluate(element => [...element.querySelectorAll("td, th")].every((cell) => {
+    const translated = cell.querySelector(".jiandao-translated-block-content").getBoundingClientRect()
+    const source = cell.ownerDocument.createRange()
+    source.selectNode(cell.firstChild)
+    const original = source.getBoundingClientRect()
+    const bounds = cell.getBoundingClientRect()
+    return translated.top >= original.bottom && translated.left >= bounds.left && translated.right <= bounds.right
+  })), "bilingual translations start below the source and fit within their cells")
+
+  await popup.getByRole("button", { name: "Translation only", exact: true }).click()
+  await article.waitForFunction(() => [...document.querySelectorAll("table th, table td")].every(cell => cell.textContent.startsWith("【译】")), undefined, { timeout: 10_000 })
+  assert.equal(await table.locator("tr").count(), 4)
+  assert.equal(await cells.count(), 8)
+  assert.deepEqual(await cells.allTextContents(), originals.map(text => `【译】${text.slice(0, 24)}`))
+  assert.deepEqual(await table.locator("a").allTextContents(), ["【译】Release checker", "【译】Source mapper", "【译】Coverage report"])
+  assert.deepEqual(await table.locator("a").evaluateAll(nodes => nodes.map(node => node.href)), links)
+
+  await popup.getByRole("button", { name: "Bilingual", exact: true }).click()
+  await article.waitForFunction(() => document.querySelectorAll("table .jiandao-translated-block-content").length === 8, undefined, { timeout: 10_000 })
+  await pressTranslateShortcut(article)
+  await article.locator(".jiandao-translated-content-wrapper").first().waitFor({ state: "detached", timeout: 10_000 })
+  assert.deepEqual(await cells.allTextContents(), originals)
+  assert.deepEqual(await table.locator("a").evaluateAll(nodes => nodes.map(node => node.href)), links)
+})
+
 it("user translates a copy of an article: Given page context is on and the built-in prompt, When the article is translated and then a copy with another description, Then the copy gets its translations from the cache without a new request", async () => {
   const { popup, extensionId } = await setUpService()
   await popup.goto(`chrome-extension://${extensionId}/options.html`)
