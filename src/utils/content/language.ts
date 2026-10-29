@@ -2,6 +2,8 @@ import type { LangCodeISO6393 } from "@/definitions"
 import type { BackgroundGenerateTextPayload } from "@/types/background-generate-text"
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
+import { franc } from "franc"
+import { langCodeISO6393Schema } from "@/definitions"
 import { getLocalConfig } from "@/utils/config/storage"
 import { logger } from "@/utils/logger"
 import { sendMessage } from "@/utils/message"
@@ -11,12 +13,12 @@ import { cleanText } from "./utils"
 const DEFAULT_MIN_LENGTH = 10
 const DEFAULT_MAX_LENGTH_FOR_LLM = 500
 
-export type DetectionSource = "llm" | "fallback"
+export type DetectionSource = "llm" | "franc" | "fallback"
 
 export interface DetectLanguageOptions {
   /** Minimum text length to attempt detection (default: 10) */
   minLength?: number
-  /** LLM provider config for detection (non-LLM providers not supported) */
+  /** Explicitly opt into LLM detection with this provider; otherwise detect locally. */
   providerConfig?: ProviderConfig
   /** Max text length for LLM detection (default: 500) */
   maxLengthForLLM?: number
@@ -28,7 +30,7 @@ export interface DetectLanguageResult {
 }
 
 /**
- * Detect language of text using LLM.
+ * Detect language locally unless the caller explicitly supplies an LLM provider.
  * Returns both the detected code and the detection source.
  * @param text - Text to detect language for
  * @param options - Detection options
@@ -45,6 +47,14 @@ export async function detectLanguageWithSource(
     return { code: "und", source: "fallback" }
   }
 
+  // Page startup, navigation and tab activation must not send text to a provider.
+  if (!options?.providerConfig) {
+    const result = langCodeISO6393Schema.safeParse(franc(trimmedText))
+    return result.success
+      ? { code: result.data, source: "franc" }
+      : { code: "und", source: "fallback" }
+  }
+
   const maxLength = options?.maxLengthForLLM ?? DEFAULT_MAX_LENGTH_FOR_LLM
   const textForLLM = cleanText(trimmedText, maxLength)
   const llmResult = await detectLanguageWithLLM(
@@ -59,7 +69,7 @@ export async function detectLanguageWithSource(
 }
 
 /**
- * Detect language of text using LLM.
+ * Detect language locally unless the caller explicitly supplies an LLM provider.
  * @param text - Text to detect language for
  * @param options - Detection options
  * @returns Detected language code or null if detection failed

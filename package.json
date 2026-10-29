@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@wxt-dev/i18n": "^0.2.5",
+    "franc": "^6.2.0",
     "jotai": "^3.0.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
